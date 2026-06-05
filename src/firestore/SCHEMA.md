@@ -1,4 +1,6 @@
-# Contrato de Datos (Firestore Schema) - recos-BnM
+# # Contrato de Datos (Firestore Schema) - recos-BnM
+
+
 
 ## 1. Colección: `users`
 
@@ -12,13 +14,19 @@
 
   * `displayName` (string)
 
+  * `photoUrl` (string) - Avatar del usuario
+
   * `preferences` (array of strings) - ej. ["Action", "Sci-Fi"]
 
   * `createdAt` (timestamp)
 
+  * `updatedAt` (timestamp)
+
+
+
 ## 2. Colección: `content`
 
-* **Descripción:** Catálogo de películas/series (Solo lectura).
+* **Descripción:** Catálogo de películas, series y libros (Solo lectura).
 
 * **Documento (ID):** Auto-generado
 
@@ -26,13 +34,27 @@
 
   * `title` (string)
 
-  * `type` (string) - "movie" | "series"
+  * `type` (string) - "movie" | "series" | "book"
+
+  * `creator` (array of strings) - Autores (libros) o Directores (películas)
 
   * `genres` (array of strings)
 
   * `description` (string)
 
-  * `posterUrl` (string)
+  * `posterUrl` (string) - URL del póster o portada del libro
+
+  * `year` (number) - Año de lanzamiento o publicación
+
+  * `rating` (number) - Calificación promedio (para función de scoring)
+
+  * `popularity` (number) - Métrica de popularidad (TMDB, etc.)
+
+  * `source` (string) - Origen de los datos (ej. "TMDB", "Google Books")
+
+  * `whereToWatch` (array of strings) - Plataformas de disponibilidad
+
+
 
 ## 3. Colección: `swipes`
 
@@ -50,6 +72,8 @@
 
   * `timestamp` (timestamp)
 
+
+
 ## 4. Colección: `collections`
 
 * **Descripción:** Listas personalizadas (ej. "Favoritos", "Ver después").
@@ -65,3 +89,6 @@
   * `items` (array of strings) - IDs del contenido guardado
 
   * `createdAt` (timestamp)
+
+  * `updatedAt` (timestamp)
+
