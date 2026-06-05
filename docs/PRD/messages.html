@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+ <head>
+
+  <meta charset="utf-8"/>
+<title>Exported Data</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+  <link href="css/style.css" rel="stylesheet"/>
+
+  <script src="js/script.js" type="text/javascript">
+
+  </script>
+
+ </head>
+
+ <body onload="CheckLocation();">
+
+  <div class="page_wrap">
+
+   <div class="page_header">
+
+    <div class="content">
+
+     <div class="text bold">
+2026 Abr-Jun Prog. Av. 
+     </div>
+
+    </div>
+
+   </div>
+
+   <div class="page_body chat_page">
+
+    <div class="history">
+
+     <div class="message service" id="message-1">
+
+      <div class="body details">
+3 June 2026
+      </div>
+
+     </div>
+
+     <div class="message default clearfix" id="message60">
+
+      <div class="pull_left userpic_wrap">
+
+       <div class="userpic userpic8" style="width: 42px; height: 42px">
+
+        <div class="initials" style="line-height: 42px">
+GP
+        </div>
+
+       </div>
+
+      </div>
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 20:44:58 UTC-06:00">
+20:44
+       </div>
+
+       <div class="from_name">
+Germán Pacheco
+       </div>
+
+       <div class="media_wrap clearfix">
+
+        <a class="photo_wrap clearfix pull_left" href="photos/photo_4@03-06-2026_20-44-58.jpg">
+
+         <img class="photo" src="photos/photo_4@03-06-2026_20-44-58_thumb.jpg" style="width: 260px; height: 138px"/>
+
+        </a>
+
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix" id="message61">
+
+      <div class="pull_left userpic_wrap">
+
+       <div class="userpic userpic6" style="width: 42px; height: 42px">
+
+        <div class="initials" style="line-height: 42px">
+LT
+        </div>
+
+       </div>
+
+      </div>
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 20:45:08 UTC-06:00">
+20:45
+       </div>
+
+       <div class="from_name">
+Luis Tellez
+       </div>
+
+       <div class="media_wrap clearfix">
+
+        <div class="media clearfix pull_left media_file">
+
+         <div class="fill pull_left">
+
+         </div>
+
+         <div class="body">
+
+          <div class="title bold">
+viaje_usuario_tinder_contenidos_4.pdf
+          </div>
+
+          <div class="description">
+Not included, change data exporting settings to download.
+          </div>
+
+          <div class="status details">
+5.0 KB
+          </div>
+
+         </div>
+
+        </div>
+
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix" id="message62">
+
+      <div class="pull_left userpic_wrap">
+
+       <div class="userpic userpic8" style="width: 42px; height: 42px">
+
+        <div class="initials" style="line-height: 42px">
+IP
+        </div>
+
+       </div>
+
+      </div>
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 20:53:56 UTC-06:00">
+20:53
+       </div>
+
+       <div class="from_name">
+Israel Perez Garcia
+       </div>
+
+       <div class="text">
+Una disculpa a todos, pero me tuve que desconectar, me empecé a sentir mareado.<br>Cualquier actividad (tickets) que me asignen, estoy totalmente de acuerdo.<br>Y nuevamente, una disculpa.
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix" id="message63">
+
+      <div class="pull_left userpic_wrap">
+
+       <div class="userpic userpic5" style="width: 42px; height: 42px">
+
+        <div class="initials" style="line-height: 42px">
+GA
+        </div>
+
+       </div>
+
+      </div>
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 21:21:03 UTC-06:00">
+21:21
+       </div>
+
+       <div class="from_name">
+Gustavo Anahuac
+       </div>
+
+       <div class="text">
+# PRD — Tinder de Contenidos: Películas y Libros<br><br>## 1. Control de versiones<br><br>| Campo | Valor |<br>|---|---|<br>| <strong>Proyecto</strong> | Tinder de Contenidos (clave: *Match&amp;Read* / *Match&amp;Watch*) |<br>| <strong>Estado</strong> | Listo para desarrollo |<br>| <strong>Versión</strong> | 2.0 (refactor: catálogo, métricas, riesgos y contratos de API) |<br>| <strong>Fecha</strong> | Junio 2026 |<br>| <strong>Stack core (GCP)</strong> | Firebase Auth · Cloud Run (API) · Firestore · Firebase Hosting (PWA) |<br>| <strong>APIs externas</strong> | TMDB (primaria, películas) · Google Books · IMDb vía RapidAPI (fallback) · TMDB Watch Providers (streaming) |<br><br>&gt; <strong>Cambio clave v2:</strong> se sustituye &quot;IMDb API oficial&quot; como fuente primaria de películas. IMDb no ofrece una API pública estable para este caso; los datos de catálogo, popularidad, calificación y disponibilidad de streaming se obtienen de <strong>TMDB</strong> (gratuita, documentada, con endpoint de *watch providers*). IMDb vía RapidAPI queda como enriquecimiento opcional.<br><br>---<br><br>## 2. Visión y objetivos<br><br>Reducir la &quot;fatiga de decisión&quot; en el consumo de películas y libros mediante una interfaz móvil-first basada en gestos (*swipes*), entregada como <strong>PWA</strong> sobre infraestructura serverless en GCP.<br><br>### North Star Metric<br><strong>Swipes calificados por usuario activo semanal</strong> (proxy directo de descubrimiento y engagement).<br><br>### Objetivos del MVP (medibles)<br><br>| Objetivo | Métrica | Meta |<br>|---|---|---|<br>| Activación | % de usuarios que completan onboarding y ≥20 swipes en sesión 1 | ≥ 60% |<br>| Engagement | Swipes promedio / sesión | ≥ 30 |<br>| Retención | Retención D7 | ≥ 25% |<br>| Conversión a biblioteca | % de usuarios que guardan ≥1 título | ≥ 40% |<br>| Eficiencia técnica | Costo de infraestructura / 1.000 usuarios activos | &lt; USD 5 |<br><br>---<br><br>## 3. Alcance<br><br>### Dentro de alcance (MVP)<br>Registro/login, onboarding por swipe, feed de películas y libros con swipe, vista de detalle, biblioteca con listas y notas, capa de caché de catálogo, reglas de seguridad de Firestore.<br><br>### Fuera de alcance (MVP)<br>- Recomendación con ML / *collaborative filtering* (se usa popularidad + contenido).<br>- Matching social entre usuarios o funciones de amistad.<br>- Disponibilidad de streaming en tiempo real verificada por región (se usa el proveedor que devuelva TMDB; sin garantía contractual).<br>- Notificaciones push.<br>- Pagos o monetización.<br>- App nativa iOS/Android (solo PWA).<br><br>---<br><br>## 4. Supuestos y dependencias<br><br>- <strong>TMDB y Google Books</strong> mantienen sus cuotas gratuitas actuales; se respeta el *rate limiting* de cada una mediante caché.<br>- El catálogo se <strong>pre-indexa periódicamente</strong> en Firestore; el feed no consulta APIs externas en caliente salvo para enriquecer detalle.<br>- Licencia de uso de TMDB exige atribución visible (&quot;This product uses the TMDB API but is not endorsed or certified by TMDB&quot;).<br>- Firestore tiene límites de filtrado compuesto: el *ranking* del feed se calcula en backend, no vía query nativa.<br><br>---<br><br>## 5. Arquitectura de alto nivel (GCP)<br><br>1. <strong>Frontend (PWA)</strong> — React o Vue, optimizado para gestos táctiles, Service Worker para offline parcial. Alojado en <strong>Firebase Hosting</strong>.<br>2. <strong>Auth</strong> — <strong>Firebase Authentication</strong> (Email/Password + Google Sign-In).<br>3. <strong>Backend API</strong> — Microservicios en Node.js o Python en <strong>Cloud Run</strong> (escala a cero).<br>4. <strong>Base de datos</strong> — <strong>Cloud Firestore</strong> (perfiles, swipes, colecciones, catálogo cacheado).<br>5. <strong>Ingesta de catálogo</strong> — Job programado (Cloud Scheduler → Cloud Run) que sincroniza TMDB y Google Books a la colección <code>content</code>, evitando llamadas duplicadas y controlando costos.<br><br><pre><br>[PWA] --auth--&gt; [Firebase Auth]<br>  |  REST<br>  v<br>[Cloud Run API] &lt;--&gt; [Firestore: users, swipes, collections, content]<br>       ^<br>       | sync programado<br>[Cloud Scheduler] --&gt; [Cloud Run: ingest] --&gt; [TMDB / Google Books]<br></pre><br><br>---<br><br>## 6. Modelo de datos (Firestore)<br><br><code>`</code><br>users/{userId}<br>  email, displayName, authProvider, createdAt<br>  prefs: { genres: [], authors: [], directors: [], cold_start_done: bool }
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix joined" id="message64">
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 21:21:03 UTC-06:00">
+21:21
+       </div>
+
+       <div class="text">
+content/{contentId}            // catálogo cacheado<br>  type: &quot;movie&quot; | &quot;book&quot;<br>  externalId, source: &quot;tmdb&quot; | &quot;google_books&quot;<br>  title, cover, year, genres: [], synopsis<br>  popularity (float), rating (float, escala 0–10 normalizada)<br>  watchProviders: []           // solo movies; placeholder si no hay dato<br>  syncedAt<br><br>swipes/{swipeId}<br>  userId, contentId, contentType<br>  action: &quot;like&quot; | &quot;dislike&quot;<br>  timestamp<br><br>collections/{collectionId}<br>  userId, contentId, contentType<br>  listName (default: &quot;Guardados&quot;), personalNote, savedAt<br><pre><br><br>---<br><br>## 7. Épicas e historias de usuario<br><br>### ÉPICA 1 — Registro y calibración inicial (P1)<br>*Dolores:* onboarding largo, exceso de datos, géneros poco representativos.<br><br>#### HU1.1 — Registro simplificado (Email + Google)<br>- **Como** usuario, **quiero** registrarme con email o Google, **para** entrar rápido y seguro.<br>- **Criterios de aceptación:**<br>  - Máximo 2 clics con Google Auth.<br>  - Validación de formato de email.<br>  - Éxito → redirección a calibración de perfil.<br>- **Tareas técnicas:**<br>  1. Activar proveedores Email y Google en Firebase.<br>  2. Componentes UI responsivos de Login/Registro.<br>  3. Inicializar SDK de Firebase en frontend.<br>  4. Crear documento en `users` en el primer registro.<br><br>#### HU1.2 — Calibración por swipe (cold start)<br>- **Como** usuario, **quiero** un onboarding de 5–10 tarjetas + selección simple de géneros y autores/directores, **para** que la app entienda mis gustos sin formularios.<br>- **Criterios de aceptación:**<br>  - Máximo 10 tarjetas secuenciales; pueden saltarse.<br>  - Buscador predictivo de autores/directores favoritos (opcional).<br>  - Al terminar se marca `prefs.cold_start_done = true`.<br>- **Tareas técnicas:**<br>  1. Componente de onboarding con barra de progreso.<br>  2. Buscador predictivo contra endpoints de búsqueda (TMDB / Google Books) en backend.<br>  3. Persistir vector de preferencias en `users.prefs`.<br><br>---<br><br>### ÉPICA 2 — Selección y filtrado de contenido (P2)<br>*Dolores:* falta de indicador del tipo activo, confusión al cambiar de feed.<br><br>#### HU2.1 — Conmutador de tipo (Tab Selector)<br>- **Como** usuario, **quiero** alternar entre &quot;Libros&quot; y &quot;Películas&quot; desde un control visible, **para** consumir según mi ánimo manteniendo feeds independientes.<br>- **Criterios de aceptación:**<br>  - Indicador visual de alta visibilidad del modo activo (color de acento o icono).<br>  - Al cambiar de pestaña no se pierde el estado del feed actual.<br>- **Tareas técnicas:**<br>  1. Navbar/tabs persistentes con estados.<br>  2. Gestión de estado global para separar `active_feed` (`movies` / `books`).<br><br>---<br><br>### ÉPICA 3 — Recomendación y mecánica de swipe (P3)<br>*Dolores:* tarjetas con poca info, contenido repetido, feed que se agota.<br><br>#### HU3.1 — Algoritmo de arranque (popularidad + contenido)<br>- **Como** sistema, **debo** mezclar TMDB y Google Books filtrando por géneros del usuario y priorizando alta popularidad/calificación, **para** evitar el arranque en frío.<br>- **Criterios de aceptación:**<br>  - Las primeras 20 tarjetas pertenecen al top de los géneros seleccionados.<br>  - Nunca se muestra contenido ya *swipeado* (`like` o `dislike`).<br>- **Tareas técnicas:**<br>  1. Endpoint `GET /api/feed` que recibe `userId`, `type`, `cursor`.<br>  2. Lógica: leer `content` pre-indexado por géneros del usuario, restar IDs presentes en `swipes`.<br>  3. **Score normalizado** (evita que escalas distintas sesguen el ranking):<br>     </pre><br>     score = 0.7 * norm(popularity) + 0.3 * norm(rating)<br>     // norm(x) = (x - min) / (max - min) sobre el conjunto candidato<br>     <code>`</code><br>  4. Para feed de &gt;100 swipes, sumar señal de afinidad: +peso a géneros con mayor ratio de <code>like</code> histórico del usuario.
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix joined" id="message65">
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 21:21:04 UTC-06:00">
+21:21
+       </div>
+
+       <div class="text">
+#### HU3.2 — Feed interactivo con swipe<br>- <strong>Como</strong> usuario, <strong>quiero</strong> tarjetas con portada, título, género, descripción breve y calificación, y hacer swipe derecha (like) / izquierda (no), <strong>para</strong> descubrir rápido.<br>- <strong>Criterios de aceptación:</strong><br>  - Gestos táctiles nativos con animación fluida (≈60 FPS).<br>  - Precarga asíncrona de las siguientes 3 tarjetas.<br>- <strong>Tareas técnicas:</strong><br>  1. Librería de gestos (`react-tinder-card` o lógica custom con Framer Motion).<br>  2. *Pre-fetching*: al quedar 5 tarjetas en el stack, disparar <code>GET /api/feed</code> silencioso.<br>  3. Cada swipe → <code>POST /api/swipe</code> no bloqueante (`userId`, <code>contentId</code>, <code>type</code>, <code>action</code>, `timestamp`).<br><br>---<br><br>### ÉPICA 4 — Vista de detalle (P4)<br>*Dolores:* exceso de info en una pantalla, no saber dónde ver la película.<br><br>#### HU4.1 — Vista expandida equilibrada<br>- <strong>Como</strong> usuario, <strong>quiero</strong> tocar una tarjeta para ver sinopsis completa, autor/director, año, género, reseñas resumidas y plataformas de streaming, <strong>para</strong> evaluar con calma.<br>- <strong>Criterios de aceptación:</strong><br>  - Transición tipo modal/slide-up que no destruye el stack inferior.<br>  - Tres acciones flotantes: &quot;Guardar&quot;, &quot;No me interesa&quot;, &quot;Compartir&quot;.<br>- <strong>Tareas técnicas:</strong><br>  1. Componente de detalle (sheet expandible).<br>  2. Streaming: usar <strong>TMDB Watch Providers</strong>; si no hay dato, mostrar placeholder neutro (sin inventar disponibilidad). *Reemplaza el mapeo aleatorio de íconos del MVP original, que comunicaba información falsa.*<br><br>---<br><br>### ÉPICA 5 — Colecciones y listas (P5)<br>*Dolores:* colecciones desordenadas, olvido del motivo de guardado, listas difíciles de hallar.<br><br>#### HU5.1 — Guardado clasificado + listas personalizadas<br>- <strong>Como</strong> usuario, <strong>quiero</strong> que al guardar (swipe derecha o botón) el contenido se separe automáticamente en &quot;Películas&quot; y &quot;Libros&quot; con fecha, y poder crear listas (ej. &quot;Para el finde&quot;), <strong>para</strong> retomar el consumo y controlar mi catálogo.<br>- <strong>Criterios de aceptación:</strong><br>  - &quot;Colección&quot; accesible en un paso desde la barra inferior.<br>  - Cada elemento permite añadir una &quot;Nota personal&quot;.<br>- <strong>Tareas técnicas:</strong><br>  1. Modelo <code>collections</code> (ver §6).<br>  2. Vista de biblioteca con filtros por tipo y por lista.<br>  3. CRUD en Cloud Run para listas y notas.<br><br>---<br><br>## 8. Contratos de API (MVP)<br><br>| Método | Endpoint | Entrada | Salida |<br>|---|---|---|---|<br>| GET | <code>/api/feed</code> | <code>userId</code>, <code>type</code>, <code>cursor</code> | <code>[ {contentId, title, cover, genres, rating, synopsis} ]</code> |<br>| POST | <code>/api/swipe</code> | <code>userId</code>, <code>contentId</code>, <code>type</code>, <code>action</code> | <code>204</code> |<br>| GET | <code>/api/content/{id}</code> | — | objeto <code>content</code> completo + watchProviders |<br>| GET | <code>/api/collections</code> | <code>userId</code>, <code>?type</code>, <code>?listName</code> | <code>[ collections ]</code> |<br>| POST | <code>/api/collections</code> | <code>userId</code>, <code>contentId</code>, <code>listName</code>, <code>personalNote</code> | <code>201</code> |<br>| PATCH | <code>/api/collections/{id}</code> | <code>personalNote</code>, <code>listName</code> | <code>200</code> |<br>| DELETE | <code>/api/collections/{id}</code> | — | <code>204</code> |<br><br>---<br><br>## 9. Requerimientos no funcionales<br><br>- <strong>Rendimiento:</strong> LCP &lt; 2.5 s en 4G simulada.<br>- <strong>Offline:</strong> cachear la shell de la PWA + últimos 10 ítems de la colección vía Service Worker.<br>- <strong>Disponibilidad:</strong> Cloud Run con escala a cero; *cold start* mitigado con <code>min-instances=1</code> si la latencia inicial degrada la activación.<br>- <strong>Atribución:</strong> mostrar el aviso requerido por TMDB.<br><br>### Reglas de seguridad de Firestore<br><pre><br>service cloud.firestore {<br>  match /databases/{database}/documents {<br>    match /users/{userId} {<br>      allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;<br>    }<br>    match /swipes/{swipeId} {<br>      allow read, write: if request.auth != null<br>        &amp;&amp; request.resource.data.userId == request.auth.uid;<br>    }<br>    match /collections/{collectionId} {<br>      allow read, write: if request.auth != null<br>        &amp;&amp; (resource == null || resource.data.userId == request.auth.uid);<br>    }<br>    match /content/{contentId} {<br>      allow read: if request.auth != null;   // catálogo: solo lectura para clientes<br>      allow write: if false;                 // escritura únicamente por el job de ingesta<br>    }<br>  }<br>}<br></pre><br><br>---<br><br>## 10. Eventos de analítica (mínimos)
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message default clearfix joined" id="message66">
+
+      <div class="body">
+
+       <div class="pull_right date details" title="03.06.2026 21:21:04 UTC-06:00">
+21:21
+       </div>
+
+       <div class="text">
+<code>onboarding_completed</code>, <code>swipe</code> (con <code>action</code>, <code>type`), `feed_exhausted</code>, <code>detail_opened</code>, <code>content_saved</code>, <code>list_created</code>, <code>note_added</code>. Permiten medir todas las metas de §2.<br><br>---<br><br>## 11. Riesgos y mitigaciones<br><br>| Riesgo | Impacto | Mitigación |<br>|---|---|---|<br>| Costos/cuotas de APIs externas | Alto | Pre-indexar catálogo; servir feed desde Firestore, no en caliente |<br>| Datos de streaming inexactos | Medio | Usar TMDB Watch Providers; placeholder neutro cuando no hay dato |<br>| Cold start de Cloud Run afecta activación | Medio | <code>min-instances=1</code> si la métrica D0 se degrada |<br>| Límites de filtrado de Firestore | Medio | Ranking en backend; índices compuestos por <code>type`+`genres</code> |<br>| Feed agotado para usuarios muy activos | Medio | Paginación por cursor + señal de afinidad histórica |<br><br>---<br><br>## 12. Despliegue manual (sin CI/CD)<br><br>### Backend (Cloud Run)<br><pre><br>gcloud run deploy tinder-contenidos-backend \<br>  --source . \<br>  --region us-central1 \<br>  --allow-unauthenticated<br></pre><br><br>### Frontend (PWA en Firebase Hosting)<br><pre><br>npm run build<br>firebase login<br>firebase deploy --only hosting<br></pre><br><br>### Job de ingesta de catálogo (recomendado)<br><pre><br>gcloud run deploy tinder-contenidos-ingest --source ./ingest --region us-central1 --no-allow-unauthenticated<br>gcloud scheduler jobs create http sync-catalogo \<br>  --schedule &quot;0 4 * * *&quot; \<br>  --uri &quot;https://&lt;URL-ingest&gt;/run&quot; \<br>  --http-method POST<br></pre><br><br>---<br><br>## 13. Roadmap por fases<br><br>- <strong>Fase 1 (MVP):</strong> Épicas 1–5 con popularidad + contenido.<br>- <strong>Fase 2:</strong> señal de afinidad histórica, listas compartibles, notificaciones.<br>- <strong>Fase 3:</strong> recomendación con ML, disponibilidad de streaming por región, monetización.
+       </div>
+
+      </div>
+
+     </div>
+
+     <div class="message service" id="message-2">
+
+      <div class="body details">
+4 June 2026
+      </div>
+
+     </div>
+
+     <div class="message default clearfix" id="message67">
+
+      <div class="pull_left userpic_wrap">
+
+       <div class="userpic userpic6" style="width: 42px; height: 42px">
+
+        <div class="initials" style="line-height: 42px">
+EC
+        </div>
+
+       </div>
+
+      </div>
+
+      <div class="body">
+
+       <div class="pull_right date details" title="04.06.2026 09:34:12 UTC-06:00">
+09:34
+       </div>
+
+       <div class="from_name">
+Edgar Coronel
+       </div>
+
+       <div class="text">
+Estimado Equipo, Buenos días.. cómo están?? <br>Con la finalidad de repartir las Historias de Usuario, y la carga de trabajo. TODOS serían tan amables de darme 2 cosas:<br>1) Celular, 2) Nivel de desarrollo (Alto / Medio / Bajo)<br><br>Si gustan mandenme esos datos en PM ya sea por aquí o por Whats al <a href="tel:5580134138">5580134138</a><br><br>Gracias.
+       </div>
+
+      </div>
+
+     </div>
+
+    </div>
+
+   </div>
+
+  </div>
+
+ </body>
+
+</html>
