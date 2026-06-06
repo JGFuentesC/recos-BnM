@@ -5,14 +5,6 @@ import { AuthProvider } from './contexts/AuthContext'
 import './index.css'
 import App from './App.jsx'
 
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // PWA shell is optional during local development and first rollout.
-    })
-  })
-}
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
@@ -22,3 +14,12 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => console.log('[SW] Registrado:', reg.scope))
+      .catch((err) => console.warn('[SW] Registro fallido:', err))
+  })
+}
