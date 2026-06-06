@@ -8,37 +8,40 @@ import {
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, googleProvider } from '../firebase/config'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+  const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser)
-      setLoading(false)
-    })
-
-    return () => unsub()
-  }, [])
+  async function loadUserProfile(uid) {
+    const profileRef = doc(db, 'users', uid)
+    const profileSnap = await getDoc(profileRef)
+    const profileData = profileSnap.exists() ? profileSnap.data() : null
+    setUserProfile(profileData)
+    return profileData
+  }
 
   async function ensureUserDocument(firebaseUser, providerName) {
-    await setDoc(
-      doc(db, 'users', firebaseUser.uid),
-      {
+    const profileRef = doc(db, 'users', firebaseUser.uid)
+    const profileSnap = await getDoc(profileRef)
+
+    if (!profileSnap.exists()) {
+      const displayName =
+        firebaseUser.displayName ?? firebaseUser.email?.split('@')[0] ?? 'Usuario'
+
+      await setDoc(profileRef, {
         email: firebaseUser.email ?? '',
-        displayName:
-          firebaseUser.displayName ??
-          firebaseUser.email?.split('@')[0] ??
-          'Usuario',
+        displayName,
         authProvider: providerName,
         createdAt: serverTimestamp(),
         prefs: {
@@ -47,22 +50,57 @@ export function AuthProvider({ children }) {
           directors: [],
           cold_start_done: false,
         },
-      },
-      { merge: true },
-    )
+      })
+    }
+
+    return loadUserProfile(firebaseUser.uid)
   }
 
-  async function signInWithGoogle() {
+  function inferProvider(firebaseUser) {
+    const providerId = firebaseUser?.providerData?.[0]?.providerId
+    return providerId === 'google.com' ? 'google' : 'email'
+  }
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true)
+
+      if (!firebaseUser) {
+        setCurrentUser(null)
+        setUserProfile(null)
+        setLoading(false)
+        return
+      }
+
+      setCurrentUser(firebaseUser)
+
+      try {
+        await ensureUserDocument(firebaseUser, inferProvider(firebaseUser))
+      } finally {
+        setLoading(false)
+      }
+    })
+
+    return () => unsub()
+  }, [])
+
+  async function loginWithEmail(email, password) {
+    const result = await signInWithEmailAndPassword(auth, email, password)
+    await ensureUserDocument(result.user, 'email')
+    return result.user
+  }
+
+  async function loginWithGoogle() {
     const result = await signInWithPopup(auth, googleProvider)
     await ensureUserDocument(result.user, 'google')
     return result.user
   }
 
-  async function signUpWithEmail(name, email, password) {
+  async function register(email, password, displayName) {
     const result = await createUserWithEmailAndPassword(auth, email, password)
 
-    if (name) {
-      await updateProfile(result.user, { displayName: name })
+    if (displayName) {
+      await updateProfile(result.user, { displayName })
     }
 
     await ensureUserDocument(result.user, 'email')
@@ -73,15 +111,24 @@ export function AuthProvider({ children }) {
     await signOut(auth)
   }
 
+  function refreshUserProfile(uid) {
+    const targetUid = uid ?? currentUser?.uid
+    return targetUid ? loadUserProfile(targetUid) : Promise.resolve(null)
+  }
+
   const value = useMemo(
     () => ({
-      user,
+      currentUser,
+      userProfile,
       loading,
-      signInWithGoogle,
-      signUpWithEmail,
+      loginWithEmail,
+      loginWithGoogle,
+      register,
       logout,
+      refreshUserProfile,
+      setUserProfile,
     }),
-    [user, loading],
+    [currentUser, userProfile, loading],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

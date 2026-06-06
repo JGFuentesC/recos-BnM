@@ -72,7 +72,7 @@ const CARDS = [
 ]
 
 export default function Onboarding() {
-  const { user, logout } = useAuth()
+  const { currentUser, logout, setUserProfile } = useAuth()
   const navigate = useNavigate()
   const [index, setIndex] = useState(0)
   const [status, setStatus] = useState('')
@@ -84,7 +84,7 @@ export default function Onboarding() {
 
   async function saveSwipe(card, action) {
     await addDoc(collection(db, 'swipes'), {
-      userId: user.uid,
+      userId: currentUser.uid,
       contentId: card.id,
       contentType: 'onboarding',
       type: 'onboarding',
@@ -94,7 +94,7 @@ export default function Onboarding() {
   }
 
   async function completeOnboarding(skipped = false) {
-    await updateDoc(doc(db, 'users', user.uid), {
+    await updateDoc(doc(db, 'users', currentUser.uid), {
       'prefs.genres': Array.from(likedGenres),
       'prefs.authors': [],
       'prefs.directors': [],
@@ -102,6 +102,18 @@ export default function Onboarding() {
       onboardingCompletedAt: serverTimestamp(),
       onboardingSkipped: skipped,
     })
+
+    setUserProfile((previous) => ({
+      ...(previous ?? {}),
+      prefs: {
+        ...(previous?.prefs ?? {}),
+        genres: Array.from(likedGenres),
+        authors: [],
+        directors: [],
+        cold_start_done: true,
+      },
+      onboardingSkipped: skipped,
+    }))
 
     setStatus('Calibracion completada y guardada en Firestore.')
     navigate('/feed')
