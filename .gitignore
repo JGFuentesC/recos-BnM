@@ -16,7 +16,4 @@ docs/gap-analysis.md
 docs/SECURITY-AUDIT-2026-06-04.md
 docs/SECURITY-AUDIT-2026-06-05.md
 feat-manuel.md
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache
-.obsidian/plugins/
+.obsidian/
