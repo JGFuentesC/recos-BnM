@@ -1,36 +1,51 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { signInWithGoogle, signUpWithEmail } = useAuth()
-  const [name, setName] = useState('')
+  const { loginWithEmail, loginWithGoogle, refreshUserProfile, userProfile } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
+  function resolvePostAuthRoute(profile) {
+    return profile?.prefs?.cold_start_done ? '/feed' : '/onboarding'
+  }
+
+  function mapErrorMessage(code) {
+    if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
+      return 'Correo o contraseña incorrectos.'
+    }
+
+    if (code === 'auth/invalid-email') {
+      return 'El correo no tiene formato valido.'
+    }
+
+    if (code === 'auth/popup-closed-by-user') {
+      return 'Cerraste la ventana de Google antes de completar el acceso.'
+    }
+
+    return 'No se pudo iniciar sesion. Intenta de nuevo.'
+  }
+
   async function handleGoogle() {
     setError('')
     setStatus('Iniciando Google Sign-In...')
     try {
-      await signInWithGoogle()
-      navigate('/onboarding')
-    } catch {
+      const firebaseUser = await loginWithGoogle()
+      const freshProfile = await refreshUserProfile(firebaseUser.uid)
+      navigate(resolvePostAuthRoute(freshProfile ?? userProfile))
+    } catch (firebaseError) {
       setStatus('')
-      setError('No se pudo iniciar con Google. Revisa dominios autorizados.')
+      setError(mapErrorMessage(firebaseError?.code))
     }
   }
 
   async function handleEmail(e) {
     e.preventDefault()
     setError('')
-
-    if (!name.trim()) {
-      setError('Escribe tu nombre.')
-      return
-    }
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError('Correo invalido.')
@@ -42,14 +57,15 @@ export default function Login() {
       return
     }
 
-    setStatus('Creando cuenta...')
+    setStatus('Iniciando sesion...')
 
     try {
-      await signUpWithEmail(name.trim(), email.trim(), password)
-      navigate('/onboarding')
-    } catch {
+      const firebaseUser = await loginWithEmail(email.trim(), password)
+      const freshProfile = await refreshUserProfile(firebaseUser.uid)
+      navigate(resolvePostAuthRoute(freshProfile ?? userProfile))
+    } catch (firebaseError) {
       setStatus('')
-      setError('No se pudo registrar. Verifica Auth y Firestore.')
+      setError(mapErrorMessage(firebaseError?.code))
     }
   }
 
@@ -65,11 +81,6 @@ export default function Login() {
 
         <form onSubmit={handleEmail} className="form">
           <input
-            placeholder="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
             placeholder="Correo"
             type="email"
             value={email}
@@ -82,9 +93,13 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <button className="btn" type="submit">
-            Registrarse con email
+            Iniciar sesion con email
           </button>
         </form>
+
+        <p className="muted" style={{ marginTop: 10 }}>
+          ¿No tienes cuenta? <Link to="/register">Registrate</Link>
+        </p>
 
         {status && <p className="status">{status}</p>}
         {error && <p className="error">{error}</p>}
