@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match&Read | HU1.1</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-elevated: rgba(255, 255, 255, 0.04);
+      --surface: rgba(255, 255, 255, 0.06);
+      --surface-strong: rgba(255, 255, 255, 0.1);
+      --text: #f2efed;
+      --muted: rgba(242, 239, 237, 0.68);
+      --border: rgba(255, 255, 255, 0.08);
+      --orange: #ff571a;
+      --orange-soft: #ffb59e;
+      --violet: #dcb8ff;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-full: 999px;
+      --max-width: 430px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 87, 26, 0.2), transparent 22%),
+        radial-gradient(circle at 80% 20%, rgba(255, 181, 158, 0.1), transparent 20%),
+        radial-gradient(circle at 50% 85%, rgba(220, 184, 255, 0.08), transparent 25%),
+        linear-gradient(180deg, #080808 0%, #0a0a0a 100%);
+      color: var(--text);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .phone {
+      width: min(100%, var(--max-width));
+      min-height: min(100vh - 36px, 960px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 34px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(7, 7, 7, 0.92), rgba(10, 10, 10, 0.98));
+      box-shadow: var(--shadow);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.55) 38%, rgba(0, 0, 0, 0.88) 100%),
+        url("https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80") center/cover no-repeat;
+      opacity: 0.28;
+      filter: saturate(0.75) contrast(1.05);
+      transform: scale(1.08);
+      z-index: -2;
+    }
+
+    .phone::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 87, 26, 0.06) 0%, transparent 22%, transparent 74%, rgba(255, 87, 26, 0.08) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .top-accent {
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      opacity: 0.7;
+    }
+
+    .content {
+      min-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px 18px 22px;
+      gap: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      align-items: center;
+      text-align: center;
+      padding-top: 8px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .mark {
+      width: 128px;
+      height: 128px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(36, 40, 55, 0.92), rgba(18, 19, 21, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), 0 18px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .mark svg {
+      width: 58px;
+      height: 58px;
+      color: var(--orange);
+      filter: drop-shadow(0 0 12px rgba(255, 87, 26, 0.28));
+    }
+
+    .brand-name {
+      font-size: 1.75rem;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--orange);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 7vw, 2.9rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+      max-width: 12ch;
+    }
+
+    h1 .accent {
+      color: var(--orange);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 1.03rem;
+      line-height: 1.62;
+      color: var(--muted);
+      max-width: 28ch;
+      text-wrap: balance;
+    }
+
+    .panel {
+      margin-top: auto;
+      display: grid;
+      gap: 12px;
+      padding: 4px 0 0;
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: var(--radius-lg);
+      min-height: 58px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      user-select: none;
+      outline: none;
+    }
+
+    .button:active { transform: scale(0.985); }
+    .button:focus-visible { box-shadow: 0 0 0 2px rgba(255, 87, 26, 0.35), 0 0 0 6px rgba(255, 87, 26, 0.08); }
+
+    .google {
+      background: #f0ece8;
+      color: #171717;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .google:hover { opacity: 0.96; }
+
+    .email {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .email:hover {
+      border-color: rgba(255, 87, 26, 0.5);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .button svg {
+      flex: none;
+    }
+
+    .divider {
+      height: 1px;
+      width: 35%;
+      margin: 10px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 87, 26, 0.6), transparent);
+      opacity: 0.6;
+    }
+
+    .legal {
+      margin-top: 12px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: rgba(242, 239, 237, 0.54);
+      text-align: center;
+      padding-inline: 6px;
+    }
+
+    .legal a {
+      color: rgba(242, 239, 237, 0.78);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+
+    .status {
+      display: none;
+      margin-top: 8px;
+      border: 1px solid rgba(255, 87, 26, 0.2);
+      background: rgba(255, 87, 26, 0.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: #ffd7cb;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .status.show { display: block; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(14px);
+      display: none;
+      align-items: end;
+      justify-content: center;
+      padding: 18px;
+      z-index: 10;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(100%, var(--max-width));
+      background: rgba(16, 16, 16, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transform: translateY(12px);
+      animation: rise 180ms ease forwards;
+    }
+
+    @keyframes rise {
+      to { transform: translateY(0); }
+    }
+
+    .modal-head {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-subtitle {
+      margin: 8px 0 0;
+      font-size: 0.93rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.86rem;
+      color: rgba(242, 239, 237, 0.72);
+    }
+
+    .field input {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 14px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: rgba(255, 87, 26, 0.55);
+      box-shadow: 0 0 0 4px rgba(255, 87, 26, 0.08);
+    }
+
+    .modal-actions {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 4px;
+    }
+
+    .primary {
+      background: linear-gradient(180deg, #ff6a31, #ff4a12);
+      color: #210600;
+      box-shadow: 0 16px 34px rgba(255, 87, 26, 0.28);
+    }
+
+    .primary:hover { box-shadow: 0 18px 38px rgba(255, 87, 26, 0.36); }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .secondary:hover { background: rgba(255, 255, 255, 0.07); }
+
+    .onboarding {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 87, 26, 0.18), transparent 28%), linear-gradient(180deg, #090909, #050505);
+      display: none;
+      place-items: center;
+      z-index: 20;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .onboarding.open { display: grid; }
+
+    .onboarding-card {
+      width: min(100%, 420px);
+      padding: 28px 24px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 87, 26, 0.14);
+      color: #ffd5c8;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .step {
+      padding: 14px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .step strong {
+      color: var(--orange);
+    }
+
+    .hint {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 390px) {
+      .phone { border-radius: 28px; }
+      .content { padding: 16px 14px 20px; }
+      .mark { width: 112px; height: 112px; }
+      .modal-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" role="application" aria-label="Pantalla de bienvenida de Match&Read">
+    <div class="top-accent"></div>
+    <div class="content">
+      <header>
+        <div class="brand">
+          <div class="mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 14h16c3.314 0 6 2.686 6 6v24c0-3.314 2.686-6 6-6h8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 14v30c0 3.314 2.686 6 6 6h20" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M38 18l12 8-12 8V18Z" fill="currentColor"/>
+              <path d="M24 24h6M24 31h6M24 38h6" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-name">Match&Read</div>
+        </div>
+
+        <div class="hero">
+          <h1>Tu próximo match está a un <span class="accent">swipe</span>.</h1>
+          <p class="subtitle">Descubre libros y películas de forma intuitiva con una entrada rápida y segura.</p>
+        </div>
+      </header>
+
+      <section class="panel" aria-label="Acciones de acceso">
+        <button class="button google" id="googleBtn" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z"/>
+          </svg>
+          Continuar con Google
+        </button>
+
+        <button class="button email" id="emailBtn" type="button">Registrarse con Email</button>
+        <div class="divider"></div>
+        <div class="status" id="statusBox" aria-live="polite"></div>
+
+        <p class="legal">Al continuar, aceptas nuestros <a href="#">términos y condiciones</a> y nuestra <a href="#">política de privacidad</a>.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="emailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="modal-title" id="modalTitle">Crear cuenta con email</h2>
+        <p class="modal-subtitle">Este flujo representa HU1.1: validación, registro y creación del perfil base en Firestore.</p>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="name">Nombre</label>
+          <input id="name" type="text" placeholder="Andrés" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email">Correo</label>
+          <input id="email" type="email" placeholder="andres@correo.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input id="password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+        </div>
+        <div class="modal-actions">
+          <button class="button secondary" id="cancelEmail" type="button">Cancelar</button>
+          <button class="button primary" id="submitEmail" type="button">Registrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="onboarding" id="onboarding">
+    <div class="onboarding-card">
+      <div class="badge">HU1.1 completada</div>
+      <h2 style="margin:0;font-size:2rem;line-height:1.05;letter-spacing:-0.04em;">Bienvenido a Match&Read</h2>
+      <p class="hint">El usuario ya quedó autenticado. El siguiente paso es llevarlo a la calibración por swipe de HU1.2.</p>
+      <div class="steps">
+        <div class="step"><strong>1.</strong> Usuario autenticado con Google o email.</div>
+        <div class="step"><strong>2.</strong> Documento base creado en Firestore.</div>
+        <div class="step"><strong>3.</strong> Redirección al onboarding de preferencias.</div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+    const statusBox = document.getElementById('statusBox');
+    const emailModal = document.getElementById('emailModal');
+    const onboarding = document.getElementById('onboarding');
+    const googleBtn = document.getElementById('googleBtn');
+    const emailBtn = document.getElementById('emailBtn');
+    const cancelEmail = document.getElementById('cancelEmail');
+    const submitEmail = document.getElementById('submitEmail');
+    const emailInput = document.getElementById('email');
+    const nameInput = document.getElementById('name');
+    const passwordInput = document.getElementById('password');
+
+    const firebaseConfig = {
+      // Pega aqui los valores reales desde Firebase Console.
+      apiKey: 'AIzaSyCMCcSLn3jc2bhamh0d4Wiy7daJj9hacGA',
+      authDomain: 'proyectofinal-71637.firebaseapp.com',
+      projectId: 'proyectofinal-71637',
+      storageBucket: 'proyectofinal-71637.firebasestorage.app',
+      messagingSenderId: '113446095664',
+      appId: '1:113446095664:web:8487145f158264c55ed6f5'
+    };
+
+    const firebaseReady = Object.values(firebaseConfig).every(Boolean);
+    let auth = null;
+    let db = null;
+
+    if (firebaseReady) {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    }
+
+    function setStatus(message, tone = 'info') {
+      statusBox.textContent = message;
+      statusBox.classList.add('show');
+      statusBox.style.borderColor = tone === 'error' ? 'rgba(255, 180, 171, 0.35)' : 'rgba(255, 87, 26, 0.2)';
+      statusBox.style.background = tone === 'error' ? 'rgba(255, 180, 171, 0.08)' : 'rgba(255, 87, 26, 0.08)';
+      statusBox.style.color = tone === 'error' ? '#ffd5cf' : '#ffd7cb';
+    }
+
+    function openEmailModal() {
+      emailModal.classList.add('open');
+      setTimeout(() => nameInput.focus(), 0);
+    }
+
+    function closeEmailModal() {
+      emailModal.classList.remove('open');
+    }
+
+    async function ensureUserDocument(user, provider) {
+      if (!firebaseReady) {
+        localStorage.setItem('matchread_user', JSON.stringify({
+          uid: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? 'Usuario'
+        }));
+        setStatus(`Autenticación simulada completada con ${provider}. Se creará users/{userId} y se pasa al onboarding.`, 'info');
+        onboarding.classList.add('open');
+        setTimeout(() => {
+          window.location.href = 'hui1_2_calibracion.html';
+        }, 900);
+        return;
+      }
+
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email ?? '',
+        displayName: user.displayName ?? user.email?.split('@')[0] ?? 'Usuario',
+        authProvider: provider,
+        createdAt: serverTimestamp(),
+        prefs: {
+          genres: [],
+          authors: [],
+          directors: [],
+          cold_start_done: false
+        }
+      }, { merge: true });
+
+      localStorage.setItem('matchread_user', JSON.stringify({
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? 'Usuario'
+      }));
+
+      setStatus(`Cuenta lista con ${provider}. Se creó o actualizó users/${user.uid} y se pasa al onboarding.`, 'info');
+      onboarding.classList.add('open');
+      setTimeout(() => {
+        window.location.href = 'hui1_2_calibracion.html';
+      }, 900);
+    }
+
+    async function signInWithGoogle() {
+      if (!firebaseReady) {
+        await ensureUserDocument({ uid: 'demo-google', email: 'demo@matchread.app', displayName: 'Demo Google' }, 'Google');
+        return;
+      }
+
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      await ensureUserDocument(result.user, 'Google');
+    }
+
+    async function registerWithEmail(name, email, password) {
+      if (!firebaseReady) {
+        await ensureUserDocument({ uid: 'demo-email', email, displayName: name }, 'email');
+        return;
+      }
+
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      if (name) {
+        await updateProfile(result.user, { displayName: name });
+      }
+      await ensureUserDocument(result.user, 'email');
+    }
+
+    googleBtn.addEventListener('click', async () => {
+      if (navigator.vibrate) navigator.vibrate(10);
+      setStatus('Iniciando Google Sign-In...', 'info');
+
+      try {
+        await signInWithGoogle();
+      } catch (error) {
+        console.error(error);
+        setStatus('No se pudo completar Google Sign-In. Revisa la configuración de Firebase.', 'error');
+      }
+    });
+
+    emailBtn.addEventListener('click', () => {
+      openEmailModal();
+      if (navigator.vibrate) navigator.vibrate(10);
+    });
+
+    cancelEmail.addEventListener('click', closeEmailModal);
+
+    emailModal.addEventListener('click', (event) => {
+      if (event.target === emailModal) closeEmailModal();
+    });
+
+    submitEmail.addEventListener('click', async () => {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!name) {
+        setStatus('Falta el nombre. Completa el campo para continuar.', 'error');
+        nameInput.focus();
+        return;
+      }
+
+      if (!validEmail) {
+        setStatus('El correo no es válido. Revisa el formato antes de continuar.', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      if (password.length < 6) {
+        setStatus('La contraseña debe tener al menos 6 caracteres.', 'error');
+        passwordInput.focus();
+        return;
+      }
+
+      closeEmailModal();
+      setStatus('Registrando usuario con email...', 'info');
+
+      try {
+        await registerWithEmail(name, email, password);
+      } catch (error) {
+        console.error(error);
+        setStatus('No se pudo registrar con email. Verifica Firebase Auth y los proveedores habilitados.', 'error');
+      }
+
+      if (navigator.vibrate) navigator.vibrate(10);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeEmailModal();
+    });
+
+    if (!firebaseReady) {
+      setStatus('Prototipo listo. Pega la configuración de Firebase en el bloque firebaseConfig para activar Auth y Firestore reales.', 'info');
+    }
+  </script>
+</body>
+</html>

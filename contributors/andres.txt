@@ -1,0 +1,60 @@
+HU1.1 - Registro simplificado (Email + Google)
+
+Objetivo:
+Hacer que un usuario pueda registrarse o iniciar sesion rapido con email o Google y que, al hacerlo por primera vez, se cree su documento en `users`.
+
+Dependencias minimas del equipo:
+- Proyecto Firebase creado.
+- Authentication habilitado con Email/Password y Google.
+- Variables de entorno de Firebase definidas.
+- Estructura basica del frontend lista para agregar pantallas.
+
+Primer orden de trabajo:
+1. Crear la pantalla de login/registro.
+2. Conectar Firebase Auth.
+3. Crear el documento inicial del usuario en Firestore al registrarse por primera vez.
+4. Redirigir al onboarding cuando el login sea exitoso.
+
+Entregables:
+- Formulario de email valido.
+- Boton de Google Sign-In.
+- Manejo de error de autenticacion.
+- Redireccion despues de autenticar.
+- Creacion de `users/{userId}` con datos base.
+
+Forma mas segura de empezar:
+- Primero login con email.
+- Luego Google Sign-In.
+- Al final, la escritura en Firestore.
+
+Chequeo de aceptacion:
+- Un usuario puede entrar sin ayuda manual.
+- Si es su primer acceso, queda creado su perfil base.
+- Si falla autenticacion, se muestra un mensaje claro.
+
+---
+
+HU1.2 - Calibracion por swipe (cold start)
+
+Implementado:
+- Pantalla de onboarding visual tipo stack de tarjetas.
+- 8 tarjetas iniciales de calibracion (cumple rango 5-10 del PRD).
+- Acciones: like, dislike, guardar y saltar.
+- Barra de progreso dinamica.
+- Swipe por gesto horizontal en tarjeta activa.
+- Guardado de cada accion en coleccion `swipes`.
+- Cierre de onboarding con actualizacion en `users`:
+	- prefs.genres
+	- prefs.authors
+	- prefs.directors
+	- prefs.cold_start_done = true
+
+Archivos clave:
+- hui1_1_bienvenida.html
+- hui1_2_calibracion.html
+
+Flujo actual:
+1. Login/registro en HU1.1.
+2. Creacion/actualizacion de `users/{uid}`.
+3. Redireccion automatica a HU1.2.
+4. Calibracion y persistencia en Firestore.
