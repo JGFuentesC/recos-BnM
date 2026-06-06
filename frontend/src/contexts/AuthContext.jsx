@@ -1,8 +1,8 @@
 import {
+  useCallback,
   createContext,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import {
@@ -23,15 +23,15 @@ export function AuthProvider({ children }) {
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  async function loadUserProfile(uid) {
+  const loadUserProfile = useCallback(async (uid) => {
     const profileRef = doc(db, 'users', uid)
     const profileSnap = await getDoc(profileRef)
     const profileData = profileSnap.exists() ? profileSnap.data() : null
     setUserProfile(profileData)
     return profileData
-  }
+  }, [])
 
-  async function ensureUserDocument(firebaseUser, providerName) {
+  const ensureUserDocument = useCallback(async (firebaseUser, providerName) => {
     const profileRef = doc(db, 'users', firebaseUser.uid)
     const profileSnap = await getDoc(profileRef)
 
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
     }
 
     return loadUserProfile(firebaseUser.uid)
-  }
+  }, [loadUserProfile])
 
   function inferProvider(firebaseUser) {
     const providerId = firebaseUser?.providerData?.[0]?.providerId
@@ -82,21 +82,21 @@ export function AuthProvider({ children }) {
     })
 
     return () => unsub()
-  }, [])
+  }, [ensureUserDocument])
 
-  async function loginWithEmail(email, password) {
+  const loginWithEmail = useCallback(async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password)
     await ensureUserDocument(result.user, 'email')
     return result.user
-  }
+  }, [ensureUserDocument])
 
-  async function loginWithGoogle() {
+  const loginWithGoogle = useCallback(async () => {
     const result = await signInWithPopup(auth, googleProvider)
     await ensureUserDocument(result.user, 'google')
     return result.user
-  }
+  }, [ensureUserDocument])
 
-  async function register(email, password, displayName) {
+  const register = useCallback(async (email, password, displayName) => {
     const result = await createUserWithEmailAndPassword(auth, email, password)
 
     if (displayName) {
@@ -105,35 +105,33 @@ export function AuthProvider({ children }) {
 
     await ensureUserDocument(result.user, 'email')
     return result.user
-  }
+  }, [ensureUserDocument])
 
-  async function logout() {
+  const logout = useCallback(async () => {
     await signOut(auth)
-  }
+  }, [])
 
-  function refreshUserProfile(uid) {
+  const refreshUserProfile = useCallback((uid) => {
     const targetUid = uid ?? currentUser?.uid
     return targetUid ? loadUserProfile(targetUid) : Promise.resolve(null)
-  }
+  }, [currentUser, loadUserProfile])
 
-  const value = useMemo(
-    () => ({
-      currentUser,
-      userProfile,
-      loading,
-      loginWithEmail,
-      loginWithGoogle,
-      register,
-      logout,
-      refreshUserProfile,
-      setUserProfile,
-    }),
-    [currentUser, userProfile, loading],
-  )
+  const value = {
+    currentUser,
+    userProfile,
+    loading,
+    loginWithEmail,
+    loginWithGoogle,
+    register,
+    logout,
+    refreshUserProfile,
+    setUserProfile,
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {

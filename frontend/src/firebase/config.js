@@ -15,7 +15,9 @@ export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const googleProvider = new GoogleAuthProvider()
 
-if (import.meta.env.DEV) {
+const useFirebaseEmulators = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true'
+
+if (import.meta.env.DEV && useFirebaseEmulators) {
   try {
     connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
   } catch {
