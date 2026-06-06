@@ -1,60 +1,77 @@
+DEVLOG - EPICA 1 (Andres)
+Proyecto: Match&Read
+Epica: Registro y calibracion inicial (P1)
+Historias: HU1.1 + HU1.2
+Estado: Completado en ambiente local con Firebase real
+
+Resumen ejecutivo:
+Se implemento el flujo inicial de usuario de extremo a extremo:
+1) autenticacion (Google y email),
+2) creacion de perfil base en Firestore,
+3) onboarding de calibracion por swipe,
+4) cierre de cold start con actualizacion de preferencias.
+
+Alcance implementado:
+
 HU1.1 - Registro simplificado (Email + Google)
-
-Objetivo:
-Hacer que un usuario pueda registrarse o iniciar sesion rapido con email o Google y que, al hacerlo por primera vez, se cree su documento en `users`.
-
-Dependencias minimas del equipo:
-- Proyecto Firebase creado.
-- Authentication habilitado con Email/Password y Google.
-- Variables de entorno de Firebase definidas.
-- Estructura basica del frontend lista para agregar pantallas.
-
-Primer orden de trabajo:
-1. Crear la pantalla de login/registro.
-2. Conectar Firebase Auth.
-3. Crear el documento inicial del usuario en Firestore al registrarse por primera vez.
-4. Redirigir al onboarding cuando el login sea exitoso.
-
-Entregables:
-- Formulario de email valido.
-- Boton de Google Sign-In.
-- Manejo de error de autenticacion.
-- Redireccion despues de autenticar.
-- Creacion de `users/{userId}` con datos base.
-
-Forma mas segura de empezar:
-- Primero login con email.
-- Luego Google Sign-In.
-- Al final, la escritura en Firestore.
-
-Chequeo de aceptacion:
-- Un usuario puede entrar sin ayuda manual.
-- Si es su primer acceso, queda creado su perfil base.
-- Si falla autenticacion, se muestra un mensaje claro.
-
----
+- Pantalla de bienvenida y acceso (mobile-first).
+- Boton principal de Google Sign-In.
+- Modal de registro por email.
+- Validacion de correo y longitud minima de password.
+- Integracion con Firebase Auth (Google + Email/Password).
+- Creacion/actualizacion de documento users/{uid} en Firestore.
+- Persistencia local de sesion minima para continuidad de flujo.
+- Redireccion automatica hacia HU1.2 despues de autenticar.
 
 HU1.2 - Calibracion por swipe (cold start)
-
-Implementado:
-- Pantalla de onboarding visual tipo stack de tarjetas.
-- 8 tarjetas iniciales de calibracion (cumple rango 5-10 del PRD).
-- Acciones: like, dislike, guardar y saltar.
-- Barra de progreso dinamica.
-- Swipe por gesto horizontal en tarjeta activa.
-- Guardado de cada accion en coleccion `swipes`.
-- Cierre de onboarding con actualizacion en `users`:
+- Pantalla de onboarding visual en estilo stack.
+- 8 tarjetas iniciales (cumple criterio PRD: 5-10).
+- Interacciones: like, dislike, guardar, saltar.
+- Gesto horizontal en tarjeta activa (swipe manual).
+- Barra de progreso dinamica por avance.
+- Registro de acciones en coleccion swipes.
+- Cierre de onboarding con update a users/{uid}:
 	- prefs.genres
 	- prefs.authors
 	- prefs.directors
 	- prefs.cold_start_done = true
+	- onboardingCompletedAt
+	- onboardingSkipped
 
-Archivos clave:
+Archivos de trabajo:
 - hui1_1_bienvenida.html
 - hui1_2_calibracion.html
 
-Flujo actual:
-1. Login/registro en HU1.1.
-2. Creacion/actualizacion de `users/{uid}`.
-3. Redireccion automatica a HU1.2.
-4. Calibracion y persistencia en Firestore.
+Decisiones tecnicas relevantes:
+- Se uso Firebase JS SDK modular desde CDN para acelerar implementacion MVP.
+- Se mantuvo arquitectura simple de HTML + CSS + JS para iterar rapido.
+- Se conecto Firestore desde frontend para validar flujo funcional completo.
+- Se incluyo fallback visual en mensajes de estado para depuracion de pruebas.
+
+Pruebas ejecutadas:
+- Ejecucion local en http://localhost:5500
+- Login con Google: correcto
+- Registro con email/password: correcto
+- Creacion de users/{uid}: validado en Firestore
+- Registro de swipes onboarding: validado en Firestore
+- Marcado de prefs.cold_start_done: validado en Firestore
+- Validacion de UX: botones y swipe activos en mobile viewport
+
+Problemas encontrados y resolucion:
+- Problema: area de tarjetas bloqueaba botones inferiores en HU1.2.
+	Resolucion: ajuste de alturas y z-index en stack y footer de acciones.
+- Problema: pruebas iniciales con file:// limitaban flujo de auth.
+	Resolucion: servidor local con python -m http.server 5500.
+
+Riesgos y pendientes para siguiente iteracion:
+- Definir reglas de seguridad Firestore finales (actualmente orientado a pruebas).
+- Mover configuracion Firebase a variables de entorno en stack final.
+- Sustituir dataset de onboarding estatico por catalogo servido por backend.
+- Conectar salida de HU1.2 al feed real de Epica 2/3.
+
+Entregable funcional actual:
+Flujo operativo: HU1.1 -> HU1.2 -> cierre de calibracion en Firestore.
+
+Notas para equipo:
+- Cualquier companero puede probar en local con acceso al proyecto Firebase.
+- Se recomienda usar cuentas de prueba para no contaminar datos productivos.
