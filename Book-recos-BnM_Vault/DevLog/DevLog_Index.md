@@ -24,6 +24,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-04-vault-completion\|2026-06-04 (sesión 2)]] | Completación del vault: 14 archivos faltantes creados (Requirements, Architecture, QA, Release, Roadmap Phases) + template universal de 30 archivos en `E:\Personal\Templates\ProjectVault_Template\` | Claude Code + odiaz |
 | [[DevLog/2026-06-05-auditoria-sistema-ia\|2026-06-05 (sesión 3)]] | Auditoría completa del vault + sistema de colaboración IA: 13 AGENT_CONTEXT.md creados, DevLog template actualizado con campos agent/model, DoD y PR Checklist actualizados, TAREA FINAL agregada a 12 Sprint files, mock mínimo estándar definido, discrepancia GET /api/collections resuelta | Claude Code (claude-sonnet-4-6) + odiaz |
 | [[DevLog/2026-06-05-mitigacion-riesgos\|2026-06-05 (sesión 4)]] | Mitigación de 9 riesgos: conflictos de ownership corregidos (Marina/Monserrat, Juan Carlos/Diana→App.jsx, Luis/Héctor/Christian→app.js, Germán→main.jsx), secret CI corregido, dependencia falsa Christian→Luis eliminada, standup async agregado, R07 resuelto en Risk Register, recordatorio AGENT_CONTEXT en 12 Sprint files | Claude Code (claude-sonnet-4-6) + odiaz |
+| [[DevLog/2026-06-06-juan-carlos-onboarding\|2026-06-06 (sesión 5)]] | Kinetic Cinema Design: onboarding + TabSelector rediseñados con tokens de Andrés (glassmorphism, #ff571a, Geist, Material Symbols), AuthContext con authProvider, Firebase config restaurada, 17 tests verdes | Claude Code (big-pickle) + Juan Carlos Macías |
 
 ---
 
