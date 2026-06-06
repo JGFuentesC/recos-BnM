@@ -25,6 +25,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-05-auditoria-sistema-ia\|2026-06-05 (sesión 3)]] | Auditoría completa del vault + sistema de colaboración IA: 13 AGENT_CONTEXT.md creados, DevLog template actualizado con campos agent/model, DoD y PR Checklist actualizados, TAREA FINAL agregada a 12 Sprint files, mock mínimo estándar definido, discrepancia GET /api/collections resuelta | Claude Code (claude-sonnet-4-6) + odiaz |
 | [[DevLog/2026-06-05-mitigacion-riesgos\|2026-06-05 (sesión 4)]] | Mitigación de 9 riesgos: conflictos de ownership corregidos (Marina/Monserrat, Juan Carlos/Diana→App.jsx, Luis/Héctor/Christian→app.js, Germán→main.jsx), secret CI corregido, dependencia falsa Christian→Luis eliminada, standup async agregado, R07 resuelto en Risk Register, recordatorio AGENT_CONTEXT en 12 Sprint files | Claude Code (claude-sonnet-4-6) + odiaz |
 | [[DevLog/2026-06-06-andres-auth\|2026-06-06 (sesión 5)]] | Implementación Epic 1 en rama andres: login/registro Firebase, onboarding con `cold_start_done`, rutas protegidas, placeholders de integración, registro de service worker y scaffold backend (`admin.js`, `auth.js`, `app.js`) para desbloqueo del equipo | Codex (GPT-5.3-Codex) + Andres Gonzalez |
+| [[DevLog/2026-06-06-german-cicd\|2026-06-06 (sesión 6)]] | CI/CD pipeline (GitHub Actions → Firebase Hosting), frontend Hello World con Vite + React, Service Worker PWA, PWA Manifest, firebase.json hosting config, CLAUDE.md, README.md actualizado, .env.example files | Claude Code (claude-sonnet-4-6) + Germán Pacheco |
 
 ---
 

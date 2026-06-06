@@ -1,19 +1,93 @@
-# reco-BnM — Catálogo & Scoring (HU 3.1)
+# Recos BnM — Book & Movie Recommendations
 
-**rama:** `feat/manuel`  
-**asignado:** Manuel Serranía Reinada  
-**épica:** 3 — Recomendación y mecánica de swipe (P3)
+**Plataforma PWA de recomendación personalizada de libros y películas.**
 
 ---
 
-## Lo que entrega esta rama
+## Stack
 
-| Artefacto | ubicación | qué hace |
+| Capa | Tecnología |
+|---|---|
+| Frontend | React + Vite + PWA |
+| Backend | Node.js |
+| Base de datos | Firestore (emulador local) |
+| Hosting | Firebase Hosting |
+| CI/CD | GitHub Actions |
+| Ingesta | Python (TMDB + Google Books) |
+
+---
+
+## Despliegue automático (CI/CD)
+
+El pipeline se activa automáticamente en cada push a la rama `main`:
+
+1. **Build** del frontend con Vite
+2. **Deploy** a Firebase Hosting (canal `live`)
+
+Workflow: `.github/workflows/deploy.yml`
+
+### Secrets requeridos en GitHub
+
+| Secret | Descripción |
+|---|---|
+| `FIREBASE_SERVICE_ACCOUNT` | JSON completo del service account de Firebase (rol: Firebase Hosting Admin) |
+| `VITE_FIREBASE_API_KEY` | API Key del proyecto Firebase |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Auth domain del proyecto Firebase |
+| `VITE_FIREBASE_PROJECT_ID` | ID del proyecto Firebase |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Storage bucket del proyecto Firebase |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Sender ID de Firebase Cloud Messaging |
+| `VITE_FIREBASE_APP_ID` | App ID del proyecto Firebase |
+
+### Cómo generar el Service Account
+
+1. Ir a [console.cloud.google.com](https://console.cloud.google.com) → IAM y administración → Cuentas de servicio
+2. Crear cuenta con rol **Firebase Hosting Admin**
+3. Crear clave JSON y copiar el contenido completo como secret `FIREBASE_SERVICE_ACCOUNT`
+
+> ⚠️ `firebase login:ci` genera un token de sesión que NO funciona con `firebaseServiceAccount`.
+
+### Variables de entorno locales
+
+**Frontend** — crear `frontend/.env` (valores en `frontend/.env.example`):
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+**Backend** — crear `backend/.env` (ver `backend/.env.example`):
+```bash
+TMDB_API_KEY=
+GOOGLE_BOOKS_API_KEY=
+FIRESTORE_PROJECT_ID=recos-bnm
+FIRESTORE_EMULATOR_HOST=localhost:8080
+GOOGLE_APPLICATION_CREDENTIALS=
+```
+
+---
+
+## Funcionalidad offline (PWA)
+
+La aplicación funciona como PWA con soporte offline parcial:
+- **Shell** cacheada al instalar (navegación offline)
+- **Colección** cachea hasta 10 ítems (Network First con fallback a caché)
+- Service Worker: `frontend/public/sw.js`
+
+---
+
+## Épica 3 — Catálogo & Scoring (Manuel Serranía)
+
+**HU 3.1** — Rama `feat/manuel`
+
+| Artefacto | Ubicación | Qué hace |
 |---|---|---|
-| Pipeline de ingesta | `ingest/src/` | Trae ~550 ítems (300 movies + 250 books) de TMDB + Google Books y los escribe en Firestore colección `content` |
-| Módulo de scoring | `api/src/services/scoring.js` | Calcula `score = 0.7·norm(popularity) + 0.3·norm(rating)` con boost opcional por afinidad de géneros |
-| Tests | `ingest/tests/` | 30 tests: modelos + fórmula scoring |
-| Documentación | `docs/` | Plan, heartbeat, gap-analysis, testing guide, security audit |
+| Pipeline de ingesta | `ingest/src/` | Trae ~550 ítems (300 movies + 250 books) de TMDB + Google Books |
+| Módulo de scoring | `api/src/services/scoring.js` | `score = 0.7·norm(popularity) + 0.3·norm(rating)` |
+| Tests | `ingest/tests/` | 30 tests |
+| Documentación | `docs/` | Plan, heartbeat, testing guide, security audit |
 
 ---
 
@@ -32,6 +106,16 @@
 ---
 
 ## Cómo usar
+
+### 0. Iniciar frontend localmente
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abrir en http://localhost:5173
 
 ### 1. Iniciar emulator de Firestore
 
@@ -217,8 +301,24 @@ Atribución requerida en UI:
 
 ```
 recos-BnM/
+├── .github/workflows/
+│   └── deploy.yml            ← CI/CD: build + deploy a Firebase Hosting
+├── frontend/                 ← PWA React + Vite
+│   ├── public/
+│   │   ├── sw.js             ← Service Worker (offline parcial)
+│   │   └── manifest.json     ← PWA manifest
+│   ├── src/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── .env.example
+│   └── package.json
+├── backend/
+│   ├── .env.example
+│   └── src/
+│       └── services/
+│           └── scoring.js    ← Módulo de scoring
 ├── api/src/services/
-│   └── scoring.js            ← Módulo de scoring (para Luis)
+│   └── scoring.js            ← Módulo de scoring
 ├── ingest/
 │   ├── src/
 │   │   ├── main.py           ← Entry point (Cloud Run)
@@ -235,6 +335,7 @@ recos-BnM/
 │   └── requirements.txt
 ├── src/firestore/
 │   └── SCHEMA.md             ← Schema de Israel
+├── CLAUDE.md                 ← Gobernanza de IA
 └── docs/
     ├── SYSTEM_HEARTBEAT.md
     ├── TESTING_HU3.1.md
