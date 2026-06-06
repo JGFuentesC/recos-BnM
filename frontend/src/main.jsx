@@ -5,6 +5,14 @@ import { AuthProvider } from './contexts/AuthContext'
 import './index.css'
 import App from './App.jsx'
 
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // PWA shell is optional during local development and first rollout.
+    })
+  })
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
