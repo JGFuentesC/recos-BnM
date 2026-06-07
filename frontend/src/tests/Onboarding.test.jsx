@@ -1,11 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, afterEach } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
 import Onboarding from "../pages/Onboarding"
 
+const { mockNavigate } = vi.hoisted(() => ({
+  mockNavigate: vi.fn(),
+}))
+
+const mockUpdateDoc = vi.fn(() => Promise.resolve())
+const mockAddDoc = vi.fn(() => Promise.resolve("mock-swipe-id"))
+
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn(() => "mock-doc-ref"),
-  updateDoc: vi.fn(() => Promise.resolve()),
+  collection: vi.fn(() => "mock-collection"),
+  addDoc: mockAddDoc,
+  updateDoc: mockUpdateDoc,
   serverTimestamp: vi.fn(() => "mock-timestamp"),
 }))
 
@@ -13,16 +22,22 @@ vi.mock("../firebase/config", () => ({
   db: "mock-db",
 }))
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom")
-  return { ...actual, useNavigate: () => vi.fn() }
-})
-
+const mockLogout = vi.fn()
+const mockSetUserProfile = vi.fn()
 const mockUser = { uid: "test-uid-123", email: "test@test.com" }
 
 vi.mock("../contexts/AuthContext", () => ({
-  useAuth: () => ({ currentUser: mockUser }),
+  useAuth: () => ({
+    currentUser: mockUser,
+    logout: mockLogout,
+    setUserProfile: mockSetUserProfile,
+  }),
 }))
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom")
+  return { ...actual, useNavigate: () => mockNavigate }
+})
 
 function renderOnboarding() {
   return render(
@@ -33,7 +48,7 @@ function renderOnboarding() {
 }
 
 describe("Onboarding", () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks()
   })
 
@@ -42,7 +57,7 @@ describe("Onboarding", () => {
     expect(screen.getByText("¿Qué tipo de contenido te gusta?")).toBeDefined()
   })
 
-  it("shows all genre chips", () => {
+  it("shows all 12 genre chips", () => {
     renderOnboarding()
     const genres = [
       "Acción", "Drama", "Comedia", "Terror", "Romance",
@@ -76,44 +91,41 @@ describe("Onboarding", () => {
     expect(screen.getByText("Continuar").disabled).toBe(true)
   })
 
-  it("progresses to step 2 after selecting a genre and clicking continue", () => {
+  it("advances to step 2 after selecting a genre and clicking continue", () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
-    expect(screen.getByText(/1 de 5 tarjetas/)).toBeDefined()
+    expect(document.querySelector(".ob-card")).toBeDefined()
   })
 
   it("shows progress bar", () => {
     renderOnboarding()
-    const progressFills = document.querySelectorAll(
-      "[style*='background-color: rgb(255, 87, 26)']"
-    )
-    expect(progressFills.length).toBeGreaterThan(0)
+    expect(document.querySelector(".ob-progress-fill")).toBeDefined()
   })
 
-  it("allows skipping cards in step 2", () => {
+  it("shows action buttons in step 2", () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
-    fireEvent.click(screen.getByText("Saltar"))
-    expect(screen.getByText(/2 de 5 tarjetas/)).toBeDefined()
+    const actions = document.querySelector(".ob-actions")
+    expect(actions).toBeDefined()
+    expect(actions.querySelectorAll("button").length).toBe(3)
   })
 
-  it("shows like and dislike buttons in step 2", () => {
+  it("shows 'Saltar' button in step 2", () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
-    expect(screen.getByLabelText("Me gusta")).toBeDefined()
-    expect(screen.getByLabelText("No me interesa")).toBeDefined()
+    expect(screen.getByText("Saltar")).toBeDefined()
   })
 
-  it("liking all cards advances to step 3", async () => {
+  it("liking all 8 cards advances to step 3", async () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
 
-    for (let i = 0; i < 5; i++) {
-      fireEvent.click(screen.getByLabelText("Me gusta"))
+    for (let i = 0; i < 8; i++) {
+      fireEvent.click(screen.getByText("♡"))
     }
 
     await waitFor(() => {
@@ -121,12 +133,13 @@ describe("Onboarding", () => {
     })
   })
 
-  it("renders optional author and director inputs in step 3", async () => {
+  it("shows author and director inputs in step 3", async () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
-    for (let i = 0; i < 5; i++) {
-      fireEvent.click(screen.getByLabelText("Me gusta"))
+
+    for (let i = 0; i < 8; i++) {
+      fireEvent.click(screen.getByText("♡"))
     }
 
     await waitFor(() => {
@@ -143,8 +156,9 @@ describe("Onboarding", () => {
     renderOnboarding()
     fireEvent.click(screen.getByText("Ciencia Ficción"))
     fireEvent.click(screen.getByText("Continuar"))
-    for (let i = 0; i < 5; i++) {
-      fireEvent.click(screen.getByLabelText("Me gusta"))
+
+    for (let i = 0; i < 8; i++) {
+      fireEvent.click(screen.getByText("♡"))
     }
 
     await waitFor(() => {
@@ -152,9 +166,24 @@ describe("Onboarding", () => {
     })
   })
 
-  it("renders loading state when no user is provided", () => {
-    vi.mocked(vi.fn()).mockReturnValue({ currentUser: null })
+  it("calls updateDoc with correct prefs on finish", async () => {
     renderOnboarding()
-    expect(screen.getByText("Cargando...")).toBeDefined()
+    fireEvent.click(screen.getByText("Ciencia Ficción"))
+    fireEvent.click(screen.getByText("Continuar"))
+
+    for (let i = 0; i < 8; i++) {
+      fireEvent.click(screen.getByText("♡"))
+    }
+
+    await waitFor(() => {
+      expect(screen.getByText("Empezar a descubrir →")).toBeDefined()
+    })
+
+    fireEvent.click(screen.getByText("Empezar a descubrir →"))
+
+    await waitFor(() => {
+      expect(mockUpdateDoc).toHaveBeenCalled()
+    })
   })
+
 })

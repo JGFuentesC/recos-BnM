@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { useAuth } from '../contexts/AuthContext'
+import './Onboarding.css'
+
+const GENRES = [
+  "Acción", "Drama", "Comedia", "Terror", "Romance",
+  "Ciencia Ficción", "Misterio", "Documentales", "Fantasía",
+  "Thriller", "Biografías", "Historia",
+]
 
 const CARDS = [
   {
@@ -74,13 +81,21 @@ const CARDS = [
 export default function Onboarding() {
   const { currentUser, logout, setUserProfile } = useAuth()
   const navigate = useNavigate()
+  const [step, setStep] = useState(1)
+  const [selectedGenres, setSelectedGenres] = useState([])
+  const [author, setAuthor] = useState("")
+  const [director, setDirector] = useState("")
   const [index, setIndex] = useState(0)
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [likedGenres, setLikedGenres] = useState(new Set())
 
   const current = CARDS[index]
-  const progress = useMemo(() => Math.round((index / CARDS.length) * 100), [index])
+  const progress = useMemo(() => {
+    if (step === 1) return 10
+    if (step === 3) return 90
+    return Math.round(10 + (index / CARDS.length) * 80)
+  }, [step, index])
 
   async function saveSwipe(card, action) {
     await addDoc(collection(db, 'swipes'), {
@@ -94,10 +109,11 @@ export default function Onboarding() {
   }
 
   async function completeOnboarding(skipped = false) {
+    const genres = selectedGenres.length > 0 ? selectedGenres : Array.from(likedGenres)
     await updateDoc(doc(db, 'users', currentUser.uid), {
-      'prefs.genres': Array.from(likedGenres),
-      'prefs.authors': [],
-      'prefs.directors': [],
+      'prefs.genres': genres,
+      'prefs.authors': author.trim() ? [author.trim()] : [],
+      'prefs.directors': director.trim() ? [director.trim()] : [],
       'prefs.cold_start_done': true,
       onboardingCompletedAt: serverTimestamp(),
       onboardingSkipped: skipped,
@@ -107,9 +123,9 @@ export default function Onboarding() {
       ...(previous ?? {}),
       prefs: {
         ...(previous?.prefs ?? {}),
-        genres: Array.from(likedGenres),
-        authors: [],
-        directors: [],
+        genres,
+        authors: author.trim() ? [author.trim()] : [],
+        directors: director.trim() ? [director.trim()] : [],
         cold_start_done: true,
       },
       onboardingSkipped: skipped,
@@ -137,7 +153,7 @@ export default function Onboarding() {
 
       const nextIndex = index + 1
       if (nextIndex >= CARDS.length) {
-        await completeOnboarding(false)
+        setStep(3)
         return
       }
 
@@ -156,59 +172,159 @@ export default function Onboarding() {
     }
   }
 
+  function handleContinueToSwipe() {
+    setStep(2)
+  }
+
+  function toggleGenre(genre) {
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+    )
+  }
+
   return (
     <div className="ob-shell">
-      <header className="ob-topbar">
-        <div className="ob-brand">Match&Read</div>
-        <button className="ob-skip" onClick={handleSkip}>Saltar</button>
-      </header>
+      {step === 2 && (
+        <header className="ob-topbar">
+          <div className="ob-brand">Match&Read</div>
+          <button className="ob-skip" onClick={handleSkip}>Saltar</button>
+        </header>
+      )}
 
       <div className="ob-progress-track">
         <div className="ob-progress-fill" style={{ width: `${progress}%` }} />
       </div>
 
       <main className="ob-content">
-        <h1 className="ob-title">Personaliza tu feed</h1>
-        <p className="ob-subtitle">Desliza para indicarnos que generos y estilos te apasionan.</p>
-
-        {current ? (
-          <article className="ob-card">
-            <img className="ob-card-image" src={current.image} alt={current.title} />
-            <div className="ob-overlay" />
-            <div className="ob-card-body">
-              <div className="ob-chips">
-                {current.chips.map((chip) => (
-                  <span key={chip} className="ob-chip">{chip}</span>
-                ))}
-              </div>
-              <h2 className="ob-card-title">{current.title}</h2>
-              <p className="ob-card-description">{current.description}</p>
-            </div>
-          </article>
-        ) : (
-          <p className="ob-empty">Sin tarjetas disponibles.</p>
+        {step === 1 && (
+          <StepGenres
+            genres={GENRES}
+            selected={selectedGenres}
+            onToggle={toggleGenre}
+            onContinue={handleContinueToSwipe}
+          />
         )}
 
-        <section className="ob-actions">
-          <button className="ob-btn ob-btn-muted" onClick={() => handleAction('dislike')}>
-            ✕
-          </button>
-          <button className="ob-btn ob-btn-like" onClick={() => handleAction('like')}>
-            ♡
-          </button>
-          <button className="ob-btn ob-btn-muted" onClick={() => handleAction('like')}>
-            ⌑
-          </button>
-        </section>
+        {step === 2 && (
+          <>
+            <h1 className="ob-title">Personaliza tu feed</h1>
+            <p className="ob-subtitle">Desliza para indicarnos que generos y estilos te apasionan.</p>
 
-        <div className="ob-footline">TU PROXIMO MATCH ESTA A UN SWIPE.</div>
-        <div className="ob-footnote">Calibrando tus gustos...</div>
+            {current ? (
+              <article className="ob-card">
+                <img className="ob-card-image" src={current.image} alt={current.title} />
+                <div className="ob-overlay" />
+                <div className="ob-card-body">
+                  <div className="ob-chips">
+                    {current.chips.map((chip) => (
+                      <span key={chip} className="ob-chip">{chip}</span>
+                    ))}
+                  </div>
+                  <h2 className="ob-card-title">{current.title}</h2>
+                  <p className="ob-card-description">{current.description}</p>
+                </div>
+              </article>
+            ) : (
+              <p className="ob-empty">Sin tarjetas disponibles.</p>
+            )}
 
-        <button className="ob-logout" onClick={logout}>Cerrar sesion</button>
+            <section className="ob-actions">
+              <button className="ob-btn ob-btn-muted" onClick={() => handleAction('dislike')}>
+                ✕
+              </button>
+              <button className="ob-btn ob-btn-like" onClick={() => handleAction('like')}>
+                ♡
+              </button>
+              <button className="ob-btn ob-btn-muted" onClick={() => handleAction('like')}>
+                ⌑
+              </button>
+            </section>
 
-        {status && <p className="status">{status}</p>}
-        {error && <p className="error">{error}</p>}
+            <div className="ob-footline">TU PROXIMO MATCH ESTA A UN SWIPE.</div>
+            <div className="ob-footnote">Calibrando tus gustos...</div>
+
+            <button className="ob-logout" onClick={logout}>Cerrar sesion</button>
+
+            {status && <p className="status">{status}</p>}
+            {error && <p className="error">{error}</p>}
+          </>
+        )}
+
+        {step === 3 && (
+          <StepProfile
+            author={author}
+            director={director}
+            onAuthorChange={setAuthor}
+            onDirectorChange={setDirector}
+            onFinish={() => completeOnboarding(false)}
+          />
+        )}
       </main>
+    </div>
+  )
+}
+
+function StepGenres({ genres, selected, onToggle, onContinue }) {
+  const canContinue = selected.length > 0
+  return (
+    <div className="step-wrapper">
+      <h1 className="step-title">¿Qué tipo de contenido te gusta?</h1>
+      <p className="step-subtitle">
+        Selecciona al menos un género para que podamos recomendarte contenido personalizado.
+      </p>
+      <div className="genre-grid">
+        {genres.map((genre) => {
+          const active = selected.includes(genre)
+          return (
+            <button
+              key={genre}
+              className={`genre-chip${active ? ' genre-chip--active' : ''}`}
+              onClick={() => onToggle(genre)}
+            >
+              {genre}
+            </button>
+          )
+        })}
+      </div>
+      <button
+        className={`step-btn step-btn--primary${!canContinue ? ' step-btn--disabled' : ''}`}
+        disabled={!canContinue}
+        onClick={onContinue}
+      >
+        Continuar
+      </button>
+    </div>
+  )
+}
+
+function StepProfile({ author, director, onAuthorChange, onDirectorChange, onFinish }) {
+  return (
+    <div className="step-wrapper">
+      <h1 className="step-title">Casi listo</h1>
+      <p className="step-subtitle">
+        Cuéntanos un poco más sobre tus preferencias (opcional).
+      </p>
+      <label className="step-label">¿Algún autor favorito?</label>
+      <input
+        type="text"
+        className="step-input"
+        value={author}
+        onChange={(e) => onAuthorChange(e.target.value)}
+        placeholder="ej. Gabriel García Márquez"
+      />
+      <div className="step-spacer" />
+      <label className="step-label">¿Algún director favorito?</label>
+      <input
+        type="text"
+        className="step-input"
+        value={director}
+        onChange={(e) => onDirectorChange(e.target.value)}
+        placeholder="ej. Christopher Nolan"
+      />
+      <div className="step-spacer-large" />
+      <button className="step-btn step-btn--primary" onClick={onFinish}>
+        Empezar a descubrir →
+      </button>
     </div>
   )
 }
