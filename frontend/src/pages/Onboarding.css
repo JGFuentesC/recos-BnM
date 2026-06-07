@@ -1,3 +1,20 @@
+@keyframes slideInFromRight {
+  from { transform: translateX(60px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.step-slide-in {
+  width: 100%;
+  animation: slideInFromRight 300ms ease-out;
+}
+
+.ob-card-counter {
+  font-size: 0.875rem;
+  color: rgba(242, 239, 237, 0.6);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
 .step-wrapper {
   flex: 1;
   display: flex;
