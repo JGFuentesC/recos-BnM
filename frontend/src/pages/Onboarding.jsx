@@ -196,6 +196,7 @@ export default function Onboarding() {
       </div>
 
       <main className="ob-content">
+        <div key={step} className="step-slide-in">
         {step === 1 && (
           <StepGenres
             genres={GENRES}
@@ -209,6 +210,8 @@ export default function Onboarding() {
           <>
             <h1 className="ob-title">Personaliza tu feed</h1>
             <p className="ob-subtitle">Desliza para indicarnos que generos y estilos te apasionan.</p>
+
+            <p className="ob-card-counter">{index + 1} de {CARDS.length} tarjetas</p>
 
             {current ? (
               <article className="ob-card">
@@ -259,6 +262,7 @@ export default function Onboarding() {
             onFinish={() => completeOnboarding(false)}
           />
         )}
+      </div>
       </main>
     </div>
   )
