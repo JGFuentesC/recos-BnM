@@ -1,0 +1,16 @@
+{
+  "name": "Recos BnM",
+  "short_name": "RecosBnM",
+  "description": "Book & Movie Recommendation Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

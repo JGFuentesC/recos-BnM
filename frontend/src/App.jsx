@@ -1,10 +1,20 @@
-import { Routes, Route, Navigate } from "react-router-dom"
-import ProtectedRoute from "./components/ProtectedRoute"
-import Onboarding from "./pages/Onboarding"
+import { Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import FeedPlaceholder from './pages/FeedPlaceholder'
+import Login from './pages/Login'
+import LibraryPlaceholder from './pages/LibraryPlaceholder'
+import MockFeed from './pages/MockFeed'
+import Onboarding from './pages/Onboarding'
+import Register from './pages/Register'
+import './App.css'
 
-export default function App() {
+function App() {
   return (
+    // TODO: envolver con <FeedProvider> cuando Juan Carlos entregue FeedContext.jsx
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route
         path="/onboarding"
         element={
@@ -17,47 +27,22 @@ export default function App() {
         path="/feed"
         element={
           <ProtectedRoute>
-            <div
-              style={{
-                minHeight: "100dvh",
-                backgroundColor: "#0F0E17",
-                color: "#FFFFFE",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "Inter, sans-serif",
-              }}
-            >
-              <p>Feed (Monserrat)</p>
-            </div>
+            <FeedPlaceholder />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/login"
+        path="/library"
         element={
-          <div
-            style={{
-              minHeight: "100dvh",
-              backgroundColor: "#0F0E17",
-              color: "#A7A9BE",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Inter, sans-serif",
-              gap: 16,
-              padding: 24,
-            }}
-          >
-            <h2 style={{ color: "#FFFFFE", fontFamily: "Playfair Display, serif" }}>
-              Iniciar sesión
-            </h2>
-            <p>Andrés: implementar Login.jsx aquí</p>
-          </div>
+          <ProtectedRoute>
+            <LibraryPlaceholder />
+          </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/onboarding" replace />} />
+      <Route path="/mock-feed" element={<MockFeed />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
+
+export default App

@@ -1,0 +1,339 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(100%, 420px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.card h1 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.card h2 {
+  margin: 12px 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 12px;
+}
+
+.form {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  border: 0;
+  background: #ff571a;
+  color: #310a00;
+  font-weight: 700;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.link {
+  border: 0;
+  background: transparent;
+  color: #ffb59e;
+  cursor: pointer;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff571a, #7701d0);
+}
+
+.status {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 87, 26, 0.14);
+  border: 1px solid rgba(255, 87, 26, 0.34);
+}
+
+.error {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 180, 171, 0.14);
+  border: 1px solid rgba(255, 180, 171, 0.34);
+}
+
+.center {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+}
+
+.ob-shell {
+  min-height: 100dvh;
+  color: #f2efed;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 87, 26, 0.18), transparent 26%),
+    radial-gradient(circle at 85% 10%, rgba(119, 1, 208, 0.16), transparent 20%),
+    linear-gradient(180deg, #0b0c0f, #060709);
+}
+
+.ob-topbar {
+  height: 68px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+
+.ob-brand {
+  color: #ff571a;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.ob-skip {
+  border: 0;
+  background: transparent;
+  color: rgba(242, 239, 237, 0.85);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.ob-progress-track {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.ob-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff571a, #7701d0);
+  box-shadow: 0 0 14px rgba(255, 87, 26, 0.5);
+  transition: width 220ms ease;
+}
+
+.ob-content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 18px 30px;
+  text-align: center;
+}
+
+.ob-title {
+  margin: 6px 0;
+  font-size: clamp(2.1rem, 6vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.ob-subtitle {
+  margin: 0 auto 18px;
+  max-width: 42ch;
+  color: rgba(242, 239, 237, 0.78);
+  font-size: 1.03rem;
+}
+
+.ob-card {
+  position: relative;
+  width: min(100%, 640px);
+  height: min(62dvh, 620px);
+  margin: 0 auto;
+  border-radius: 34px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 28px 55px rgba(0, 0, 0, 0.55);
+}
+
+.ob-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ob-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 16%, rgba(0, 0, 0, 0.08) 38%, rgba(0, 0, 0, 0.88) 92%);
+}
+
+.ob-card-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 18px 20px 22px;
+  text-align: left;
+}
+
+.ob-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ob-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ob-card-title {
+  margin: 10px 0 6px;
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.ob-card-description {
+  margin: 0;
+  max-width: 28ch;
+  color: rgba(242, 239, 237, 0.78);
+  font-size: 1.04rem;
+  line-height: 1.45;
+}
+
+.ob-actions {
+  margin: 18px auto 0;
+  width: min(100%, 460px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ob-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f2efed;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.ob-btn-muted {
+  width: 74px;
+  height: 74px;
+  font-size: 2rem;
+}
+
+.ob-btn-like {
+  width: 98px;
+  height: 98px;
+  font-size: 2.5rem;
+  border: 0;
+  color: #2f0b00;
+  background: #ff571a;
+  box-shadow: 0 0 34px rgba(255, 87, 26, 0.45);
+}
+
+.ob-footline {
+  margin-top: 16px;
+  color: #ff571a;
+  font-size: 0.95rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.ob-footnote {
+  margin-top: 6px;
+  color: rgba(242, 239, 237, 0.75);
+  font-style: italic;
+}
+
+.ob-logout {
+  margin-top: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2efed;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.ob-empty {
+  color: rgba(242, 239, 237, 0.78);
+}
+
+@media (max-width: 640px) {
+  .ob-brand {
+    font-size: 1.65rem;
+  }
+
+  .ob-card {
+    height: min(52dvh, 500px);
+    border-radius: 28px;
+  }
+
+  .ob-card-title {
+    font-size: clamp(2.1rem, 10vw, 3.5rem);
+  }
+
+  .ob-actions {
+    width: 100%;
+    max-width: 360px;
+    gap: 18px;
+    justify-content: center;
+  }
+
+  .ob-btn-muted {
+    width: 68px;
+    height: 68px;
+  }
+
+  .ob-btn-like {
+    width: 88px;
+    height: 88px;
+  }
+}
