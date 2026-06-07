@@ -9,17 +9,14 @@
 const request = require('supertest')
 const express = require('express')
 
-// ─── Mock firebase/admin ─────────────────────────────────────────────────────
+// ─── Mock firebase/admin ──────────────────────────────────────────────────────
 const mockAdd = jest.fn().mockResolvedValue({ id: 'swipe-doc-id' })
 
-jest.mock('../src/firebase/admin', () => ({
-  db: {
-    collection: jest.fn().mockReturnValue({ add: mockAdd }),
-  },
-  firestore: {
-    FieldValue: { serverTimestamp: jest.fn().mockReturnValue('MOCK_TIMESTAMP') },
-  },
-}))
+jest.mock('../src/firebase/admin', () => {
+  const firestoreFn = jest.fn(() => ({ collection: jest.fn().mockReturnValue({ add: mockAdd }) }))
+  firestoreFn.FieldValue = { serverTimestamp: jest.fn().mockReturnValue('MOCK_TIMESTAMP') }
+  return { firestore: firestoreFn, auth: jest.fn() }
+})
 
 // ─── Mock auth middleware ─────────────────────────────────────────────────────
 jest.mock('../src/middleware/auth', () => (req, res, next) => {
@@ -61,6 +58,28 @@ describe('POST /api/swipe', () => {
     expect(res.body.error).toBe('missing_token')
   })
 
+  test('400 — falta contentId', async () => {
+    const { contentId: _, ...bodyWithoutContentId } = validBody
+    const res = await request(app)
+      .post('/api/swipe')
+      .set('Authorization', 'Bearer fake-token')
+      .send(bodyWithoutContentId)
+
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_fields')
+  })
+
+  test('400 — falta userId → retorna 400 no 403', async () => {
+    const { userId: _, ...bodyWithoutUserId } = validBody
+    const res = await request(app)
+      .post('/api/swipe')
+      .set('Authorization', 'Bearer fake-token')
+      .send(bodyWithoutUserId)
+
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_fields')
+  })
+
   test('400 — action inválida', async () => {
     const res = await request(app)
       .post('/api/swipe')
@@ -69,16 +88,6 @@ describe('POST /api/swipe', () => {
 
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('invalid_action')
-  })
-
-  test('400 — falta contentId', async () => {
-    const res = await request(app)
-      .post('/api/swipe')
-      .set('Authorization', 'Bearer fake-token')
-      .send({ ...validBody, contentId: undefined })
-
-    expect(res.status).toBe(400)
-    expect(res.body.error).toBe('missing_fields')
   })
 
   test('204 — swipe válido (like)', async () => {
