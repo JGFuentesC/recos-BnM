@@ -5,7 +5,7 @@ import subprocess
 import pytest
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
-SCORING_JS = os.path.join(REPO_ROOT, "api", "src", "services", "scoring.js")
+SCORING_JS = os.path.join(REPO_ROOT, "backend", "src", "services", "scoring.js")
 
 
 def _run_node(script: str) -> list:
@@ -133,3 +133,11 @@ def test_node_module_exports():
         capture_output=True, text=True, cwd=REPO_ROOT,
     )
     assert result.stdout.strip() == "function function"
+
+def test_node_module_exports_scoreCandidates():
+    rel = os.path.relpath(SCORING_JS, REPO_ROOT).replace("\\", "/")
+    result = subprocess.run(
+        ["node", "-e", f"const m = require('./{rel}'); console.log(typeof m.scoreCandidates, m.scoreCandidates === m.computeScore);"],
+        capture_output=True, text=True, cwd=REPO_ROOT,
+    )
+    assert result.stdout.strip() == "function true"

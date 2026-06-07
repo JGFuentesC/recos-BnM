@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Literal
 
 
-ContentType = Literal["movie", "book", "series"]
+ContentType = Literal["movie", "book"]
 SourceType = Literal["tmdb", "google_books"]
 
 
@@ -13,14 +13,14 @@ class ContentItem:
     externalId: str
     source: SourceType
     title: str
-    posterUrl: str
+    cover: str
     year: int
     creator: list[str] = field(default_factory=list)
     genres: list[str] = field(default_factory=list)
-    description: str = ""
+    synopsis: str = ""
     popularity: float = 0.0
     rating: float = 0.0
-    whereToWatch: list[str] = field(default_factory=list)
+    watchProviders: list[str] = field(default_factory=list)
     syncedAt: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     @property
@@ -28,9 +28,7 @@ class ContentItem:
         return f"{self.source}_{self.externalId}"
 
     def to_firestore_dict(self) -> dict:
-        d = asdict(self)
-        d["syncedAt"] = d["syncedAt"].isoformat()
-        return d
+        return asdict(self)
 
     @classmethod
     def from_tmdb(cls, details: dict, watch_providers: list[str]) -> "ContentItem":
@@ -41,14 +39,14 @@ class ContentItem:
             externalId=str(details["id"]),
             source="tmdb",
             title=details.get("title", ""),
-            posterUrl=f"https://image.tmdb.org/t/p/w500{details.get('poster_path', '')}" if details.get("poster_path") else "",
+            cover=f"https://image.tmdb.org/t/p/w500{details.get('poster_path', '')}" if details.get("poster_path") else "",
             year=cls._extract_year(details.get("release_date", "")),
             creator=directors,
             genres=[g["name"] for g in details.get("genres", [])],
-            description=details.get("overview", ""),
+            synopsis=details.get("overview", ""),
             popularity=details.get("popularity", 0.0),
             rating=details.get("vote_average", 0.0),
-            whereToWatch=watch_providers,
+            watchProviders=watch_providers,
         )
 
     @classmethod
@@ -61,11 +59,11 @@ class ContentItem:
             externalId=volume["id"],
             source="google_books",
             title=info.get("title", ""),
-            posterUrl=image_links.get("thumbnail", ""),
+            cover=image_links.get("thumbnail", ""),
             year=cls._extract_year(info.get("publishedDate", "")),
             creator=info.get("authors", []),
             genres=info.get("categories", []),
-            description=info.get("description", ""),
+            synopsis=info.get("description", ""),
             popularity=0.0,
             rating=raw_rating * 2.0,
         )
