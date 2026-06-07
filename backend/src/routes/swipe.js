@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const authMiddleware = require('../middleware/auth')
 const admin = require('../firebase/admin')
-const { db } = require('../firebase/admin')
+const db = admin.firestore()
 
 const router = Router()
 
@@ -24,17 +24,17 @@ const VALID_CONTENT_TYPES = ['movie', 'book']
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, contentId, contentType, action } = req.body
 
-  // Validar que userId coincide con el token
-  if (req.user.uid !== userId) {
-    return res.status(403).json({ error: 'forbidden' })
-  }
-
-  // Validar campos requeridos
+  // Validar campos requeridos primero
   if (!userId || !contentId || !contentType || !action) {
     return res.status(400).json({
       error: 'missing_fields',
       required: ['userId', 'contentId', 'contentType', 'action'],
     })
+  }
+
+  // Validar que userId coincide con el token
+  if (req.user.uid !== userId) {
+    return res.status(403).json({ error: 'forbidden' })
   }
 
   if (!VALID_ACTIONS.includes(action)) {

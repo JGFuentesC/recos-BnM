@@ -1,7 +1,8 @@
 const { Router } = require('express')
 const authMiddleware = require('../middleware/auth')
 const { computeScore } = require('../services/scoring')
-const { db } = require('../firebase/admin')
+const admin = require('../firebase/admin')
+const db = admin.firestore()
 
 const router = Router()
 
