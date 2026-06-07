@@ -29,7 +29,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-06-german-cicd|2026-06-06 (sesión 6)]]          | CI/CD pipeline (GitHub Actions → Firebase Hosting), frontend Hello World con Vite + React, Service Worker PWA, PWA Manifest, firebase.json hosting config, CLAUDE.md, README.md actualizado, .env.example files                                                                                                                 | Claude Code (claude-sonnet-4-6) + Germán Pacheco |
 | [[DevLog/2026-06-05-manuel-ingest|2026-06-05 (sesión 7)]]         | Pipeline de ingest TMDB/Books (550 docs), modelo ContentItem, scoring.js, 30 tests, Dockerfile. Hallazgos de auditoría documentados en Correcciones-Manuel.md                                                                                                                                                                    | Claude Code (claude-sonnet-4-6) + Manuel Serranía |
 | [[DevLog/2026-06-06-israel-schema|2026-06-06 (sesión 8)]]        | Alineación crítica de [SCHEMA.md](http://SCHEMA.md) al PRD, configuración de índices compuestos para feed, emuladores de auth/hosting y scripts de pruebas de seguridad de Firestore.                                                                                                                                           | Gemini / Cursor + Israel Pérez García            |
-
+| [[DevLog/2026-06-06-juan-carlos-onboarding|2026-06-06 (sesión 9)]] | Extensión de Onboarding con Steps 1 y 3 sobre base de Andrés (selección de géneros + perfil autor/director), Onboarding.css propio, tests reescritos para estructura de 3 pasos, TabSelector pill-shaped sin emojis, FeedContext.jsx listo para que Andrés envuelva App | Claude Code (big-pickle) + Juan Carlos Macías |
 
 ---
 
