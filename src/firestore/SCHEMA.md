@@ -42,6 +42,7 @@
 | `source`         | string      | `"tmdb"` o `"google_books"`                                                          |
 | `title`          | string      | Título del contenido                                                                 |
 | `cover`          | string      | URL de la portada o imagen de portada                                                |
+| `creator`        | arraystring | Directores (movie) o autores (book). Ej: `["Christopher Nolan"]` o `["F. Scott Fitzgerald"]` |
 | `year`           | number      | Año de lanzamiento o publicación                                                     |
 | `genres`         | arraystring | Lista de géneros (ej. `["Acción","Thriller"]`)                                       |
 | `synopsis`       | string      | Sinopsis o descripción completa                                                      |

@@ -90,6 +90,7 @@ interface ContentDocument {
   source: "tmdb" | "google_books";  // Fuente del dato
   title: string;                    // Título
   cover: string;                    // URL de la portada/imagen
+  creator: string[];                // Directores (movie) o autores (book). Ej: ["Christopher Nolan"]
   year: number;                     // Año de lanzamiento/publicación
   genres: string[];                 // Lista de géneros. Ej: ["Sci-Fi", "Thriller"]
   synopsis: string;                 // Sinopsis (puede ser truncada del original)
@@ -109,6 +110,7 @@ interface ContentDocument {
   "source": "tmdb",
   "title": "Inception",
   "cover": "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+  "creator": ["Christopher Nolan"],
   "year": 2010,
   "genres": ["Sci-Fi", "Action", "Thriller"],
   "synopsis": "Un ladrón que roba secretos corporativos a través del uso de la tecnología de compartir sueños...",
@@ -127,6 +129,7 @@ interface ContentDocument {
   "source": "google_books",
   "title": "Cien años de soledad",
   "cover": "https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1",
+  "creator": ["Gabriel García Márquez"],
   "year": 1967,
   "genres": ["Fiction", "Magical Realism", "Literary Fiction"],
   "synopsis": "La novela narra la historia de la familia Buendía a lo largo de siete generaciones...",
