@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from models import ContentItem
@@ -29,21 +30,21 @@ def test_from_tmdb_creates_correct_fields():
     assert item.externalId == "550"
     assert item.source == "tmdb"
     assert item.title == "Fight Club"
-    assert item.posterUrl == "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg"
+    assert item.cover == "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg"
     assert item.year == 1999
     assert item.creator == ["David Fincher"]
     assert item.genres == ["Drama", "Thriller"]
-    assert item.description == "A ticking time bomb of a movie."
+    assert item.synopsis == "A ticking time bomb of a movie."
     assert item.popularity == 85.5
     assert item.rating == 8.4
-    assert item.whereToWatch == ["Netflix", "Amazon Prime"]
+    assert item.watchProviders == ["Netflix", "Amazon Prime"]
     assert item.content_id == "tmdb_550"
 
 
 def test_from_tmdb_missing_poster_returns_empty_string():
     mock_details = {"id": 999, "title": "No Poster"}
     item = ContentItem.from_tmdb(mock_details, [])
-    assert item.posterUrl == ""
+    assert item.cover == ""
 
 
 def test_from_tmdb_missing_release_date_returns_year_zero():
@@ -61,7 +62,7 @@ def test_from_tmdb_handles_empty_genres():
 def test_from_tmdb_empty_watch_providers():
     mock_details = {"id": 300, "title": "No Providers"}
     item = ContentItem.from_tmdb(mock_details, [])
-    assert item.whereToWatch == []
+    assert item.watchProviders == []
 
 
 def test_from_tmdb_extracts_director():
@@ -103,14 +104,14 @@ def test_from_google_books_creates_correct_fields():
     assert item.externalId == "abc123"
     assert item.source == "google_books"
     assert item.title == "The Great Gatsby"
-    assert item.posterUrl == "http://books.google.com/cover.jpg"
+    assert item.cover == "http://books.google.com/cover.jpg"
     assert item.year == 1925
     assert item.creator == ["F. Scott Fitzgerald"]
     assert item.genres == ["Fiction", "Classic"]
-    assert item.description == "A story of the jazz age."
+    assert item.synopsis == "A story of the jazz age."
     assert item.popularity == 0.0
     assert item.rating == 9.0
-    assert item.whereToWatch == []
+    assert item.watchProviders == []
     assert item.content_id == "google_books_abc123"
 
 
@@ -135,7 +136,7 @@ def test_book_rating_max_five_becomes_ten():
 def test_book_missing_cover_returns_empty_string():
     mock_volume = {"id": "x4", "volumeInfo": {}}
     item = ContentItem.from_google_books(mock_volume)
-    assert item.posterUrl == ""
+    assert item.cover == ""
 
 
 def test_book_missing_categories_returns_empty_list():
@@ -147,7 +148,7 @@ def test_book_missing_categories_returns_empty_list():
 def test_book_missing_description_returns_empty_string():
     mock_volume = {"id": "x6", "volumeInfo": {}}
     item = ContentItem.from_google_books(mock_volume)
-    assert item.description == ""
+    assert item.synopsis == ""
 
 
 def test_book_extracts_authors():
@@ -179,7 +180,13 @@ def test_to_firestore_dict_includes_all_fields():
     assert d["source"] == "tmdb"
     assert d["title"] == "Test"
     assert d["rating"] == 0.0
-    assert isinstance(d["syncedAt"], str)
+    assert d["cover"] == ""
+    assert d["synopsis"] == ""
+    assert d["watchProviders"] == []
+    assert isinstance(d["syncedAt"], datetime)
+    assert "posterUrl" not in d
+    assert "description" not in d
+    assert "whereToWatch" not in d
 
 
 def test_extract_year():

@@ -67,4 +67,4 @@ function computeScore(items, genreAffinity = {}) {
     .sort((a, b) => b.score - a.score);
 }
 
-module.exports = { normalize, computeScore };
+module.exports = { normalize, computeScore, scoreCandidates: computeScore };
