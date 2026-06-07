@@ -9,8 +9,11 @@
 const request = require('supertest')
 const express = require('express')
 
-// ─── Mock firebase/admin ─────────────────────────────────────────────────────
-const mockUserDoc   = { exists: true, data: () => ({ prefs: { genres: ['Action'] } }) }
+// ─── Datos de mock ────────────────────────────────────────────────────────────
+const mockUserDoc = {
+  exists: true,
+  data: () => ({ prefs: { genres: ['Action'] } }),
+}
 const mockContentDocs = [
   { id: 'c1', data: () => ({ title: 'Movie A', cover: 'http://a.jpg', genres: ['Action'], rating: 8.0, synopsis: 'Synopsis A', type: 'movie', popularity: 100 }) },
   { id: 'c2', data: () => ({ title: 'Movie B', cover: 'http://b.jpg', genres: ['Drama'],  rating: 7.5, synopsis: 'Synopsis B', type: 'movie', popularity: 80  }) },
@@ -36,11 +39,14 @@ const mockCollection = jest.fn().mockImplementation((col) => {
   }
 })
 
-jest.mock('../src/firebase/admin', () => ({
-  db: { collection: mockCollection },
-  auth: jest.fn(),
-  firestore: { FieldValue: { serverTimestamp: jest.fn() } },
-}))
+// ─── Mock firebase/admin ──────────────────────────────────────────────────────
+// admin.firestore() → instancia de Firestore (db)
+// admin.firestore.FieldValue → namespace de utilidades
+jest.mock('../src/firebase/admin', () => {
+  const firestoreFn = jest.fn(() => ({ collection: mockCollection }))
+  firestoreFn.FieldValue = { serverTimestamp: jest.fn() }
+  return { firestore: firestoreFn, auth: jest.fn() }
+})
 
 // ─── Mock auth middleware ─────────────────────────────────────────────────────
 jest.mock('../src/middleware/auth', () => (req, res, next) => {
@@ -74,7 +80,7 @@ describe('GET /api/feed', () => {
     const res = await request(app)
       .get('/api/feed')
       .set('Authorization', 'Bearer fake-token')
-      .query({ userId: 'user-test-123' }) // sin type
+      .query({ userId: 'user-test-123' })
 
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('missing_params')
@@ -84,9 +90,10 @@ describe('GET /api/feed', () => {
     const res = await request(app)
       .get('/api/feed')
       .set('Authorization', 'Bearer fake-token')
-      .query({ type: 'movie' }) // sin userId
+      .query({ type: 'movie' })
 
     expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_params')
   })
 
   test('200 — devuelve array de ítems sin los ya swipeados', async () => {
