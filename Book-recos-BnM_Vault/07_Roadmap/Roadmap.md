@@ -1,12 +1,15 @@
 ---
-project: "Recos-BnM"
-owner: "Eduardo Coronel (PM)"
-status: "Approved"
+project: Recos-BnM
+owner: Edgar Coronel (PM)
+status: Approved
 version: "1.0"
-last_reviewed: "2026-06-04"
-milestone: "MVP"
+last_reviewed: 2026-06-04
+milestone: MVP
 source_of_truth: true
-tags: [roadmap, phases, planning]
+tags:
+  - roadmap
+  - phases
+  - planning
 ---
 
 # Roadmap — Recos-BnM
@@ -20,15 +23,22 @@ tags: [roadmap, phases, planning]
 
 | Fase | Nombre | Timeline | Estado |
 |---|---|---|---|
-| [[07_Roadmap/Phases/Phase_01_MVP\|Fase 1]] | MVP | Sprint 1 — Jun 2026 | 🟢 En progreso |
+| [[07_Roadmap/Phases/Phase_01_MVP\|Fase 1]] | MVP | 6–15 Jun 2026 · PoC 1: Vie 12 · Entrega: Lun 15 | 🟢 En progreso |
 | [[07_Roadmap/Phases/Phase_02_Engagement\|Fase 2]] | Mejoras de engagement | Q3 2026 | ⏳ Por planificar |
 | [[07_Roadmap/Phases/Phase_03_ML\|Fase 3]] | Personalización avanzada | Q4 2026 | ⏳ Por planificar |
 
 ---
 
-## Fase 1 — MVP (Sprint 1, Junio 2026)
+## Fase 1 — MVP (Sprint 1, 6–15 Junio 2026)
 
 **Objetivo:** Experiencia base de swipe funcional, desplegada en Firebase Hosting.
+
+**Hitos internos:**
+- 🔴 **Sáb–Dom 7–8 jun:** Hotfixes críticos (Israel schema + Andrés auth + Manuel ingest)
+- 🟡 **Lun–Mié 9–11 jun:** Wave 2 — backend APIs + UI components en paralelo
+- 🎯 **Vie 12 jun — PoC 1:** Demo GCP con flujo login → swipe → guardar funcionando
+- 🟢 **Sáb–Dom 13–14 jun:** Biblioteca (Diana) + QA (Ulises) + fixes post-PoC
+- 🎯 **Lun 15 jun — PoC 2 / Entrega final:** MVP completo
 
 **Épicas incluidas:**
 - Épica 1: Registro (Email + Google) + onboarding por swipe

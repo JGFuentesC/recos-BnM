@@ -1,4 +1,7 @@
 .env
+*.env
+jc.env
+env.jc
 firebase-debug.log
 firestore-debug.log
 .firebase/
@@ -17,3 +20,4 @@ docs/SECURITY-AUDIT-2026-06-04.md
 docs/SECURITY-AUDIT-2026-06-05.md
 feat-manuel.md
 .obsidian/
+docs/MANUEL_CORRECTIONS_HEARTBEAT.md

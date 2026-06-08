@@ -15,7 +15,7 @@ class TMDBClient:
     def _get(self, path: str, params: dict | None = None) -> dict:
         url = f"{TMDB_BASE}{path}"
         params = params or {}
-        params.setdefault("language", "en-US")
+        params.setdefault("language", "es-MX")
         resp = self.session.get(url, params=params)
         resp.raise_for_status()
         return resp.json()
@@ -46,7 +46,7 @@ class TMDBClient:
     def get_watch_providers(self, movie_id: int) -> list[str]:
         data = self._get(f"/movie/{movie_id}/watch/providers")
         results = data.get("results", {})
-        for region in ("US", "CA", "GB"):
+        for region in ("MX", "US", "CA", "GB"):
             region_data = results.get(region, {})
             providers = region_data.get("flatrate", []) + region_data.get("rent", []) + region_data.get("buy", [])
             if providers:

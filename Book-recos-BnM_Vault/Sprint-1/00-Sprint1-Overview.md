@@ -1,7 +1,16 @@
 # Sprint 1 — Recos-BnM · Visión general y orden de trabajo
 
-**Fecha límite:** Miércoles 10 de junio de 2026  
-**Objetivo del sprint:** MVP funcional con Auth, Feed de swipe, Detalle, y Biblioteca  
+> 📋 Timeline detallado con PoCs → ver [[Timeline-Sprint1-v2]]
+
+**⚠️ Fechas actualizadas (v2.0 — 2026-06-06):**
+| Hito | Fecha | Descripción |
+|---|---|---|
+| Hotfixes Wave 0+1 | Sáb 7 – Dom 8 jun | Israel + Andrés + Manuel cierran sus correcciones |
+| Wave 2 completa | Lun 9 – Mié 11 jun | Backend APIs + UI components listos |
+| **PoC 1 en GCP** | **Vie 12 jun** | Demo en Firebase Hosting: login → swipe → guardar |
+| Fixes post-PoC 1 | Sáb 13 – Dom 14 jun | Diana + Ulises + bugs del PoC 1 |
+| **PoC 2 / Entrega final** | **Lun 15 jun** | MVP completo con Biblioteca + QA + ROADMAP |
+
 **Project Manager:** [[PM-Edgar-Coronel|Eduardo Coronel]] ← empieza aquí
 
 ---
@@ -15,30 +24,35 @@
 WAVE -1 — Eduardo (PM) configura infraestructura ANTES que todos
 └── Eduardo Coronel  → GCP, Firebase, GitHub repo, API keys, Secrets
 
-WAVE 0 — Empezar HOY (bloqueante para todos)
-└── 🔴 Israel Pérez  → Schema Firestore + reglas + índices
+WAVE 0-FIX  [SAT 7 JUN] — Hotfixes bloqueantes (Israel ya entregó, hay errores)
+└── 🔴 Israel Pérez  → Corregir SCHEMA.md + índices vacíos + firebase.json incompleto + tests vacíos
+                        ⏱️ Deadline: domingo 8 por la noche
 
-WAVE 1 — En paralelo, después de Israel
-├── 🟠 Andrés González  → Firebase Auth + middleware auth.js
-└── 🟠 Manuel Serranía  → Ingest job TMDB/Books + scoring.js
+WAVE 1-FIX  [SAT 7 – SUN 8 JUN] — Andrés y Manuel arrancan / corrigen
+├── 🔴 Andrés González  → Construir todo desde cero (frontend React + backend + auth.js + app.js scaffold)
+│                          ⏱️ Deadline: domingo 8 por la noche — BLOQUEA A 8 PERSONAS
+└── 🟠 Manuel Serranía  → Fix models.py (nombres de campo) + re-ingest + scoring.js en backend/
+                           ⏱️ Necesita schema de Israel (sáb) → termina domingo 8
 
-WAVE 2 — En paralelo, después de Andrés + Manuel
-├── 🟡 Luis Téllez      → API /feed + /swipe
-├── 🟡 Héctor Morales   → API /content/{id}
-├── 🟡 Christian Ruiz   → API CRUD /collections (POST, PATCH, DELETE)
-├── 🟡 Edgar Coronel    → UI ContentCard (puede iniciar con mocks)
-├── 🟡 Juan Carlos      → UI Onboarding + Tab Selector (puede iniciar con mocks)
-└── 🟡 Germán Pacheco   → CI/CD + Service Worker (CI puede iniciar antes)
+WAVE 2  [MON 9 – WED 11 JUN] — En paralelo (todos arrancan el lunes)
+├── 🟡 Luis Téllez      → API /feed + /swipe (necesita auth.js de Andrés ✅)
+├── 🟡 Héctor Morales   → API /content/{id} (necesita auth.js + content poblado)
+├── 🟡 Christian Ruiz   → API CRUD /collections GET+POST+PATCH+DELETE
+├── 🟡 Edgar Coronel    → UI ContentCard ✅ INDEPENDIENTE — puede iniciar hoy con mocks
+├── 🟡 Juan Carlos      → UI Onboarding + Tab Selector (necesita auth de Andrés)
+└── 🟡 Germán Pacheco   → CI/CD ✅ INDEPENDIENTE — hello world antes del domingo 8
 
-WAVE 3 — Después de Wave 2
-├── 🟢 Monserrat Miranda → UI SwipeDeck
-└── 🟢 Marina García     → UI DetailSheet
+WAVE 3  [WED 11 – THU 12 JUN] — Integración
+├── 🟢 Monserrat Miranda → UI SwipeDeck (necesita ContentCard + /api/feed)
+└── 🟢 Marina García     → UI DetailSheet (necesita /api/content + /api/collections)
 
-WAVE 4 — Después de Wave 3
-└── 🔵 Diana Álvarez     → UI Biblioteca
+🎯 PoC 1  [FRI 12 JUN] — Demo en GCP: login → onboarding → swipe → detalle → guardar
 
-WAVE 5 — Al final
-└── ⚪ Ulises Chaparro   → QA + Postman + ROADMAP.md
+WAVE 4  [SAT 13 – SUN 14 JUN] — Post-PoC 1 (fin de semana)
+├── 🔵 Diana Álvarez     → UI Biblioteca completa con API real (puede empezar con mocks el mié 11)
+└── ⚪ Ulises Chaparro   → QA manual + Postman + ROADMAP.md (puede empezar borrador el mié 11)
+
+🎯 PoC 2 / ENTREGA FINAL  [MON 15 JUN] — MVP completo
 ```
 
 ---

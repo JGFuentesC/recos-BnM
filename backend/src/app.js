@@ -24,6 +24,10 @@ if (fs.existsSync(contentRoutePath)) {
   app.use('/api/content', require('./routes/content'))
 }
 
+// Wave 2 — Luis Téllez
+app.use('/api/feed',  require('./routes/feed'))
+app.use('/api/swipe', require('./routes/swipe'))
+
 const port = Number(process.env.PORT || 3001)
 app.listen(port, () => {
   console.log(`[backend] listening on http://localhost:${port}`)
