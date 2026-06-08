@@ -1,4 +1,7 @@
 .env
+*.env
+jc.env
+env.jc
 firebase-debug.log
 firestore-debug.log
 .firebase/
