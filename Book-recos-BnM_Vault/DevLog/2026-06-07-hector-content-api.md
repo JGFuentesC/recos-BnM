@@ -29,23 +29,21 @@ tags: [devlog, sprint-1, wave-2, backend, content]
 - **Archivos creados/modificados:**
   - `backend/src/routes/content.js` (nuevo)
   - `backend/tests/content.test.js` (nuevo)
-  - `DevLog/2026-06-07-hector-content-api.md` (nuevo)
-  - `DevLog/DevLog_Index.md` (nuevo — no existía aún)
+  - Merge Pull Request #29 a main: aceptado ✅
 - **Decisiones autónomas del agente:**
   - Se incluyó el campo `creator` en la respuesta porque existe en `src/firestore/SCHEMA.md`
     (el prompt original del sprint lo omitía) y Marina lo necesita para el DetailSheet.
   - Validación de `:id` (rechazo de vacío o con `/`) para evitar path traversal a subcolecciones → 400 `invalid_id`.
-  - Whitelist explícita de campos en la respuesta para no filtrar `externalId`, `popularity`, `syncedAt`.
+  - Whitelist explícita de campos en la respuesta para no exponer `externalId`, `popularity`, `syncedAt`.
   - 500 con mensaje genérico; el detalle del error solo se loguea en servidor (no information disclosure).
-- **Correcciones manuales:** ninguna pendiente.
+- **Correcciones manuales:** ninguna.
 - **Prompt inicial usado:** Sprint file de Héctor (`Sprint-1/05-Hector-Morales.md`) + agent-context.
 
 ## Bloqueantes encontrados y resueltos
 - ✅ **Tooling de tests:** Andrés agregó `jest`, `supertest`, script `"test": "jest --runInBand --forceExit"`
   y config de Jest en `backend/package.json`. **RESUELTO.**
-- ✅ **Ruta `/api/content` en app.js:** Agreguée la línea `app.use('/api/content', require('./routes/content'))`
-  después de las rutas de Luis. Esta fue coordinación completada en la sesión IA (post-rebase sobre main).
-  **RESUELTO — endpoint ahora es accesible.**
+- ✅ **Ruta `/api/content` en app.js:** Agregada con condicional defensivo (fs.existsSync). **RESUELTO.**
+- ✅ **Merge a main:** Pull Request #29 aceptado (commit f143f07). **RESUELTO.**
 
 ## Próximos pasos para el siguiente colaborador
 - **Marina:** puede consumir `GET /api/content/:id` para el DetailSheet.
