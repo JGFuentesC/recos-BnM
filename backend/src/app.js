@@ -17,6 +17,10 @@ app.get('/api/private/ping', auth, (req, res) => {
   res.json({ ok: true, uid: req.user.uid })
 })
 
+// Wave 2 — Luis Téllez
+app.use('/api/feed',  require('./routes/feed'))
+app.use('/api/swipe', require('./routes/swipe'))
+
 const port = Number(process.env.PORT || 3001)
 app.listen(port, () => {
   console.log(`[backend] listening on http://localhost:${port}`)
