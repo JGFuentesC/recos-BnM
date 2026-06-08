@@ -1,0 +1,1470 @@
+{
+ "name": "2026 Abr-Jun Prog. Av.",
+ "type": "private_supergroup",
+ "id": 3962263455,
+ "messages": [
+  {
+   "id": 60,
+   "type": "message",
+   "date": "2026-06-03T20:44:58",
+   "date_unixtime": "1780541098",
+   "from": "Germán Pacheco",
+   "from_id": "user1831825129",
+   "photo": "photos/photo_4@03-06-2026_20-44-58.jpg",
+   "photo_file_size": 157215,
+   "width": 1056,
+   "height": 561,
+   "text": "",
+   "text_entities": []
+  },
+  {
+   "id": 61,
+   "type": "message",
+   "date": "2026-06-03T20:45:08",
+   "date_unixtime": "1780541108",
+   "from": "Luis Tellez",
+   "from_id": "user1500384395",
+   "file": "(File not included. Change data exporting settings to download.)",
+   "file_name": "viaje_usuario_tinder_contenidos_4.pdf",
+   "file_size": 5160,
+   "thumbnail": "(File not included. Change data exporting settings to download.)",
+   "thumbnail_file_size": 15622,
+   "mime_type": "application/pdf",
+   "text": "",
+   "text_entities": []
+  },
+  {
+   "id": 62,
+   "type": "message",
+   "date": "2026-06-03T20:53:56",
+   "date_unixtime": "1780541636",
+   "from": "Israel Perez Garcia",
+   "from_id": "user7309099022",
+   "text": "Una disculpa a todos, pero me tuve que desconectar, me empecé a sentir mareado.\nCualquier actividad (tickets) que me asignen, estoy totalmente de acuerdo.\nY nuevamente, una disculpa.",
+   "text_entities": [
+    {
+     "type": "plain",
+     "text": "Una disculpa a todos, pero me tuve que desconectar, me empecé a sentir mareado.\nCualquier actividad (tickets) que me asignen, estoy totalmente de acuerdo.\nY nuevamente, una disculpa."
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "type": "message",
+   "date": "2026-06-03T21:21:03",
+   "date_unixtime": "1780543263",
+   "from": "Gustavo Anahuac",
+   "from_id": "user1555532799",
+   "text": [
+    "# PRD — Tinder de Contenidos: Películas y Libros\n\n## 1. Control de versiones\n\n| Campo | Valor |\n|---|---|\n| ",
+    {
+     "type": "bold",
+     "text": "Proyecto"
+    },
+    " | Tinder de Contenidos (clave: *Match&Read* / *Match&Watch*) |\n| ",
+    {
+     "type": "bold",
+     "text": "Estado"
+    },
+    " | Listo para desarrollo |\n| ",
+    {
+     "type": "bold",
+     "text": "Versión"
+    },
+    " | 2.0 (refactor: catálogo, métricas, riesgos y contratos de API) |\n| ",
+    {
+     "type": "bold",
+     "text": "Fecha"
+    },
+    " | Junio 2026 |\n| ",
+    {
+     "type": "bold",
+     "text": "Stack core (GCP)"
+    },
+    " | Firebase Auth · Cloud Run (API) · Firestore · Firebase Hosting (PWA) |\n| ",
+    {
+     "type": "bold",
+     "text": "APIs externas"
+    },
+    " | TMDB (primaria, películas) · Google Books · IMDb vía RapidAPI (fallback) · TMDB Watch Providers (streaming) |\n\n> ",
+    {
+     "type": "bold",
+     "text": "Cambio clave v2:"
+    },
+    " se sustituye \"IMDb API oficial\" como fuente primaria de películas. IMDb no ofrece una API pública estable para este caso; los datos de catálogo, popularidad, calificación y disponibilidad de streaming se obtienen de ",
+    {
+     "type": "bold",
+     "text": "TMDB"
+    },
+    " (gratuita, documentada, con endpoint de *watch providers*). IMDb vía RapidAPI queda como enriquecimiento opcional.\n\n---\n\n## 2. Visión y objetivos\n\nReducir la \"fatiga de decisión\" en el consumo de películas y libros mediante una interfaz móvil-first basada en gestos (*swipes*), entregada como ",
+    {
+     "type": "bold",
+     "text": "PWA"
+    },
+    " sobre infraestructura serverless en GCP.\n\n### North Star Metric\n",
+    {
+     "type": "bold",
+     "text": "Swipes calificados por usuario activo semanal"
+    },
+    " (proxy directo de descubrimiento y engagement).\n\n### Objetivos del MVP (medibles)\n\n| Objetivo | Métrica | Meta |\n|---|---|---|\n| Activación | % de usuarios que completan onboarding y ≥20 swipes en sesión 1 | ≥ 60% |\n| Engagement | Swipes promedio / sesión | ≥ 30 |\n| Retención | Retención D7 | ≥ 25% |\n| Conversión a biblioteca | % de usuarios que guardan ≥1 título | ≥ 40% |\n| Eficiencia técnica | Costo de infraestructura / 1.000 usuarios activos | < USD 5 |\n\n---\n\n## 3. Alcance\n\n### Dentro de alcance (MVP)\nRegistro/login, onboarding por swipe, feed de películas y libros con swipe, vista de detalle, biblioteca con listas y notas, capa de caché de catálogo, reglas de seguridad de Firestore.\n\n### Fuera de alcance (MVP)\n- Recomendación con ML / *collaborative filtering* (se usa popularidad + contenido).\n- Matching social entre usuarios o funciones de amistad.\n- Disponibilidad de streaming en tiempo real verificada por región (se usa el proveedor que devuelva TMDB; sin garantía contractual).\n- Notificaciones push.\n- Pagos o monetización.\n- App nativa iOS/Android (solo PWA).\n\n---\n\n## 4. Supuestos y dependencias\n\n- ",
+    {
+     "type": "bold",
+     "text": "TMDB y Google Books"
+    },
+    " mantienen sus cuotas gratuitas actuales; se respeta el *rate limiting* de cada una mediante caché.\n- El catálogo se ",
+    {
+     "type": "bold",
+     "text": "pre-indexa periódicamente"
+    },
+    " en Firestore; el feed no consulta APIs externas en caliente salvo para enriquecer detalle.\n- Licencia de uso de TMDB exige atribución visible (\"This product uses the TMDB API but is not endorsed or certified by TMDB\").\n- Firestore tiene límites de filtrado compuesto: el *ranking* del feed se calcula en backend, no vía query nativa.\n\n---\n\n## 5. Arquitectura de alto nivel (GCP)\n\n1. ",
+    {
+     "type": "bold",
+     "text": "Frontend (PWA)"
+    },
+    " — React o Vue, optimizado para gestos táctiles, Service Worker para offline parcial. Alojado en ",
+    {
+     "type": "bold",
+     "text": "Firebase Hosting"
+    },
+    ".\n2. ",
+    {
+     "type": "bold",
+     "text": "Auth"
+    },
+    " — ",
+    {
+     "type": "bold",
+     "text": "Firebase Authentication"
+    },
+    " (Email/Password + Google Sign-In).\n3. ",
+    {
+     "type": "bold",
+     "text": "Backend API"
+    },
+    " — Microservicios en Node.js o Python en ",
+    {
+     "type": "bold",
+     "text": "Cloud Run"
+    },
+    " (escala a cero).\n4. ",
+    {
+     "type": "bold",
+     "text": "Base de datos"
+    },
+    " — ",
+    {
+     "type": "bold",
+     "text": "Cloud Firestore"
+    },
+    " (perfiles, swipes, colecciones, catálogo cacheado).\n5. ",
+    {
+     "type": "bold",
+     "text": "Ingesta de catálogo"
+    },
+    " — Job programado (Cloud Scheduler → Cloud Run) que sincroniza TMDB y Google Books a la colección ",
+    {
+     "type": "code",
+     "text": "content"
+    },
+    ", evitando llamadas duplicadas y controlando costos.\n\n",
+    {
+     "type": "pre",
+     "text": "\n[PWA] --auth--> [Firebase Auth]\n  |  REST\n  v\n[Cloud Run API] <--> [Firestore: users, swipes, collections, content]\n       ^\n       | sync programado\n[Cloud Scheduler] --> [Cloud Run: ingest] --> [TMDB / Google Books]\n",
+     "language": ""
+    },
+    "\n\n---\n\n## 6. Modelo de datos (Firestore)\n\n",
+    {
+     "type": "code",
+     "text": "`"
+    },
+    "\nusers/{userId}\n  email, displayName, authProvider, createdAt\n  prefs: { genres: [], authors: [], directors: [], cold_start_done: bool }"
+   ],
+   "text_entities": [
+    {
+     "type": "plain",
+     "text": "# PRD — Tinder de Contenidos: Películas y Libros\n\n## 1. Control de versiones\n\n| Campo | Valor |\n|---|---|\n| "
+    },
+    {
+     "type": "bold",
+     "text": "Proyecto"
+    },
+    {
+     "type": "plain",
+     "text": " | Tinder de Contenidos (clave: *Match&Read* / *Match&Watch*) |\n| "
+    },
+    {
+     "type": "bold",
+     "text": "Estado"
+    },
+    {
+     "type": "plain",
+     "text": " | Listo para desarrollo |\n| "
+    },
+    {
+     "type": "bold",
+     "text": "Versión"
+    },
+    {
+     "type": "plain",
+     "text": " | 2.0 (refactor: catálogo, métricas, riesgos y contratos de API) |\n| "
+    },
+    {
+     "type": "bold",
+     "text": "Fecha"
+    },
+    {
+     "type": "plain",
+     "text": " | Junio 2026 |\n| "
+    },
+    {
+     "type": "bold",
+     "text": "Stack core (GCP)"
+    },
+    {
+     "type": "plain",
+     "text": " | Firebase Auth · Cloud Run (API) · Firestore · Firebase Hosting (PWA) |\n| "
+    },
+    {
+     "type": "bold",
+     "text": "APIs externas"
+    },
+    {
+     "type": "plain",
+     "text": " | TMDB (primaria, películas) · Google Books · IMDb vía RapidAPI (fallback) · TMDB Watch Providers (streaming) |\n\n> "
+    },
+    {
+     "type": "bold",
+     "text": "Cambio clave v2:"
+    },
+    {
+     "type": "plain",
+     "text": " se sustituye \"IMDb API oficial\" como fuente primaria de películas. IMDb no ofrece una API pública estable para este caso; los datos de catálogo, popularidad, calificación y disponibilidad de streaming se obtienen de "
+    },
+    {
+     "type": "bold",
+     "text": "TMDB"
+    },
+    {
+     "type": "plain",
+     "text": " (gratuita, documentada, con endpoint de *watch providers*). IMDb vía RapidAPI queda como enriquecimiento opcional.\n\n---\n\n## 2. Visión y objetivos\n\nReducir la \"fatiga de decisión\" en el consumo de películas y libros mediante una interfaz móvil-first basada en gestos (*swipes*), entregada como "
+    },
+    {
+     "type": "bold",
+     "text": "PWA"
+    },
+    {
+     "type": "plain",
+     "text": " sobre infraestructura serverless en GCP.\n\n### North Star Metric\n"
+    },
+    {
+     "type": "bold",
+     "text": "Swipes calificados por usuario activo semanal"
+    },
+    {
+     "type": "plain",
+     "text": " (proxy directo de descubrimiento y engagement).\n\n### Objetivos del MVP (medibles)\n\n| Objetivo | Métrica | Meta |\n|---|---|---|\n| Activación | % de usuarios que completan onboarding y ≥20 swipes en sesión 1 | ≥ 60% |\n| Engagement | Swipes promedio / sesión | ≥ 30 |\n| Retención | Retención D7 | ≥ 25% |\n| Conversión a biblioteca | % de usuarios que guardan ≥1 título | ≥ 40% |\n| Eficiencia técnica | Costo de infraestructura / 1.000 usuarios activos | < USD 5 |\n\n---\n\n## 3. Alcance\n\n### Dentro de alcance (MVP)\nRegistro/login, onboarding por swipe, feed de películas y libros con swipe, vista de detalle, biblioteca con listas y notas, capa de caché de catálogo, reglas de seguridad de Firestore.\n\n### Fuera de alcance (MVP)\n- Recomendación con ML / *collaborative filtering* (se usa popularidad + contenido).\n- Matching social entre usuarios o funciones de amistad.\n- Disponibilidad de streaming en tiempo real verificada por región (se usa el proveedor que devuelva TMDB; sin garantía contractual).\n- Notificaciones push.\n- Pagos o monetización.\n- App nativa iOS/Android (solo PWA).\n\n---\n\n## 4. Supuestos y dependencias\n\n- "
+    },
+    {
+     "type": "bold",
+     "text": "TMDB y Google Books"
+    },
+    {
+     "type": "plain",
+     "text": " mantienen sus cuotas gratuitas actuales; se respeta el *rate limiting* de cada una mediante caché.\n- El catálogo se "
+    },
+    {
+     "type": "bold",
+     "text": "pre-indexa periódicamente"
+    },
+    {
+     "type": "plain",
+     "text": " en Firestore; el feed no consulta APIs externas en caliente salvo para enriquecer detalle.\n- Licencia de uso de TMDB exige atribución visible (\"This product uses the TMDB API but is not endorsed or certified by TMDB\").\n- Firestore tiene límites de filtrado compuesto: el *ranking* del feed se calcula en backend, no vía query nativa.\n\n---\n\n## 5. Arquitectura de alto nivel (GCP)\n\n1. "
+    },
+    {
+     "type": "bold",
+     "text": "Frontend (PWA)"
+    },
+    {
+     "type": "plain",
+     "text": " — React o Vue, optimizado para gestos táctiles, Service Worker para offline parcial. Alojado en "
+    },
+    {
+     "type": "bold",
+     "text": "Firebase Hosting"
+    },
+    {
+     "type": "plain",
+     "text": ".\n2. "
+    },
+    {
+     "type": "bold",
+     "text": "Auth"
+    },
+    {
+     "type": "plain",
+     "text": " — "
+    },
+    {
+     "type": "bold",
+     "text": "Firebase Authentication"
+    },
+    {
+     "type": "plain",
+     "text": " (Email/Password + Google Sign-In).\n3. "
+    },
+    {
+     "type": "bold",
+     "text": "Backend API"
+    },
+    {
+     "type": "plain",
+     "text": " — Microservicios en Node.js o Python en "
+    },
+    {
+     "type": "bold",
+     "text": "Cloud Run"
+    },
+    {
+     "type": "plain",
+     "text": " (escala a cero).\n4. "
+    },
+    {
+     "type": "bold",
+     "text": "Base de datos"
+    },
+    {
+     "type": "plain",
+     "text": " — "
+    },
+    {
+     "type": "bold",
+     "text": "Cloud Firestore"
+    },
+    {
+     "type": "plain",
+     "text": " (perfiles, swipes, colecciones, catálogo cacheado).\n5. "
+    },
+    {
+     "type": "bold",
+     "text": "Ingesta de catálogo"
+    },
+    {
+     "type": "plain",
+     "text": " — Job programado (Cloud Scheduler → Cloud Run) que sincroniza TMDB y Google Books a la colección "
+    },
+    {
+     "type": "code",
+     "text": "content"
+    },
+    {
+     "type": "plain",
+     "text": ", evitando llamadas duplicadas y controlando costos.\n\n"
+    },
+    {
+     "type": "pre",
+     "text": "\n[PWA] --auth--> [Firebase Auth]\n  |  REST\n  v\n[Cloud Run API] <--> [Firestore: users, swipes, collections, content]\n       ^\n       | sync programado\n[Cloud Scheduler] --> [Cloud Run: ingest] --> [TMDB / Google Books]\n",
+     "language": ""
+    },
+    {
+     "type": "plain",
+     "text": "\n\n---\n\n## 6. Modelo de datos (Firestore)\n\n"
+    },
+    {
+     "type": "code",
+     "text": "`"
+    },
+    {
+     "type": "plain",
+     "text": "\nusers/{userId}\n  email, displayName, authProvider, createdAt\n  prefs: { genres: [], authors: [], directors: [], cold_start_done: bool }"
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "type": "message",
+   "date": "2026-06-03T21:21:03",
+   "date_unixtime": "1780543263",
+   "from": "Gustavo Anahuac",
+   "from_id": "user1555532799",
+   "text": [
+    "content/{contentId}            // catálogo cacheado\n  type: \"movie\" | \"book\"\n  externalId, source: \"tmdb\" | \"google_books\"\n  title, cover, year, genres: [], synopsis\n  popularity (float), rating (float, escala 0–10 normalizada)\n  watchProviders: []           // solo movies; placeholder si no hay dato\n  syncedAt\n\nswipes/{swipeId}\n  userId, contentId, contentType\n  action: \"like\" | \"dislike\"\n  timestamp\n\ncollections/{collectionId}\n  userId, contentId, contentType\n  listName (default: \"Guardados\"), personalNote, savedAt\n",
+    {
+     "type": "pre",
+     "text": "\n\n---\n\n## 7. Épicas e historias de usuario\n\n### ÉPICA 1 — Registro y calibración inicial (P1)\n*Dolores:* onboarding largo, exceso de datos, géneros poco representativos.\n\n#### HU1.1 — Registro simplificado (Email + Google)\n- **Como** usuario, **quiero** registrarme con email o Google, **para** entrar rápido y seguro.\n- **Criterios de aceptación:**\n  - Máximo 2 clics con Google Auth.\n  - Validación de formato de email.\n  - Éxito → redirección a calibración de perfil.\n- **Tareas técnicas:**\n  1. Activar proveedores Email y Google en Firebase.\n  2. Componentes UI responsivos de Login/Registro.\n  3. Inicializar SDK de Firebase en frontend.\n  4. Crear documento en `users` en el primer registro.\n\n#### HU1.2 — Calibración por swipe (cold start)\n- **Como** usuario, **quiero** un onboarding de 5–10 tarjetas + selección simple de géneros y autores/directores, **para** que la app entienda mis gustos sin formularios.\n- **Criterios de aceptación:**\n  - Máximo 10 tarjetas secuenciales; pueden saltarse.\n  - Buscador predictivo de autores/directores favoritos (opcional).\n  - Al terminar se marca `prefs.cold_start_done = true`.\n- **Tareas técnicas:**\n  1. Componente de onboarding con barra de progreso.\n  2. Buscador predictivo contra endpoints de búsqueda (TMDB / Google Books) en backend.\n  3. Persistir vector de preferencias en `users.prefs`.\n\n---\n\n### ÉPICA 2 — Selección y filtrado de contenido (P2)\n*Dolores:* falta de indicador del tipo activo, confusión al cambiar de feed.\n\n#### HU2.1 — Conmutador de tipo (Tab Selector)\n- **Como** usuario, **quiero** alternar entre \"Libros\" y \"Películas\" desde un control visible, **para** consumir según mi ánimo manteniendo feeds independientes.\n- **Criterios de aceptación:**\n  - Indicador visual de alta visibilidad del modo activo (color de acento o icono).\n  - Al cambiar de pestaña no se pierde el estado del feed actual.\n- **Tareas técnicas:**\n  1. Navbar/tabs persistentes con estados.\n  2. Gestión de estado global para separar `active_feed` (`movies` / `books`).\n\n---\n\n### ÉPICA 3 — Recomendación y mecánica de swipe (P3)\n*Dolores:* tarjetas con poca info, contenido repetido, feed que se agota.\n\n#### HU3.1 — Algoritmo de arranque (popularidad + contenido)\n- **Como** sistema, **debo** mezclar TMDB y Google Books filtrando por géneros del usuario y priorizando alta popularidad/calificación, **para** evitar el arranque en frío.\n- **Criterios de aceptación:**\n  - Las primeras 20 tarjetas pertenecen al top de los géneros seleccionados.\n  - Nunca se muestra contenido ya *swipeado* (`like` o `dislike`).\n- **Tareas técnicas:**\n  1. Endpoint `GET /api/feed` que recibe `userId`, `type`, `cursor`.\n  2. Lógica: leer `content` pre-indexado por géneros del usuario, restar IDs presentes en `swipes`.\n  3. **Score normalizado** (evita que escalas distintas sesguen el ranking):\n     ",
+     "language": ""
+    },
+    "\n     score = 0.7 * norm(popularity) + 0.3 * norm(rating)\n     // norm(x) = (x - min) / (max - min) sobre el conjunto candidato\n     ",
+    {
+     "type": "code",
+     "text": "`"
+    },
+    "\n  4. Para feed de >100 swipes, sumar señal de afinidad: +peso a géneros con mayor ratio de ",
+    {
+     "type": "code",
+     "text": "like"
+    },
+    " histórico del usuario."
+   ],
+   "text_entities": [
+    {
+     "type": "plain",
+     "text": "content/{contentId}            // catálogo cacheado\n  type: \"movie\" | \"book\"\n  externalId, source: \"tmdb\" | \"google_books\"\n  title, cover, year, genres: [], synopsis\n  popularity (float), rating (float, escala 0–10 normalizada)\n  watchProviders: []           // solo movies; placeholder si no hay dato\n  syncedAt\n\nswipes/{swipeId}\n  userId, contentId, contentType\n  action: \"like\" | \"dislike\"\n  timestamp\n\ncollections/{collectionId}\n  userId, contentId, contentType\n  listName (default: \"Guardados\"), personalNote, savedAt\n"
+    },
+    {
+     "type": "pre",
+     "text": "\n\n---\n\n## 7. Épicas e historias de usuario\n\n### ÉPICA 1 — Registro y calibración inicial (P1)\n*Dolores:* onboarding largo, exceso de datos, géneros poco representativos.\n\n#### HU1.1 — Registro simplificado (Email + Google)\n- **Como** usuario, **quiero** registrarme con email o Google, **para** entrar rápido y seguro.\n- **Criterios de aceptación:**\n  - Máximo 2 clics con Google Auth.\n  - Validación de formato de email.\n  - Éxito → redirección a calibración de perfil.\n- **Tareas técnicas:**\n  1. Activar proveedores Email y Google en Firebase.\n  2. Componentes UI responsivos de Login/Registro.\n  3. Inicializar SDK de Firebase en frontend.\n  4. Crear documento en `users` en el primer registro.\n\n#### HU1.2 — Calibración por swipe (cold start)\n- **Como** usuario, **quiero** un onboarding de 5–10 tarjetas + selección simple de géneros y autores/directores, **para** que la app entienda mis gustos sin formularios.\n- **Criterios de aceptación:**\n  - Máximo 10 tarjetas secuenciales; pueden saltarse.\n  - Buscador predictivo de autores/directores favoritos (opcional).\n  - Al terminar se marca `prefs.cold_start_done = true`.\n- **Tareas técnicas:**\n  1. Componente de onboarding con barra de progreso.\n  2. Buscador predictivo contra endpoints de búsqueda (TMDB / Google Books) en backend.\n  3. Persistir vector de preferencias en `users.prefs`.\n\n---\n\n### ÉPICA 2 — Selección y filtrado de contenido (P2)\n*Dolores:* falta de indicador del tipo activo, confusión al cambiar de feed.\n\n#### HU2.1 — Conmutador de tipo (Tab Selector)\n- **Como** usuario, **quiero** alternar entre \"Libros\" y \"Películas\" desde un control visible, **para** consumir según mi ánimo manteniendo feeds independientes.\n- **Criterios de aceptación:**\n  - Indicador visual de alta visibilidad del modo activo (color de acento o icono).\n  - Al cambiar de pestaña no se pierde el estado del feed actual.\n- **Tareas técnicas:**\n  1. Navbar/tabs persistentes con estados.\n  2. Gestión de estado global para separar `active_feed` (`movies` / `books`).\n\n---\n\n### ÉPICA 3 — Recomendación y mecánica de swipe (P3)\n*Dolores:* tarjetas con poca info, contenido repetido, feed que se agota.\n\n#### HU3.1 — Algoritmo de arranque (popularidad + contenido)\n- **Como** sistema, **debo** mezclar TMDB y Google Books filtrando por géneros del usuario y priorizando alta popularidad/calificación, **para** evitar el arranque en frío.\n- **Criterios de aceptación:**\n  - Las primeras 20 tarjetas pertenecen al top de los géneros seleccionados.\n  - Nunca se muestra contenido ya *swipeado* (`like` o `dislike`).\n- **Tareas técnicas:**\n  1. Endpoint `GET /api/feed` que recibe `userId`, `type`, `cursor`.\n  2. Lógica: leer `content` pre-indexado por géneros del usuario, restar IDs presentes en `swipes`.\n  3. **Score normalizado** (evita que escalas distintas sesguen el ranking):\n     ",
+     "language": ""
+    },
+    {
+     "type": "plain",
+     "text": "\n     score = 0.7 * norm(popularity) + 0.3 * norm(rating)\n     // norm(x) = (x - min) / (max - min) sobre el conjunto candidato\n     "
+    },
+    {
+     "type": "code",
+     "text": "`"
+    },
+    {
+     "type": "plain",
+     "text": "\n  4. Para feed de >100 swipes, sumar señal de afinidad: +peso a géneros con mayor ratio de "
+    },
+    {
+     "type": "code",
+     "text": "like"
+    },
+    {
+     "type": "plain",
+     "text": " histórico del usuario."
+    }
+   ]
+  },
+  {
+   "id": 65,
+   "type": "message",
+   "date": "2026-06-03T21:21:04",
+   "date_unixtime": "1780543264",
+   "from": "Gustavo Anahuac",
+   "from_id": "user1555532799",
+   "text": [
+    "#### HU3.2 — Feed interactivo con swipe\n- ",
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    " usuario, ",
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    " tarjetas con portada, título, género, descripción breve y calificación, y hacer swipe derecha (like) / izquierda (no), ",
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    " descubrir rápido.\n- ",
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    "\n  - Gestos táctiles nativos con animación fluida (≈60 FPS).\n  - Precarga asíncrona de las siguientes 3 tarjetas.\n- ",
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    "\n  1. Librería de gestos (`react-tinder-card` o lógica custom con Framer Motion).\n  2. *Pre-fetching*: al quedar 5 tarjetas en el stack, disparar ",
+    {
+     "type": "code",
+     "text": "GET /api/feed"
+    },
+    " silencioso.\n  3. Cada swipe → ",
+    {
+     "type": "code",
+     "text": "POST /api/swipe"
+    },
+    " no bloqueante (`userId`, ",
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "type"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "action"
+    },
+    ", `timestamp`).\n\n---\n\n### ÉPICA 4 — Vista de detalle (P4)\n*Dolores:* exceso de info en una pantalla, no saber dónde ver la película.\n\n#### HU4.1 — Vista expandida equilibrada\n- ",
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    " usuario, ",
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    " tocar una tarjeta para ver sinopsis completa, autor/director, año, género, reseñas resumidas y plataformas de streaming, ",
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    " evaluar con calma.\n- ",
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    "\n  - Transición tipo modal/slide-up que no destruye el stack inferior.\n  - Tres acciones flotantes: \"Guardar\", \"No me interesa\", \"Compartir\".\n- ",
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    "\n  1. Componente de detalle (sheet expandible).\n  2. Streaming: usar ",
+    {
+     "type": "bold",
+     "text": "TMDB Watch Providers"
+    },
+    "; si no hay dato, mostrar placeholder neutro (sin inventar disponibilidad). *Reemplaza el mapeo aleatorio de íconos del MVP original, que comunicaba información falsa.*\n\n---\n\n### ÉPICA 5 — Colecciones y listas (P5)\n*Dolores:* colecciones desordenadas, olvido del motivo de guardado, listas difíciles de hallar.\n\n#### HU5.1 — Guardado clasificado + listas personalizadas\n- ",
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    " usuario, ",
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    " que al guardar (swipe derecha o botón) el contenido se separe automáticamente en \"Películas\" y \"Libros\" con fecha, y poder crear listas (ej. \"Para el finde\"), ",
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    " retomar el consumo y controlar mi catálogo.\n- ",
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    "\n  - \"Colección\" accesible en un paso desde la barra inferior.\n  - Cada elemento permite añadir una \"Nota personal\".\n- ",
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    "\n  1. Modelo ",
+    {
+     "type": "code",
+     "text": "collections"
+    },
+    " (ver §6).\n  2. Vista de biblioteca con filtros por tipo y por lista.\n  3. CRUD en Cloud Run para listas y notas.\n\n---\n\n## 8. Contratos de API (MVP)\n\n| Método | Endpoint | Entrada | Salida |\n|---|---|---|---|\n| GET | ",
+    {
+     "type": "code",
+     "text": "/api/feed"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "type"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "cursor"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "[ {contentId, title, cover, genres, rating, synopsis} ]"
+    },
+    " |\n| POST | ",
+    {
+     "type": "code",
+     "text": "/api/swipe"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "type"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "action"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "204"
+    },
+    " |\n| GET | ",
+    {
+     "type": "code",
+     "text": "/api/content/{id}"
+    },
+    " | — | objeto ",
+    {
+     "type": "code",
+     "text": "content"
+    },
+    " completo + watchProviders |\n| GET | ",
+    {
+     "type": "code",
+     "text": "/api/collections"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "?type"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "?listName"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "[ collections ]"
+    },
+    " |\n| POST | ",
+    {
+     "type": "code",
+     "text": "/api/collections"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "listName"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "personalNote"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "201"
+    },
+    " |\n| PATCH | ",
+    {
+     "type": "code",
+     "text": "/api/collections/{id}"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "personalNote"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "listName"
+    },
+    " | ",
+    {
+     "type": "code",
+     "text": "200"
+    },
+    " |\n| DELETE | ",
+    {
+     "type": "code",
+     "text": "/api/collections/{id}"
+    },
+    " | — | ",
+    {
+     "type": "code",
+     "text": "204"
+    },
+    " |\n\n---\n\n## 9. Requerimientos no funcionales\n\n- ",
+    {
+     "type": "bold",
+     "text": "Rendimiento:"
+    },
+    " LCP < 2.5 s en 4G simulada.\n- ",
+    {
+     "type": "bold",
+     "text": "Offline:"
+    },
+    " cachear la shell de la PWA + últimos 10 ítems de la colección vía Service Worker.\n- ",
+    {
+     "type": "bold",
+     "text": "Disponibilidad:"
+    },
+    " Cloud Run con escala a cero; *cold start* mitigado con ",
+    {
+     "type": "code",
+     "text": "min-instances=1"
+    },
+    " si la latencia inicial degrada la activación.\n- ",
+    {
+     "type": "bold",
+     "text": "Atribución:"
+    },
+    " mostrar el aviso requerido por TMDB.\n\n### Reglas de seguridad de Firestore\n",
+    {
+     "type": "pre",
+     "text": "\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /users/{userId} {\n      allow read, write: if request.auth != null && request.auth.uid == userId;\n    }\n    match /swipes/{swipeId} {\n      allow read, write: if request.auth != null\n        && request.resource.data.userId == request.auth.uid;\n    }\n    match /collections/{collectionId} {\n      allow read, write: if request.auth != null\n        && (resource == null || resource.data.userId == request.auth.uid);\n    }\n    match /content/{contentId} {\n      allow read: if request.auth != null;   // catálogo: solo lectura para clientes\n      allow write: if false;                 // escritura únicamente por el job de ingesta\n    }\n  }\n}\n",
+     "language": "javascript"
+    },
+    "\n\n---\n\n## 10. Eventos de analítica (mínimos)"
+   ],
+   "text_entities": [
+    {
+     "type": "plain",
+     "text": "#### HU3.2 — Feed interactivo con swipe\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    {
+     "type": "plain",
+     "text": " usuario, "
+    },
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    {
+     "type": "plain",
+     "text": " tarjetas con portada, título, género, descripción breve y calificación, y hacer swipe derecha (like) / izquierda (no), "
+    },
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    {
+     "type": "plain",
+     "text": " descubrir rápido.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  - Gestos táctiles nativos con animación fluida (≈60 FPS).\n  - Precarga asíncrona de las siguientes 3 tarjetas.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  1. Librería de gestos (`react-tinder-card` o lógica custom con Framer Motion).\n  2. *Pre-fetching*: al quedar 5 tarjetas en el stack, disparar "
+    },
+    {
+     "type": "code",
+     "text": "GET /api/feed"
+    },
+    {
+     "type": "plain",
+     "text": " silencioso.\n  3. Cada swipe → "
+    },
+    {
+     "type": "code",
+     "text": "POST /api/swipe"
+    },
+    {
+     "type": "plain",
+     "text": " no bloqueante (`userId`, "
+    },
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "type"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "action"
+    },
+    {
+     "type": "plain",
+     "text": ", `timestamp`).\n\n---\n\n### ÉPICA 4 — Vista de detalle (P4)\n*Dolores:* exceso de info en una pantalla, no saber dónde ver la película.\n\n#### HU4.1 — Vista expandida equilibrada\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    {
+     "type": "plain",
+     "text": " usuario, "
+    },
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    {
+     "type": "plain",
+     "text": " tocar una tarjeta para ver sinopsis completa, autor/director, año, género, reseñas resumidas y plataformas de streaming, "
+    },
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    {
+     "type": "plain",
+     "text": " evaluar con calma.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  - Transición tipo modal/slide-up que no destruye el stack inferior.\n  - Tres acciones flotantes: \"Guardar\", \"No me interesa\", \"Compartir\".\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  1. Componente de detalle (sheet expandible).\n  2. Streaming: usar "
+    },
+    {
+     "type": "bold",
+     "text": "TMDB Watch Providers"
+    },
+    {
+     "type": "plain",
+     "text": "; si no hay dato, mostrar placeholder neutro (sin inventar disponibilidad). *Reemplaza el mapeo aleatorio de íconos del MVP original, que comunicaba información falsa.*\n\n---\n\n### ÉPICA 5 — Colecciones y listas (P5)\n*Dolores:* colecciones desordenadas, olvido del motivo de guardado, listas difíciles de hallar.\n\n#### HU5.1 — Guardado clasificado + listas personalizadas\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Como"
+    },
+    {
+     "type": "plain",
+     "text": " usuario, "
+    },
+    {
+     "type": "bold",
+     "text": "quiero"
+    },
+    {
+     "type": "plain",
+     "text": " que al guardar (swipe derecha o botón) el contenido se separe automáticamente en \"Películas\" y \"Libros\" con fecha, y poder crear listas (ej. \"Para el finde\"), "
+    },
+    {
+     "type": "bold",
+     "text": "para"
+    },
+    {
+     "type": "plain",
+     "text": " retomar el consumo y controlar mi catálogo.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Criterios de aceptación:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  - \"Colección\" accesible en un paso desde la barra inferior.\n  - Cada elemento permite añadir una \"Nota personal\".\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Tareas técnicas:"
+    },
+    {
+     "type": "plain",
+     "text": "\n  1. Modelo "
+    },
+    {
+     "type": "code",
+     "text": "collections"
+    },
+    {
+     "type": "plain",
+     "text": " (ver §6).\n  2. Vista de biblioteca con filtros por tipo y por lista.\n  3. CRUD en Cloud Run para listas y notas.\n\n---\n\n## 8. Contratos de API (MVP)\n\n| Método | Endpoint | Entrada | Salida |\n|---|---|---|---|\n| GET | "
+    },
+    {
+     "type": "code",
+     "text": "/api/feed"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "type"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "cursor"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "[ {contentId, title, cover, genres, rating, synopsis} ]"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| POST | "
+    },
+    {
+     "type": "code",
+     "text": "/api/swipe"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "type"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "action"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "204"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| GET | "
+    },
+    {
+     "type": "code",
+     "text": "/api/content/{id}"
+    },
+    {
+     "type": "plain",
+     "text": " | — | objeto "
+    },
+    {
+     "type": "code",
+     "text": "content"
+    },
+    {
+     "type": "plain",
+     "text": " completo + watchProviders |\n| GET | "
+    },
+    {
+     "type": "code",
+     "text": "/api/collections"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "?type"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "?listName"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "[ collections ]"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| POST | "
+    },
+    {
+     "type": "code",
+     "text": "/api/collections"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "userId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "contentId"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "listName"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "personalNote"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "201"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| PATCH | "
+    },
+    {
+     "type": "code",
+     "text": "/api/collections/{id}"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "personalNote"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "listName"
+    },
+    {
+     "type": "plain",
+     "text": " | "
+    },
+    {
+     "type": "code",
+     "text": "200"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| DELETE | "
+    },
+    {
+     "type": "code",
+     "text": "/api/collections/{id}"
+    },
+    {
+     "type": "plain",
+     "text": " | — | "
+    },
+    {
+     "type": "code",
+     "text": "204"
+    },
+    {
+     "type": "plain",
+     "text": " |\n\n---\n\n## 9. Requerimientos no funcionales\n\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Rendimiento:"
+    },
+    {
+     "type": "plain",
+     "text": " LCP < 2.5 s en 4G simulada.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Offline:"
+    },
+    {
+     "type": "plain",
+     "text": " cachear la shell de la PWA + últimos 10 ítems de la colección vía Service Worker.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Disponibilidad:"
+    },
+    {
+     "type": "plain",
+     "text": " Cloud Run con escala a cero; *cold start* mitigado con "
+    },
+    {
+     "type": "code",
+     "text": "min-instances=1"
+    },
+    {
+     "type": "plain",
+     "text": " si la latencia inicial degrada la activación.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Atribución:"
+    },
+    {
+     "type": "plain",
+     "text": " mostrar el aviso requerido por TMDB.\n\n### Reglas de seguridad de Firestore\n"
+    },
+    {
+     "type": "pre",
+     "text": "\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /users/{userId} {\n      allow read, write: if request.auth != null && request.auth.uid == userId;\n    }\n    match /swipes/{swipeId} {\n      allow read, write: if request.auth != null\n        && request.resource.data.userId == request.auth.uid;\n    }\n    match /collections/{collectionId} {\n      allow read, write: if request.auth != null\n        && (resource == null || resource.data.userId == request.auth.uid);\n    }\n    match /content/{contentId} {\n      allow read: if request.auth != null;   // catálogo: solo lectura para clientes\n      allow write: if false;                 // escritura únicamente por el job de ingesta\n    }\n  }\n}\n",
+     "language": "javascript"
+    },
+    {
+     "type": "plain",
+     "text": "\n\n---\n\n## 10. Eventos de analítica (mínimos)"
+    }
+   ]
+  },
+  {
+   "id": 66,
+   "type": "message",
+   "date": "2026-06-03T21:21:04",
+   "date_unixtime": "1780543264",
+   "from": "Gustavo Anahuac",
+   "from_id": "user1555532799",
+   "text": [
+    {
+     "type": "code",
+     "text": "onboarding_completed"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "swipe"
+    },
+    " (con ",
+    {
+     "type": "code",
+     "text": "action"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "type`), `feed_exhausted"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "detail_opened"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "content_saved"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "list_created"
+    },
+    ", ",
+    {
+     "type": "code",
+     "text": "note_added"
+    },
+    ". Permiten medir todas las metas de §2.\n\n---\n\n## 11. Riesgos y mitigaciones\n\n| Riesgo | Impacto | Mitigación |\n|---|---|---|\n| Costos/cuotas de APIs externas | Alto | Pre-indexar catálogo; servir feed desde Firestore, no en caliente |\n| Datos de streaming inexactos | Medio | Usar TMDB Watch Providers; placeholder neutro cuando no hay dato |\n| Cold start de Cloud Run afecta activación | Medio | ",
+    {
+     "type": "code",
+     "text": "min-instances=1"
+    },
+    " si la métrica D0 se degrada |\n| Límites de filtrado de Firestore | Medio | Ranking en backend; índices compuestos por ",
+    {
+     "type": "code",
+     "text": "type`+`genres"
+    },
+    " |\n| Feed agotado para usuarios muy activos | Medio | Paginación por cursor + señal de afinidad histórica |\n\n---\n\n## 12. Despliegue manual (sin CI/CD)\n\n### Backend (Cloud Run)\n",
+    {
+     "type": "pre",
+     "text": "\ngcloud run deploy tinder-contenidos-backend \\\n  --source . \\\n  --region us-central1 \\\n  --allow-unauthenticated\n",
+     "language": "bash"
+    },
+    "\n\n### Frontend (PWA en Firebase Hosting)\n",
+    {
+     "type": "pre",
+     "text": "\nnpm run build\nfirebase login\nfirebase deploy --only hosting\n",
+     "language": "bash"
+    },
+    "\n\n### Job de ingesta de catálogo (recomendado)\n",
+    {
+     "type": "pre",
+     "text": "\ngcloud run deploy tinder-contenidos-ingest --source ./ingest --region us-central1 --no-allow-unauthenticated\ngcloud scheduler jobs create http sync-catalogo \\\n  --schedule \"0 4 * * *\" \\\n  --uri \"https://<URL-ingest>/run\" \\\n  --http-method POST\n",
+     "language": "bash"
+    },
+    "\n\n---\n\n## 13. Roadmap por fases\n\n- ",
+    {
+     "type": "bold",
+     "text": "Fase 1 (MVP):"
+    },
+    " Épicas 1–5 con popularidad + contenido.\n- ",
+    {
+     "type": "bold",
+     "text": "Fase 2:"
+    },
+    " señal de afinidad histórica, listas compartibles, notificaciones.\n- ",
+    {
+     "type": "bold",
+     "text": "Fase 3:"
+    },
+    " recomendación con ML, disponibilidad de streaming por región, monetización."
+   ],
+   "text_entities": [
+    {
+     "type": "code",
+     "text": "onboarding_completed"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "swipe"
+    },
+    {
+     "type": "plain",
+     "text": " (con "
+    },
+    {
+     "type": "code",
+     "text": "action"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "type`), `feed_exhausted"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "detail_opened"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "content_saved"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "list_created"
+    },
+    {
+     "type": "plain",
+     "text": ", "
+    },
+    {
+     "type": "code",
+     "text": "note_added"
+    },
+    {
+     "type": "plain",
+     "text": ". Permiten medir todas las metas de §2.\n\n---\n\n## 11. Riesgos y mitigaciones\n\n| Riesgo | Impacto | Mitigación |\n|---|---|---|\n| Costos/cuotas de APIs externas | Alto | Pre-indexar catálogo; servir feed desde Firestore, no en caliente |\n| Datos de streaming inexactos | Medio | Usar TMDB Watch Providers; placeholder neutro cuando no hay dato |\n| Cold start de Cloud Run afecta activación | Medio | "
+    },
+    {
+     "type": "code",
+     "text": "min-instances=1"
+    },
+    {
+     "type": "plain",
+     "text": " si la métrica D0 se degrada |\n| Límites de filtrado de Firestore | Medio | Ranking en backend; índices compuestos por "
+    },
+    {
+     "type": "code",
+     "text": "type`+`genres"
+    },
+    {
+     "type": "plain",
+     "text": " |\n| Feed agotado para usuarios muy activos | Medio | Paginación por cursor + señal de afinidad histórica |\n\n---\n\n## 12. Despliegue manual (sin CI/CD)\n\n### Backend (Cloud Run)\n"
+    },
+    {
+     "type": "pre",
+     "text": "\ngcloud run deploy tinder-contenidos-backend \\\n  --source . \\\n  --region us-central1 \\\n  --allow-unauthenticated\n",
+     "language": "bash"
+    },
+    {
+     "type": "plain",
+     "text": "\n\n### Frontend (PWA en Firebase Hosting)\n"
+    },
+    {
+     "type": "pre",
+     "text": "\nnpm run build\nfirebase login\nfirebase deploy --only hosting\n",
+     "language": "bash"
+    },
+    {
+     "type": "plain",
+     "text": "\n\n### Job de ingesta de catálogo (recomendado)\n"
+    },
+    {
+     "type": "pre",
+     "text": "\ngcloud run deploy tinder-contenidos-ingest --source ./ingest --region us-central1 --no-allow-unauthenticated\ngcloud scheduler jobs create http sync-catalogo \\\n  --schedule \"0 4 * * *\" \\\n  --uri \"https://<URL-ingest>/run\" \\\n  --http-method POST\n",
+     "language": "bash"
+    },
+    {
+     "type": "plain",
+     "text": "\n\n---\n\n## 13. Roadmap por fases\n\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Fase 1 (MVP):"
+    },
+    {
+     "type": "plain",
+     "text": " Épicas 1–5 con popularidad + contenido.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Fase 2:"
+    },
+    {
+     "type": "plain",
+     "text": " señal de afinidad histórica, listas compartibles, notificaciones.\n- "
+    },
+    {
+     "type": "bold",
+     "text": "Fase 3:"
+    },
+    {
+     "type": "plain",
+     "text": " recomendación con ML, disponibilidad de streaming por región, monetización."
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "type": "message",
+   "date": "2026-06-04T09:34:12",
+   "date_unixtime": "1780587252",
+   "from": "Edgar Coronel",
+   "from_id": "user1143908625",
+   "text": [
+    "Estimado Equipo, Buenos días.. cómo están?? \nCon la finalidad de repartir las Historias de Usuario, y la carga de trabajo. TODOS serían tan amables de darme 2 cosas:\n1) Celular, 2) Nivel de desarrollo (Alto / Medio / Bajo)\n\nSi gustan mandenme esos datos en PM ya sea por aquí o por Whats al ",
+    {
+     "type": "phone",
+     "text": "5580134138"
+    },
+    "\n\nGracias."
+   ],
+   "text_entities": [
+    {
+     "type": "plain",
+     "text": "Estimado Equipo, Buenos días.. cómo están?? \nCon la finalidad de repartir las Historias de Usuario, y la carga de trabajo. TODOS serían tan amables de darme 2 cosas:\n1) Celular, 2) Nivel de desarrollo (Alto / Medio / Bajo)\n\nSi gustan mandenme esos datos en PM ya sea por aquí o por Whats al "
+    },
+    {
+     "type": "phone",
+     "text": "5580134138"
+    },
+    {
+     "type": "plain",
+     "text": "\n\nGracias."
+    }
+   ]
+  }
+ ]
+}

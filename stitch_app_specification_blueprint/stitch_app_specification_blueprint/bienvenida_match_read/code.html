@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Match&amp;Read - Descubre tu próxima historia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-container": "#ff571a",
+                "background": "#131313",
+                "surface-container-lowest": "#0e0e0e",
+                "surface-container-low": "#1c1b1b",
+                "on-primary": "#5e1700",
+                "on-secondary-fixed": "#2c0051",
+                "secondary-fixed": "#efdbff",
+                "on-error": "#690005",
+                "on-secondary-container": "#dcb7ff",
+                "on-tertiary-container": "#002a53",
+                "error-container": "#93000a",
+                "secondary-fixed-dim": "#dcb8ff",
+                "tertiary-fixed": "#d4e3ff",
+                "primary-fixed-dim": "#ffb59e",
+                "surface-variant": "#353534",
+                "primary-fixed": "#ffdbd0",
+                "tertiary-container": "#2492ff",
+                "on-tertiary": "#00315e",
+                "on-surface": "#e5e2e1",
+                "on-primary-fixed-variant": "#852400",
+                "on-tertiary-fixed": "#001c3a",
+                "inverse-surface": "#e5e2e1",
+                "secondary-container": "#7701d0",
+                "secondary": "#dcb8ff",
+                "primary": "#ffb59e",
+                "on-tertiary-fixed-variant": "#004785",
+                "tertiary-fixed-dim": "#a5c8ff",
+                "outline-variant": "#5c4037",
+                "tertiary": "#a5c8ff",
+                "on-primary-fixed": "#3a0b00",
+                "surface": "#131313",
+                "inverse-on-surface": "#313030",
+                "on-error-container": "#ffdad6",
+                "on-secondary": "#480081",
+                "surface-container-high": "#2a2a2a",
+                "on-secondary-fixed-variant": "#6700b5",
+                "surface-container": "#201f1f",
+                "on-primary-container": "#521300",
+                "surface-dim": "#131313",
+                "error": "#ffb4ab",
+                "on-surface-variant": "#e6beb2",
+                "inverse-primary": "#ae3200",
+                "surface-tint": "#ffb59e",
+                "surface-container-highest": "#353534",
+                "outline": "#ad897e",
+                "on-background": "#e5e2e1",
+                "surface-bright": "#3a3939"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "container-padding": "20px",
+                "xl": "48px",
+                "card-gap": "12px",
+                "lg": "24px",
+                "xs": "8px",
+                "md": "16px",
+                "base": "4px"
+            },
+            "fontFamily": {
+                "headline-lg-mobile": ["Inter"],
+                "headline-lg": ["Inter"],
+                "label-sm": ["Geist"],
+                "body-lg": ["Inter"],
+                "title-md": ["Inter"],
+                "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "title-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glassmorphism {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .cinematic-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,1) 100%);
+        }
+
+        .match-glow {
+            box-shadow: 0 0 20px rgba(255, 87, 26, 0.4);
+        }
+
+        .match-glow:active {
+            box-shadow: 0 0 35px rgba(255, 87, 26, 0.6);
+            transform: scale(0.98);
+        }
+
+        .bento-grid-item {
+            transition: transform 0.5s ease;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg selection:bg-primary-container selection:text-white overflow-hidden">
+<!-- Immersive Background Collage -->
+<div class="fixed inset-0 z-0 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 opacity-30 transform scale-110 -rotate-3 overflow-hidden">
+<!-- Generative Collage Items -->
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover" data-alt="A moody, high-contrast book cover featuring abstract oil-painting textures in deep oranges and shadows. The aesthetic is cinematic and minimalist, with sharp typography. Part of a larger grid representing a library of premium content in a dark mode digital environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqbtBZbTwOY4f1TBloBsWrbJtEa83AEZuXm3ow0yXNemMcPbwpOr4UGE8DG6xAfjC02L4U3w61DJMp58FkPQ2prBGSv4K4T6lF4h9BnY-HlwMtRIg-UsjTiL07OHqQOWV-2Ehxpf0mIweEAipFISAaAg3R6QVPYda3Ru41srX2a8cNnxOpGtG2Xhz9-VdtK5cBHJaInBi8e-ktXzbDXTVjC77lx1kE3syYZo6iZfxCR_ppZDFthg-MfMHJqwDKF3I0oHzFLjjRGLE"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Film Poster" class="w-full h-full object-cover" data-alt="A cinematic movie poster showcasing a lonely silhouette against a massive sunset. The colors are dominated by Flame Orange and deep charcoal blacks. The lighting is dramatic, capturing a moment of discovery and emotional depth. It has a high-end digital feel with grain textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAapLXfaszlC8mTdr99RHyzJs7CnA8TRLkn2SW7vtYalZPOuUnCYUifOrii6AG8ipyrim_RyKx3GbPO7xr27N6ThlPqAjWs22exl9hFHEeaZhpMbt6Lplcp-Su4u6ShyQYTZSlgqYuzaOcV3GGU3cR-zPvX5SDL1ChXqAOYkkrHr-5gL4W9A36fHvPledQIORY2imMFWx8SujqE0IHQkNryMwAiTyuNs228ihuzHQyIT4hNrYzWXWv0YgkxMImgscxaGoUK_quq2AY"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover" data-alt="Close-up of a classic leather-bound book spine under warm, directional spotlighting. The surrounding environment is pitch black, creating a sense of mystery and exclusivity. The aesthetic matches a premium digital discovery app with cinematic minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU73A3i8OYpOQcPV8u-kyIHkvO4hjfsrfqcFbMQUA1ID82aiDWYRYEcuwJdPKZdkA7ra7dOLXIoDvZ5zmWc9qKKCvZQBI885ulY2Dsa7EOH2tLG8a9o9xcxxHvP-ScR3OvWqmRtSkVtXFhcRoUSYelOD06TjTp66lbhX5i4XcNmx-GThckupWUKYSh4CwoP2sDLpnUE6RRPOEKI42xs2admNImOm6SNJSevPp8Yd-UY1qUKr3maAj7iiGe_jF08r9kxrEzu23BlSo"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Cinematic Scene" class="w-full h-full object-cover" data-alt="A futuristic sci-fi cityscape viewed from a high-rise window, bathed in neon orange and violet light. The mood is energetic yet serene, reflecting a high-velocity visual discovery experience. The shot is pristine with heavy glassmorphism elements visible in the architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo8WeWvN47ii_xcjl_nYTroRtmz2COVGBDN8njF9ifHh43ltMKxDZ_PIUaKcia5baRE9bv41NALKwLCcojaEoZB_m3X0caCltEKZlFM7nUGyuqcaTjC02lL8qU8drxakh9fBT6bjLQsXA1Fcv7eE5LCW5g2fdkWChJQwIXUe2kr8klaiyy5iiaON7csIRfpAFCt7c4dwsOy9FMXoIQ-QhClA27xfVI7XacEtVAEQOCP_supir0Av0XBGupq2VneBLxYYNQ7W4R5rA"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Graphic Novel" class="w-full h-full object-cover" data-alt="Vibrant graphic novel art style with thick ink lines and bold flame orange accents. The subject is a character lost in a massive library of floating holographic books. The aesthetic is energetic and intuitive, using a deep black background to make the content pop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAScmu32RVTQkgXVwuLPGGcFBZteLQAIFQnzC_1_x8HaYVP_RaEcnMCro9DqiKe4aW8IlBNbWOrVmfyzEaWheQ1xBSnJjqb3BWhpguXsmKqmId_7Mg9CzJfDA64mERuKYTvqqzP-lISSVGIbMqx4_z1kFSE2AtntX_nlKIvFs1CrpzIHG1pmeJdFymbar3YQDEKBrXucnasFPMqD4A4k8zI2_MUG2r2EHemslXKb2BORVZpg9jYhznK4s4H0WIIyp_mutS2v-V9MlQ"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden">
+<img alt="Movie Scene" class="w-full h-full object-cover" data-alt="A classic film noir scene of a detective in a trench coat standing under a flickering streetlight. The lighting is high-key with sharp shadows and a smoky atmosphere. The visual style is premium and cinematic, fitting for a curated story discovery platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh8SaaUTwL1PXL3sm9FjWsNFhFnE24G33azqcbYZpSRhHzjkB0L5u8SuVpAp3nuerz6i7tgIjS5MXBt4KWtNj0F9CvnziQK_3VoEGZQXxsWwM0BneeQJbgH8Ddq7kk9zK4PXvjUviA6tvBbaeG--hbuy8UvXVgheqlHSpmfLzO-F8zFlStiC5dlvFcskc9H6D5Z2plB2M4Q1gQkYzP-UBHl7fmI4hiHhfwQ5bGP_2NBOyoNcPOnRvtDdEtq9PawIOLjt3kjIoSF0g"/>
+</div>
+<!-- Repeat for density -->
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden hidden md:block">
+<img alt="Abstract Art" class="w-full h-full object-cover" data-alt="Abstract fluid motion captured in high speed, with swirls of orange and white liquid against a solid black background. The image evokes excitement and the 'moment of discovery'. It has a high-gloss, premium digital feel with soft blurred edges." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATjiNP6cCNAqu7FamoUAxhSQtQPpppkBD602CpMT6ahK4TKw7YXKGuoVeMULPLo_3mqrwvwS_V6hJL90_ryaUGuG58dmehipDa3pS4zvPcy-NxPAKDJg0dW04ChtdUp0i70e7RX0BtR6RxdItHPoWpKoY42ZCP-b0mfh3wrlOQrlT0BzEPkS7t5sT4Otkpl4fPmeRhtGn8_yybw-xjOBWe2UZ_AsUnaClvv_4pEAujcKvpaD8yupiqcV0h-3Ss_HjBHqfGEyTF-VY"/>
+</div>
+<div class="h-64 rounded-xl bg-surface-container-highest overflow-hidden hidden md:block">
+<img alt="Ancient Scroll" class="w-full h-full object-cover" data-alt="Detailed close-up of an ancient papyrus scroll being unrolled, revealing intricate symbols. The lighting is warm and golden, highlighting textures. The composition is minimalist and cinematic, focused on the act of finding a hidden gem story." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0xfkzYslX2fVPUkPPi6TJJRwf3KPuB55Gp87d9A9gRWCXZAQnL8RoWuoet3infOo4Nf7vzx_01g2wVmWjq1-jjfQOTKcytkxKlX5JA-pvwFJZb3vTrhZ6w81kxR79gczsFY88yW5AiAulRN83OQaB4BTj5WSHye9H_HbaaW87_-CUF4zvWJ49BqCFh9AF3LLImPxTefEsbAXijXfV8n1jtctx1HFk2eVJXZy2lx-PfE11egKT9b1roXS6cPy242dsdrNcaPyF4tU"/>
+</div>
+</div>
+<!-- Dark Overlay -->
+<div class="fixed inset-0 z-10 cinematic-overlay"></div>
+<!-- Onboarding Canvas -->
+<main class="relative z-20 flex flex-col items-center justify-between h-screen w-full px-container-padding py-xl text-center">
+<!-- Header/Top Section -->
+<div class="w-full flex justify-center items-center py-8">
+<div class="flex flex-col items-center gap-xs">
+<img alt="Match&amp;Read Logo" class="h-24 w-auto animate-float drop-shadow-[0_0_15px_rgba(255,87,26,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAneNkLMcg9WZ3jhZp2iE65UMCafeqVJgU9SPxXQXL3pO76IQiYj9dW-glf9jGlGRiNQ_-_EqgFstZ2g9HywMgSdu4GA2xun5dbtCP9rXZVJ2kMCBvuAULy8VO2XAEAezrbTGiTZW824bZqtt4eclN_MkJ95sDsVDh2pV5j8XlfH4J6YKqmaD1soyNdtcHb5FRzL2j2dxtV0ExUXWlozglt7ggvyTSWfuSe0IYTNLpV5KGOF2jeXaFB6n2p1Q27u6YDG_JQHg2sY0U"/>
+<span class="text-primary-container font-title-md text-title-md font-bold tracking-tight">Match&amp;Read</span>
+</div>
+</div>
+<!-- Hero Content -->
+<div class="flex flex-col items-center gap-md max-w-lg mb-12">
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-surface">
+                Tu próximo match está a un <span class="text-primary-container">swipe.</span>
+</h1>
+<p class="text-body-lg text-on-surface-variant/80 px-4">
+                Descubre libros y películas de forma intuitiva con nuestra experiencia de descubrimiento cinemático.
+            </p>
+</div>
+<!-- Action Area -->
+<div class="w-full max-w-md flex flex-col gap-md">
+<!-- Google Auth Button -->
+<button class="w-full flex items-center justify-center gap-md bg-on-surface text-surface py-md px-lg rounded-xl font-title-md transition-all hover:opacity-90 active:scale-[0.97]">
+<svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"></path>
+</svg>
+                Continuar con Google
+            </button>
+<!-- Email Signup Button -->
+<button class="w-full bg-transparent border border-on-surface-variant text-on-surface py-md px-lg rounded-xl font-title-md transition-all hover:bg-surface-variant/20 active:scale-[0.97]">
+                Registrarse con Email
+            </button>
+<!-- Gradient Dynamic Accent (Visual Flare) -->
+<div class="h-0.5 w-1/3 mx-auto mt-2 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50"></div>
+</div>
+<!-- Footer Legal -->
+<footer class="w-full py-4 px-4 text-center">
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">
+                Al continuar, aceptas nuestros <a class="underline hover:text-primary-container transition-colors" href="#">términos y condiciones</a> y nuestra <a class="underline hover:text-primary-container transition-colors" href="#">política de privacidad</a>.
+            </p>
+</footer>
+</main>
+<!-- Micro-interaction overlay script -->
+<script>
+        document.addEventListener('mousemove', (e) => {
+            const collage = document.querySelector('.fixed.inset-0.z-0');
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            collage.style.transform = `scale(1.1) rotate(-3deg) translate(${x}px, ${y}px)`;
+        });
+
+        // Simple button haptics simulation
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            });
+        });
+    </script>
+</body></html>
