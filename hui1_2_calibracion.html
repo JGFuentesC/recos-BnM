@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match&Read | HU1.2 Calibracion</title>
+  <style>
+    :root {
+      --bg: #0f1012;
+      --bg-soft: #16171a;
+      --text: #f1efee;
+      --muted: rgba(241, 239, 238, 0.74);
+      --border: rgba(255, 255, 255, 0.12);
+      --glass: rgba(18, 18, 18, 0.46);
+      --orange: #ff571a;
+      --orange-soft: #ffb59e;
+      --violet: #7a24d9;
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255, 87, 26, 0.18), transparent 24%),
+        radial-gradient(circle at 90% 22%, rgba(122, 36, 217, 0.18), transparent 18%),
+        linear-gradient(180deg, #0d0e10, #090a0b);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .app {
+      width: min(100%, 430px);
+      min-height: 100dvh;
+      position: relative;
+      border-inline: 1px solid rgba(255, 255, 255, 0.04);
+      background: linear-gradient(180deg, rgba(10, 10, 12, 0.92), rgba(8, 8, 10, 0.98));
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 70px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      background: rgba(11, 11, 12, 0.85);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--orange);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand svg { width: 22px; height: 22px; }
+
+    .skip {
+      border: 0;
+      background: transparent;
+      color: rgba(241, 239, 238, 0.82);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .progress-fill {
+      height: 2px;
+      width: 0;
+      background: linear-gradient(90deg, var(--orange), var(--violet));
+      box-shadow: 0 0 12px rgba(255, 87, 26, 0.55);
+      transition: width 220ms ease;
+    }
+
+    .content {
+      height: calc(100dvh - 72px);
+      padding: 16px 18px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .header-copy {
+      text-align: center;
+      padding-top: 6px;
+    }
+
+    .header-copy h1 {
+      margin: 4px 0 8px;
+      font-size: clamp(2rem, 8vw, 3rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .header-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+
+    .stack {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      margin-top: 6px;
+      z-index: 20;
+    }
+
+    .card {
+      position: absolute;
+      width: calc(100% - 6px);
+      height: min(58dvh, 500px);
+      border-radius: 34px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #111;
+      transform-origin: center;
+      box-shadow: var(--shadow);
+      user-select: none;
+      touch-action: pan-y;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(0.95) contrast(1.08);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.05) 30%, rgba(0, 0, 0, 0.9) 90%);
+      pointer-events: none;
+    }
+
+    .card[data-level="2"] {
+      transform: scale(0.93) translateY(-22px);
+      opacity: 0.35;
+      z-index: 10;
+    }
+
+    .card[data-level="1"] {
+      transform: scale(0.96) translateY(-10px);
+      opacity: 0.6;
+      z-index: 20;
+    }
+
+    .card[data-level="0"] {
+      z-index: 30;
+      opacity: 1;
+      transition: transform 230ms ease, opacity 230ms ease;
+    }
+
+    .card-body {
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 22px 20px 26px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      font-size: 0.88rem;
+      border-radius: 999px;
+      padding: 6px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      color: #f5f1ef;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.4rem, 11vw, 4.2rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+      max-width: 10ch;
+    }
+
+    .desc {
+      margin: 12px 0 0;
+      font-size: 1.02rem;
+      line-height: 1.5;
+      color: rgba(241, 239, 238, 0.78);
+      max-width: 24ch;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 6px;
+      position: relative;
+      z-index: 80;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.03);
+      color: #f3eeeb;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 170ms ease, background 170ms ease, border-color 170ms ease;
+    }
+
+    .btn:active { transform: scale(0.96); }
+
+    .btn-dislike, .btn-save { width: 78px; height: 78px; font-size: 2.2rem; }
+    .btn-like { width: 98px; height: 98px; font-size: 2.8rem; border: 0; background: var(--orange); color: #2b0900; box-shadow: 0 0 34px rgba(255, 87, 26, 0.42); }
+
+    .footer-copy {
+      text-align: center;
+      margin-top: 8px;
+      position: relative;
+      z-index: 80;
+    }
+
+    .footer-copy .main {
+      font-size: 0.96rem;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .footer-copy .sub {
+      margin-top: 6px;
+      color: rgba(241, 239, 238, 0.73);
+      font-style: italic;
+      font-size: 0.96rem;
+    }
+
+    .status {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      line-height: 1.35;
+      display: none;
+      position: relative;
+      z-index: 80;
+    }
+
+    .status.show { display: block; }
+
+    .status.info { background: rgba(255, 87, 26, 0.12); border: 1px solid rgba(255, 87, 26, 0.35); color: #ffd8cb; }
+    .status.error { background: rgba(255, 180, 171, 0.12); border: 1px solid rgba(255, 180, 171, 0.35); color: #ffd8d3; }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 99;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(8, 8, 10, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .overlay.open { display: grid; }
+
+    .overlay-card {
+      width: min(100%, 390px);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(20, 20, 22, 0.7);
+      padding: 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .overlay-card h2 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .overlay-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .overlay-card .go {
+      margin-top: 18px;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 14px;
+      border: 0;
+      font-weight: 700;
+      font-size: 1rem;
+      background: linear-gradient(180deg, #ff6a31, #ff4a12);
+      color: #250800;
+      cursor: pointer;
+    }
+
+    .overlay-card .small {
+      margin-top: 10px;
+      font-size: 0.84rem;
+      color: rgba(241, 239, 238, 0.62);
+    }
+
+    @media (max-width: 390px) {
+      .content { padding: 14px 14px 22px; }
+      .card { height: min(54dvh, 470px); border-radius: 28px; }
+      .btn-dislike, .btn-save { width: 72px; height: 72px; }
+      .btn-like { width: 92px; height: 92px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14 14h16c3.314 0 6 2.686 6 6v24c0-3.314 2.686-6 6-6h8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 14v30c0 3.314 2.686 6 6 6h20" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M38 18l12 8-12 8V18Z" fill="currentColor"/>
+        </svg>
+        <span>Match&Read</span>
+      </div>
+      <button class="skip" id="skipBtn">Saltar</button>
+    </header>
+
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+    <main class="content">
+      <section class="header-copy">
+        <h1>Personaliza tu feed</h1>
+        <p>Desliza para indicarnos qué géneros y estilos te apasionan.</p>
+      </section>
+
+      <section class="stack" id="stack"></section>
+
+      <section>
+        <div class="actions">
+          <button class="btn btn-dislike" id="dislikeBtn" aria-label="No me interesa">✕</button>
+          <button class="btn btn-like" id="likeBtn" aria-label="Me gusta">♡</button>
+          <button class="btn btn-save" id="saveBtn" aria-label="Guardar">⌑</button>
+        </div>
+        <div class="footer-copy">
+          <div class="main">Tu próximo match está a un swipe.</div>
+          <div class="sub">Calibrando tus gustos...</div>
+        </div>
+        <div class="status" id="statusBox" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <section class="overlay" id="doneOverlay">
+      <div class="overlay-card">
+        <h2>Calibracion completada</h2>
+        <p>Tu perfil inicial ya quedó guardado. A partir de ahora el feed puede priorizar tus gustos.</p>
+        <button class="go" id="goFeedBtn">Ir al feed (siguiente epica)</button>
+        <div class="small">HU1.2 cerrada: swipes iniciales + prefs.cold_start_done = true</div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    import { getFirestore, doc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCMCcSLn3jc2bhamh0d4Wiy7daJj9hacGA',
+      authDomain: 'proyectofinal-71637.firebaseapp.com',
+      projectId: 'proyectofinal-71637',
+      storageBucket: 'proyectofinal-71637.firebasestorage.app',
+      messagingSenderId: '113446095664',
+      appId: '1:113446095664:web:8487145f158264c55ed6f5'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const stackEl = document.getElementById('stack');
+    const progressEl = document.getElementById('progress');
+    const statusBox = document.getElementById('statusBox');
+    const likeBtn = document.getElementById('likeBtn');
+    const dislikeBtn = document.getElementById('dislikeBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const doneOverlay = document.getElementById('doneOverlay');
+    const goFeedBtn = document.getElementById('goFeedBtn');
+
+    const cards = [
+      {
+        id: 'genre_scifi',
+        title: 'Ciencia Ficcion',
+        description: 'Desde distopias neon hasta viajes estelares que desafian el tiempo.',
+        chips: ['Futurismo', 'IA'],
+        image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Ciencia Ficcion']
+      },
+      {
+        id: 'genre_fantasy',
+        title: 'Fantasia Epica',
+        description: 'Mundos perdidos, magia antigua y batallas que cambian reinos.',
+        chips: ['Aventura', 'Magia'],
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Fantasia']
+      },
+      {
+        id: 'genre_thriller',
+        title: 'Novela Negra',
+        description: 'Misterios urbanos, detectives y crimen con atmosfera intensa.',
+        chips: ['Misterio', 'Crimen'],
+        image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Thriller']
+      },
+      {
+        id: 'genre_drama',
+        title: 'Drama Intimo',
+        description: 'Historias humanas que se quedan contigo despues de los creditos.',
+        chips: ['Autor', 'Emocional'],
+        image: 'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Drama']
+      },
+      {
+        id: 'genre_history',
+        title: 'Historico',
+        description: 'Narrativas de epocas clave con personajes que marcaron su tiempo.',
+        chips: ['Biografico', 'Clasicos'],
+        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Historico']
+      },
+      {
+        id: 'genre_horror',
+        title: 'Terror',
+        description: 'Suspenso oscuro, tension progresiva y escenas inolvidables.',
+        chips: ['Suspenso', 'Psicologico'],
+        image: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Terror']
+      },
+      {
+        id: 'genre_romance',
+        title: 'Romance',
+        description: 'Quimica, decisiones y emociones en historias de gran conexion.',
+        chips: ['Feel Good', 'Relaciones'],
+        image: 'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Romance']
+      },
+      {
+        id: 'genre_documentary',
+        title: 'Documental',
+        description: 'Ideas, ciencia y sociedad contadas con mirada contemporanea.',
+        chips: ['Real', 'Investigacion'],
+        image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Documental']
+      }
+    ];
+
+    const totalCards = cards.length;
+    let currentIndex = 0;
+    let currentUser = null;
+    const likedGenres = new Set();
+    const likedAuthors = new Set();
+    const likedDirectors = new Set();
+    let isBusy = false;
+
+    function setStatus(message, tone = 'info') {
+      statusBox.textContent = message;
+      statusBox.className = `status show ${tone}`;
+    }
+
+    function updateProgress() {
+      const completed = Math.min(currentIndex, totalCards);
+      const pct = Math.round((completed / totalCards) * 100);
+      progressEl.style.width = `${pct}%`;
+    }
+
+    function cardMarkup(card, level) {
+      const chips = card.chips.map((c) => `<span class="chip">${c}</span>`).join('');
+      return `
+        <article class="card" data-level="${level}" data-id="${card.id}">
+          <img src="${card.image}" alt="${card.title}" loading="lazy" />
+          <div class="card-body">
+            <div class="chips">${chips}</div>
+            <h2 class="title">${card.title}</h2>
+            <p class="desc">${card.description}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderStack() {
+      const remaining = cards.slice(currentIndex, currentIndex + 3);
+      stackEl.innerHTML = '';
+
+      if (!remaining.length) {
+        stackEl.innerHTML = '<div style="text-align:center;color:rgba(241,239,238,0.76);">No hay mas tarjetas.</div>';
+        return;
+      }
+
+      const levels = [0, 1, 2];
+      remaining.forEach((card, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = cardMarkup(card, levels[idx]);
+        stackEl.appendChild(wrapper.firstElementChild);
+      });
+
+      attachSwipeGesture();
+    }
+
+    function attachSwipeGesture() {
+      const active = stackEl.querySelector('.card[data-level="0"]');
+      if (!active) return;
+
+      let startX = 0;
+      let dragging = false;
+
+      const onPointerDown = (e) => {
+        if (isBusy) return;
+        dragging = true;
+        startX = e.clientX;
+        active.setPointerCapture(e.pointerId);
+      };
+
+      const onPointerMove = (e) => {
+        if (!dragging) return;
+        const deltaX = e.clientX - startX;
+        const rotate = deltaX / 20;
+        active.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+      };
+
+      const onPointerUp = async (e) => {
+        if (!dragging) return;
+        dragging = false;
+        const deltaX = e.clientX - startX;
+
+        if (deltaX > 120) {
+          await processAction('like');
+          return;
+        }
+
+        if (deltaX < -120) {
+          await processAction('dislike');
+          return;
+        }
+
+        active.style.transform = '';
+      };
+
+      active.addEventListener('pointerdown', onPointerDown);
+      active.addEventListener('pointermove', onPointerMove);
+      active.addEventListener('pointerup', onPointerUp);
+      active.addEventListener('pointercancel', onPointerUp);
+    }
+
+    async function saveSwipe(action, card) {
+      if (!currentUser) {
+        throw new Error('No hay usuario autenticado para guardar el swipe.');
+      }
+
+      await addDoc(collection(db, 'swipes'), {
+        userId: currentUser.uid,
+        contentId: card.id,
+        contentType: 'onboarding',
+        type: 'onboarding',
+        action,
+        timestamp: serverTimestamp()
+      });
+
+      if (action === 'like') {
+        card.genres.forEach((g) => likedGenres.add(g));
+      }
+    }
+
+    async function completeOnboarding(skipped = false) {
+      if (!currentUser) {
+        setStatus('No hay usuario activo. Vuelve al login.', 'error');
+        return;
+      }
+
+      await updateDoc(doc(db, 'users', currentUser.uid), {
+        'prefs.genres': Array.from(likedGenres),
+        'prefs.authors': Array.from(likedAuthors),
+        'prefs.directors': Array.from(likedDirectors),
+        'prefs.cold_start_done': true,
+        onboardingCompletedAt: serverTimestamp(),
+        onboardingSkipped: skipped
+      });
+
+      doneOverlay.classList.add('open');
+      setStatus('Calibracion guardada en Firestore.', 'info');
+    }
+
+    async function processAction(action) {
+      if (isBusy || currentIndex >= totalCards) return;
+      isBusy = true;
+
+      const card = cards[currentIndex];
+      const active = stackEl.querySelector('.card[data-level="0"]');
+
+      if (active) {
+        const direction = action === 'dislike' ? -1 : 1;
+        active.style.transition = 'transform 220ms ease, opacity 220ms ease';
+        active.style.transform = `translateX(${direction * 820}px) rotate(${direction * 24}deg)`;
+        active.style.opacity = '0';
+      }
+
+      try {
+        await saveSwipe(action, card);
+        currentIndex += 1;
+        updateProgress();
+        setTimeout(async () => {
+          renderStack();
+          if (currentIndex >= totalCards) {
+            try {
+              await completeOnboarding(false);
+            } catch (error) {
+              console.error(error);
+              setStatus('No se pudo cerrar onboarding. Revisa reglas de Firestore.', 'error');
+            }
+          }
+          isBusy = false;
+        }, 240);
+      } catch (error) {
+        console.error(error);
+        setStatus('Error guardando swipe. Verifica Firestore y autenticacion.', 'error');
+        if (active) {
+          active.style.transition = 'transform 160ms ease';
+          active.style.transform = '';
+          active.style.opacity = '1';
+        }
+        isBusy = false;
+      }
+    }
+
+    function resolveUserFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem('matchread_user');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed?.uid) return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    async function start() {
+      updateProgress();
+      renderStack();
+
+      const localUser = resolveUserFromLocalStorage();
+      if (localUser) currentUser = localUser;
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = { uid: user.uid, email: user.email ?? '', displayName: user.displayName ?? 'Usuario' };
+          localStorage.setItem('matchread_user', JSON.stringify(currentUser));
+          setStatus(`Sesion activa: ${currentUser.displayName}`, 'info');
+          return;
+        }
+
+        if (!currentUser) {
+          setStatus('No detectamos sesion activa. Vuelve a HU1.1 para autenticarte.', 'error');
+        }
+      });
+    }
+
+    dislikeBtn.addEventListener('click', () => processAction('dislike'));
+    likeBtn.addEventListener('click', () => processAction('like'));
+    saveBtn.addEventListener('click', () => processAction('like'));
+
+    skipBtn.addEventListener('click', async () => {
+      if (isBusy) return;
+      isBusy = true;
+      try {
+        await completeOnboarding(true);
+      } catch (error) {
+        console.error(error);
+        setStatus('No se pudo saltar onboarding. Revisa Firestore.', 'error');
+      }
+      isBusy = false;
+    });
+
+    goFeedBtn.addEventListener('click', () => {
+      window.location.href = 'hui1_1_bienvenida.html';
+    });
+
+    start();
+  </script>
+</body>
+</html>

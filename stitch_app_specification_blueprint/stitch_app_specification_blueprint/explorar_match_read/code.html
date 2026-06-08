@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Match&amp;Read - Discovery Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .match-gradient {
+            background: linear-gradient(135deg, #ff571a 0%, #ae3200 100%);
+        }
+        .discovery-stack {
+            perspective: 1000px;
+        }
+        .active-card {
+            transform: translateZ(0) scale(1);
+            z-index: 10;
+        }
+        .background-card {
+            transform: translateZ(-50px) scale(0.95) translateY(-20px);
+            z-index: 5;
+            opacity: 0.5;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "primary-container": "#ff571a",
+                "background": "#131313",
+                "surface-container-lowest": "#0e0e0e",
+                "surface-container-low": "#1c1b1b",
+                "on-primary": "#5e1700",
+                "on-secondary-fixed": "#2c0051",
+                "secondary-fixed": "#efdbff",
+                "on-error": "#690005",
+                "on-secondary-container": "#dcb7ff",
+                "on-tertiary-container": "#002a53",
+                "error-container": "#93000a",
+                "secondary-fixed-dim": "#dcb8ff",
+                "tertiary-fixed": "#d4e3ff",
+                "primary-fixed-dim": "#ffb59e",
+                "surface-variant": "#353534",
+                "primary-fixed": "#ffdbd0",
+                "tertiary-container": "#2492ff",
+                "on-tertiary": "#00315e",
+                "on-surface": "#e5e2e1",
+                "on-primary-fixed-variant": "#852400",
+                "on-tertiary-fixed": "#001c3a",
+                "inverse-surface": "#e5e2e1",
+                "secondary-container": "#7701d0",
+                "secondary": "#dcb8ff",
+                "primary": "#ffb59e",
+                "on-tertiary-fixed-variant": "#004785",
+                "tertiary-fixed-dim": "#a5c8ff",
+                "outline-variant": "#5c4037",
+                "tertiary": "#a5c8ff",
+                "on-primary-fixed": "#3a0b00",
+                "surface": "#131313",
+                "inverse-on-surface": "#313030",
+                "on-error-container": "#ffdad6",
+                "on-secondary": "#480081",
+                "surface-container-high": "#2a2a2a",
+                "on-secondary-fixed-variant": "#6700b5",
+                "surface-container": "#201f1f",
+                "on-primary-container": "#521300",
+                "surface-dim": "#131313",
+                "error": "#ffb4ab",
+                "on-surface-variant": "#e6beb2",
+                "inverse-primary": "#ae3200",
+                "surface-tint": "#ffb59e",
+                "surface-container-highest": "#353534",
+                "outline": "#ad897e",
+                "on-background": "#e5e2e1",
+                "surface-bright": "#3a3939"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "container-padding": "20px",
+                "xl": "48px",
+                "card-gap": "12px",
+                "lg": "24px",
+                "xs": "8px",
+                "md": "16px",
+                "base": "4px"
+              },
+              "fontFamily": {
+                "headline-lg-mobile": ["Inter"],
+                "headline-lg": ["Inter"],
+                "label-sm": ["Geist"],
+                "body-lg": ["Inter"],
+                "title-md": ["Inter"],
+                "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "title-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen overflow-hidden flex flex-col">
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding h-16 backdrop-blur-xl border-b border-white/10 bg-background/80">
+<div class="flex items-center gap-xs">
+<img alt="App Logo" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYxonLPTMwBs3rTLQCVREDM5gTB-AKh5r4DHGGm7wepshlz7RMzWsChFG9YH7OJguPztv_lCNYz1b2rJrZyFS_7Et6rOWmcbneqDpIJNo2174LqgVH0v2NCBCT-V7Z9Tb02Vhzu4pD6F6kR2B_NA_g2XuPEV84h7zLZnIS6FlRXsJjoA2xn96vRWrarmCEu9l3BqLK5QwPLCyCzQdFW6PqisXwmbyrRp9VRZ7dbbwDs1VdFxUYnWCzHkN2crXfTg0w2ecwJUxUxr0"/>
+<span class="text-title-md font-title-md font-bold text-primary-container">Match&amp;Read</span>
+</div>
+<div class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-opacity" data-icon="search">search</div>
+</header>
+<main class="flex-1 mt-16 pb-28 flex flex-col items-center">
+<div class="w-full flex justify-center py-md px-container-padding">
+<div class="bg-surface-container-low p-1 rounded-full flex gap-1 w-full max-w-xs border border-white/5">
+<button class="flex-1 py-2 px-4 rounded-full text-label-sm font-label-sm transition-all duration-300 bg-primary-container text-on-primary-container shadow-lg" id="tab-movies">Películas</button>
+<button class="flex-1 py-2 px-4 rounded-full text-label-sm font-label-sm transition-all duration-300 text-on-surface-variant hover:text-on-surface" id="tab-books">Libros</button>
+</div>
+</div>
+<div class="flex-1 w-full max-w-md relative px-container-padding pt-base discovery-stack">
+<div class="absolute inset-0 top-md bottom-xs px-container-padding">
+<div class="w-full h-full rounded-xl background-card glass-card"></div>
+</div>
+<div class="relative w-full h-full rounded-xl active-card overflow-hidden shadow-2xl border border-white/10 transition-transform duration-500 ease-out cursor-grab active:cursor-grabbing" id="discovery-card">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A hyper-realistic cinematic movie poster for a science fiction space exploration film. The scene features a lone astronaut looking out a spaceship window towards a massive, glowing black hole with a vibrant accretion disk of light. The atmosphere is dark, majestic, and awe-inspiring, utilizing a palette of deep blacks, shimmering oranges, and electric purples. The visual style is premium and high-fidelity, matching a cinematic discovery app aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBATypWOgoOG5RKArO5nE3n7pM3dh7ySw8ue_6ZQeT2ISjNbCuydh6Lb4vI7zER-xVSAdj3y9LlVhM5bfG9mOq1yAqM7zHhQL33t3tQZmqM6nnNfnAo_5TygRwGgneszDE9E-IDXRTK6JNyDscg3nnFk5bq_tY-Qawa1U7aVUNjryPvtuCiT9-FoOgGMDbBVQv3knOX6gazOuuckovUB8qYsDw1F5uFRj3dI5rwXX1dmNOliofj2tOD7t5BtEl5urs9zzC_s5zXw6k')">
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-lg flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-base">
+<span class="flex items-center text-primary-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold ml-1 text-label-sm font-label-sm">8.5/10</span>
+</span>
+<div class="w-1 h-1 rounded-full bg-on-surface-variant"></div>
+<span class="text-on-surface-variant text-label-sm font-label-sm">IMDb</span>
+</div>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile text-white leading-tight">Interstellar</h2>
+<div class="flex flex-wrap gap-xs mt-base">
+<span class="px-3 py-1 glass-card rounded-full text-label-sm font-label-sm text-white/90">Sci-Fi</span>
+<span class="px-3 py-1 glass-card rounded-full text-label-sm font-label-sm text-white/90">Drama</span>
+<span class="px-3 py-1 glass-card rounded-full text-label-sm font-label-sm text-white/90">Aventura</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center gap-xl mt-lg mb-container-padding">
+<button class="w-16 h-16 rounded-full border border-white/10 bg-surface-container-low flex items-center justify-center text-white/60 hover:text-white transition-all active:scale-90 shadow-xl group">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform" data-icon="close">close</span>
+</button>
+<button class="w-20 h-20 rounded-full match-gradient flex items-center justify-center text-on-primary shadow-[0_0_30px_rgba(255,87,26,0.3)] hover:shadow-[0_0_45px_rgba(255,87,26,0.5)] transition-all active:scale-90 group">
+<span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 backdrop-blur-2xl border-t border-white/5 bg-background/70 shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-container bg-primary-container/10 rounded-xl px-4 py-1 transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="text-label-sm font-label-sm mt-1">Explorar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="text-label-sm font-label-sm mt-1">Biblioteca</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-label-sm font-label-sm mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        const tabMovies = document.getElementById('tab-movies');
+        const tabBooks = document.getElementById('tab-books');
+
+        tabMovies.addEventListener('click', () => {
+            tabMovies.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+            tabMovies.classList.remove('text-on-surface-variant');
+            tabBooks.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+            tabBooks.classList.add('text-on-surface-variant');
+        });
+
+        tabBooks.addEventListener('click', () => {
+            tabBooks.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+            tabBooks.classList.remove('text-on-surface-variant');
+            tabMovies.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+            tabMovies.classList.add('text-on-surface-variant');
+        });
+
+        const card = document.getElementById('discovery-card');
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        card.addEventListener('mousedown', startDrag);
+        card.addEventListener('touchstart', startDrag);
+
+        window.addEventListener('mousemove', drag);
+        window.addEventListener('touchmove', drag);
+
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchend', stopDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = e.type === 'mousedown' ? e.pageX : e.touches[0].pageX;
+            card.style.transition = 'none';
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            const x = e.type === 'mousemove' ? e.pageX : e.touches[0].pageX;
+            currentX = x - startX;
+            const rotation = currentX / 20;
+            card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
+            
+            if (currentX > 50) {
+                card.style.borderColor = 'rgba(255, 87, 26, 0.5)';
+            } else if (currentX < -50) {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            } else {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
+        }
+
+        function stopDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            card.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s';
+            
+            if (Math.abs(currentX) > 150) {
+                const direction = currentX > 0 ? 1000 : -1000;
+                card.style.transform = `translateX(${direction}px) rotate(${direction / 20}deg)`;
+                setTimeout(() => {
+                    card.style.transition = 'none';
+                    card.style.transform = 'translateX(0) scale(0.8)';
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease-out';
+                        card.style.transform = 'translateX(0) scale(1)';
+                        card.style.opacity = '1';
+                        card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    }, 100);
+                }, 300);
+            } else {
+                card.style.transform = 'translateX(0) rotate(0deg)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
+            currentX = 0;
+        }
+    </script>
+</body></html>
