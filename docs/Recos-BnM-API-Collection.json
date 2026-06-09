@@ -1,0 +1,181 @@
+{
+  "info": {
+    "name": "Recos-BnM API Contracts",
+    "description": "Colección de los 7 endpoints del PRD §8",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Feed",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/feed?userId=123&type=movie&cursor=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "feed"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "123"
+            },
+            {
+              "key": "type",
+              "value": "movie"
+            },
+            {
+              "key": "cursor",
+              "value": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Swipe",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/swipe",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "swipe"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"123\",\n  \"contentId\": \"456\",\n  \"type\": \"movie\",\n  \"action\": \"like\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Content Detail",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/content/456",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "content",
+            "456"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Collections",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections?userId=123&type=movie",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "123"
+            },
+            {
+              "key": "type",
+              "value": "movie"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Collection Item",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"123\",\n  \"contentId\": \"456\",\n  \"listName\": \"Favoritos\",\n  \"personalNote\": \"Excelente película\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Update Collection Item",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections/789",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections",
+            "789"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"personalNote\": \"Nota actualizada\",\n  \"listName\": \"Nuevos Favoritos\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Delete Collection Item",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections/789",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections",
+            "789"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}
