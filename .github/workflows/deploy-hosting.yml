@@ -9,9 +9,6 @@ on:
 jobs:
   backend-ingest-tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: recos-BnM
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v3
@@ -22,19 +19,14 @@ jobs:
           python-version: '3.10'
 
       - name: Instalar dependencias de Ingest
-        run: |
-          pip install -r ingest/requirements.txt
+        run: pip install -r ingest/requirements.txt
 
       - name: Correr pruebas de Ingest (pytest de Manuel)
-        run: |
-          pytest ingest/tests/
+        run: pytest ingest/tests/
 
   frontend-build-deploy:
     runs-on: ubuntu-latest
     needs: backend-ingest-tests
-    defaults:
-      run:
-        working-directory: recos-BnM
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v3
@@ -45,12 +37,12 @@ jobs:
           node-version: 18
 
       - name: Instalar dependencias del Proyecto
-        run: |
-          npm install --if-present
+        run: npm install
+        working-directory: frontend
 
       - name: Construir aplicación
-        run: |
-          npm run build --if-present
+        run: npm run build
+        working-directory: frontend
 
       - name: Desplegar a Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
