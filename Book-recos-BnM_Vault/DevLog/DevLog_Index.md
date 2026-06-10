@@ -3,7 +3,7 @@ project: "Recos-BnM"
 owner: "Equipo Recos-BnM"
 status: "Active"
 version: "1.0"
-last_reviewed: "2026-06-06"
+last_reviewed: "2026-06-09"
 milestone: "MVP"
 tags: [devlog, index, moc]
 ---
@@ -33,6 +33,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-07-hector-content-api     | 2026-06-07 (sesión 11)]] | Wave 2 backend: `GET /api/content/:id` con auth + whitelist de campos (13), watchProviders siempre array, attribution TMDB, validación id (path traversal), 8 test cases (Jest+supertest), Merge PR #29 aceptado en main                                                                                                        | Claude Code (claude-opus-4-8) + Héctor Morales Marbán  |
 | [[DevLog/2026-06-07-christian-collections-api | 2026-06-07 (sesión 11)]] | Wave 2 backend: CRUD completo `/api/collections` (GET reasignado + POST anti-duplicados + PATCH + DELETE) en `backend/src/routes/collections.js`, tests Jest+supertest self-contained (Firestore en memoria + auth mock). Rebaseado sobre main actual; reutiliza el tooling de jest ya presente. Bloqueante: ruta aún no registrada en `app.js` (Andrés). | Claude Code (claude-opus-4-8) + Christian Ruiz Hurtado |
 | [[DevLog/2026-06-08-monserrat-swipedeck | 2026-06-08 (sesión 12)]] | Wave 3 frontend: `SwipeDeck.jsx` con Framer Motion (swipe ±80px / velocidad ±300px/s, indicadores ❤️ LIKE / ✕ SKIP, stack 3 tarjetas escaladas, pre-fetch ≤5, POST /api/swipe fire-and-forget), `Feed.jsx` con TabSelector + SwipeDeck (key={activeType} para reset), framer-motion agregado a package.json. Bloqueante: Marina aún no entregó DetailSheet. | Claude Code (claude-sonnet-4-6) + Monserrat Miranda Olivas |
+| [[DevLog/2026-06-09-andres-integracion-app-feed | 2026-06-09 (sesión 13)]] | Cierre de pendientes de Andrés: merge de `main` en `andres`, resolución de conflictos backend, registro de `/api/collections` en `backend/src/app.js`, estandarización de rutas (`feed`, `swipe`, `content`, `collections`) y actualización de `App.jsx` para usar `Feed` real con `FeedProvider`. | Codex (GPT-5.3-Codex) + Andres Gonzalez |
 | [[DevLog/2026-06-09-marina-detail-sheet | 2026-06-09 (sesión 13)]] | Wave 3 frontend: `DetailSheet.jsx` bottom sheet standalone — animación CSS slide-up/down sin framer-motion, fetch GET /api/content/:id con auth, Guardar (POST /api/collections + toast), No me interesa (POST /api/swipe fire-and-forget), Compartir (Web Share API + clipboard fallback), manejo de errores, atribución TMDB, watchProviders compliance. JSDoc de integración para Monserrat. | Claude Code (claude-sonnet-4-6) + Marina García del Buey |
 | [[DevLog/2026-06-09-monserrat-detail-integration | 2026-06-09 (sesión 14)]] | Wave 3 frontend: integración de `DetailSheet` en `SwipeDeck.jsx` — import agregado + bloque JSX descomentado. Checklist de entrega completo: SwipeDeck, Feed.jsx, TabSelector, DetailSheet integrados. | Claude Code (claude-sonnet-4-6) + Monserrat Miranda Olivas |
 
