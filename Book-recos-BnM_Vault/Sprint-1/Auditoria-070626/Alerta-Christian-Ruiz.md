@@ -1,18 +1,27 @@
 ---
-persona: "Christian Ruiz"
-prioridad: "🟡 Media"
+persona: "Christian Ruiz / Imanol Ruiz"
+prioridad: "✅ Resuelto"
 tipo: ["ownership-conflicto", "PR-pendiente"]
 fecha: "2026-06-07"
-wave: 2
+updated: "2026-06-10"
+estado: "resuelto"
 ---
 
-# 🟡 Alerta — Christian Ruiz
+# ✅ Alerta — Christian Ruiz (RESUELTO 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **PR #30** (2026-06-08): `collections.js` CRUD completo + tests mergeados por Imanol Ruiz
+- **PR #21**: cerrado sin mergear (duplicado de PR #30)
+- DevLog `2026-06-07-christian-collections-api.md` acreditando el trabajo a Christian
 
 ## Entregables planificados (Wave 2)
-- ❌ `GET /api/collections` — listar colecciones del usuario
+- ✅ `backend/src/routes/collections.js` — CRUD completo mergeado PR #30
+- ✅ `backend/tests/collections.test.js` — mergeado PR #30
+- ✅ DevLog — mergeado en PR #30
 
-## Estado actual
-**Imanol Ruiz (colaborador externo) implementó el CRUD completo** de `/api/collections` en PR #21 (pendiente de merge). Esto incluye el `GET` que correspondía a Christian.
+## Estado original (2026-06-07)
+**Imanol Ruiz (colaborador externo) implementó el CRUD completo** de `/api/collections` en PR #21 (pendiente de merge). Esto incluía el `GET` que correspondía a Christian.
 
 ## Situación de ownership
 
@@ -44,4 +53,4 @@ wave: 2
 - Notificar a Edgar (PM) la decisión
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — quedan 3 días.
+~~**Miércoles 10 jun 2026** — quedan 3 días.~~ ✅ Entregado antes del cierre (Imanol cubrió).

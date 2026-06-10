@@ -1,11 +1,21 @@
 ---
 persona: "Juan Carlos Macías"
-prioridad: "🚨 URGENTE — Seguridad"
+prioridad: "🔒 Resuelto — pendiente rotación de claves"
 tipo: ["seguridad", "limpieza"]
 fecha: "2026-06-07"
+updated: "2026-06-10"
+estado: "resuelto-parcial"
 ---
 
-# 🚨 Alerta — Juan Carlos Macías
+# 🔒 Alerta — Juan Carlos Macías (ACTUALIZADO 2026-06-10)
+
+## ✅ Estado al cierre del Sprint (2026-06-10)
+
+- **Entregable de código:** ✅ Mergeado en PR #22 — Onboarding, TabSelector, FeedContext
+- **Seguridad:** 🔒 `jc.env` eliminado del tracking en PR #25 (2026-06-08)
+- **Pendiente:** ⚠️ Confirmar que las API keys fueron rotadas en los paneles externos
+
+---
 
 ## Entregables planificados
 - ✅ `Onboarding.jsx` — flujo de 3 pasos (mergeado PR #22)
@@ -13,7 +23,11 @@ fecha: "2026-06-07"
 - ✅ `FeedContext.jsx` — contexto global
 - ✅ Tests: `Onboarding.test.jsx`, `TabSelector.test.jsx`
 
-## Problema crítico — API Keys expuestas en el repo
+## 🔒 RESUELTO — `jc.env` eliminado (PR #25, 2026-06-08)
+
+El archivo `jc.env` fue removido del tracking Git y `.gitignore` actualizado. Sin embargo, **las claves estuvieron expuestas públicamente** — ver acciones pendientes abajo.
+
+## Detalle del problema original — API Keys expuestas en el repo
 
 El archivo `jc.env` fue commiteado en la raíz del repo dentro del PR #22 y ahora está en `main` en GitHub público.
 
@@ -28,7 +42,7 @@ VITE_FIREBASE_APP_ID=...        ← Firebase App ID real
 
 **Riesgo:** Cualquier persona que vea el repo en GitHub puede copiar estas claves y hacer llamadas a las APIs con la cuota del proyecto.
 
-## Acciones requeridas (en este orden)
+## ⚠️ Acciones aún pendientes
 
 ### 1. Revocar/regenerar las claves comprometidas
 - **TMDB:** https://www.themoviedb.org/settings/api → regenerar API Read Token
@@ -69,5 +83,6 @@ cp jc.env frontend/.env.local
 | TabSelector.jsx | ✅ Completo |
 | FeedContext.jsx | ✅ Completo |
 | Tests | ✅ Completo |
-| jc.env | 🚨 Eliminar urgente |
-| PRD.md / sprint.md en raíz | ⚠️ Limpiar |
+| jc.env | 🔒 Eliminado del tracking (PR #25) |
+| Rotación de API keys | ⚠️ Confirmar con Juan Carlos |
+| PRD.md / sprint.md en raíz | ⚠️ Aún presentes — limpieza pendiente |

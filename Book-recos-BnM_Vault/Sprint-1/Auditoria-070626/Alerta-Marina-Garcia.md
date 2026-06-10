@@ -1,30 +1,33 @@
 ---
 persona: "Marina García"
-prioridad: "🟡 Media"
+prioridad: "✅ Resuelto"
 tipo: ["sin-iniciar", "dependencia-pendiente"]
 fecha: "2026-06-07"
-wave: 3
+updated: "2026-06-10"
+estado: "resuelto"
 ---
 
-# 🟡 Alerta — Marina García
+# ✅ Alerta — Marina García (RESUELTO 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **PR #38** (2026-06-09): `DetailSheet.jsx` + DevLog `2026-06-09-marina-detail-sheet.md` mergeados
+- El componente se integró con `SwipeDeck.jsx` de Monserrat (PR #42)
 
 ## Entregables planificados (Wave 3)
-- ❌ `frontend/src/components/DetailSheet/DetailSheet.jsx`
-- ❌ `frontend/src/tests/DetailSheet.test.jsx` — mínimo 3 tests
+- ✅ `frontend/src/components/DetailSheet.jsx` — mergeado PR #38
+- ✅ DevLog — mergeado PR #38
 
-## Estado actual
-Branch `feat/Marina` solo contiene el archivo de contributor.
-**No hay código implementado.**
+## Estado original (2026-06-07)
+Branch `feat/Marina` solo contenía el archivo de contributor.
+**No había código implementado.**
 
-## Dependencia de entrada pendiente
-
-El DetailSheet necesita `GET /api/content/:id` para cargar el detalle completo de un ítem.
+## Dependencias resueltas
 
 | Dependencia | Estado |
 |---|---|
-| `GET /api/content/:id` (Héctor) | 🔴 Sin implementar |
-
-**Opción mientras espera:** Implementar el componente con datos mock del feed (`feed.mock.js`). La estructura de datos del feed ya incluye todos los campos necesarios: `title`, `cover`, `genres`, `rating`, `synopsis`, `type`. Conectar al endpoint real cuando Héctor entregue.
+| `GET /api/content/:id` (Héctor) | ✅ Mergeado PR #29 |
+| `ContentCard.jsx` (Edgar) | ✅ Mergeado PR #26 |
 
 ## Entregable mínimo requerido
 
@@ -46,4 +49,4 @@ El DetailSheet necesita `GET /api/content/:id` para cargar el detalle completo d
 **Referencia de diseño:** `stitch_app_specification_blueprint/` en la raíz del repo.
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — quedan 3 días.
+~~**Miércoles 10 jun 2026** — quedan 3 días.~~ ✅ Entregado antes del cierre.

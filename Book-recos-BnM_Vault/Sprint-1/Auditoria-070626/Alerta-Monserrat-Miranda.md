@@ -1,20 +1,28 @@
 ---
 persona: "Monserrat Miranda"
-prioridad: "🔴 Alta"
+prioridad: "✅ Resuelto"
 tipo: ["sin-iniciar", "desbloqueada"]
 fecha: "2026-06-07"
-wave: 3
+updated: "2026-06-10"
+estado: "resuelto"
 ---
 
-# 🔴 Alerta — Monserrat Miranda
+# ✅ Alerta — Monserrat Miranda (RESUELTO 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **PR #33** (2026-06-09): `SwipeDeck.jsx`, Sprint 1 de Monserrat mergeado
+- **PR #42** (2026-06-10): Sprint 2 — integración con DetailSheet mergeado
+- **DevLogs:** `2026-06-08-monserrat-swipedeck.md` y `2026-06-09-monserrat-detail-integration.md` en el Vault
 
 ## Entregables planificados (Wave 3)
-- ❌ `frontend/src/components/SwipeDeck/SwipeDeck.jsx` — componente principal de swipe
-- ❌ `frontend/src/tests/SwipeDeck.test.jsx` — mínimo 3 tests
+- ✅ `frontend/src/components/SwipeDeck.jsx` — mergeado PR #33
+- ✅ Integración con DetailSheet — mergeado PR #42
+- ✅ DevLogs de sesión × 2
 
-## Estado actual
-Branch `feat/monse` solo contiene el archivo de contributor (`monsemiranda.txt`).
-**No hay código implementado.**
+## Estado original (2026-06-07)
+Branch `feat/monse` solo contenía el archivo de contributor (`monsemiranda.txt`).
+**No había código implementado.**
 
 ## ✅ Desbloqueante resuelto — Luis mergeó PR #24
 
@@ -65,4 +73,4 @@ El SwipeDeck debe:
 | **Ulises (QA)** | Flujo de swipe para verificar |
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — quedan 3 días.
+~~**Miércoles 10 jun 2026** — quedan 3 días.~~ ✅ Entregado antes del cierre.
