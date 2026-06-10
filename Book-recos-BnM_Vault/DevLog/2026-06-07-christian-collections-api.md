@@ -43,9 +43,15 @@ tags: [devlog, sprint-1, wave-2, backend, collections]
 - **PATCH 200** → `{ "collectionId": "doc_1", "updated": { "personalNote": "Me encantó", "listName": "Favoritos" } }`
 - **DELETE 204** → (sin body)
 
+## Actualización 2026-06-10 — ejecución real de tests + fix
+- Se instaló Node 24 / npm 11 y se **ejecutó la suite de verdad** (ya no solo revisión estática).
+- **Bug encontrado y corregido en el test** (no en la ruta): la fábrica de `jest.mock('../src/firebase/admin')` referenciaba helpers fuera de scope (`fakeFirestore`, `FakeTimestamp`), lo que Jest prohíbe por el *hoisting* de `jest.mock` (solo permite identificadores con prefijo `mock`). Renombrados a `mockFakeFirestore` / `mockFakeTimestamp`.
+- **Casos de borde agregados** a `backend/tests/collections.test.js`: POST `missing_fields` / `invalid_content_type` / defaults `Guardados`+`""`; PATCH update parcial / `no_fields` (400); GET `missing_userId` / `invalid_type` / filtro por `listName`.
+- **Resultado: 20/20 tests en verde** (`npx jest tests/collections.test.js --runInBand`).
+
 ## Próximos pasos para el siguiente colaborador
-- **Andrés:** registrar `app.use('/api/collections', require('./routes/collections'))` en `backend/src/app.js` (mismo patrón que `feed`/`swipe`). El tooling de tests ya está en `main`, no requiere cambios en `package.json`.
-- Correr la suite: `cd backend && npm install && npm test` (7+ casos).
+- **Andrés:** ✅ ya registró `app.use('/api/collections', require('./routes/collections'))` en `backend/src/app.js`. El tooling de tests ya está en `main`, no requiere cambios en `package.json`.
+- Correr la suite: `cd backend && npm install && npm test` (20 casos).
 - **Diana** puede consumir **GET /api/collections** para la Biblioteca (desbloqueada).
 - **Marina** puede consumir **POST /api/collections** para el botón "Guardar" en DetailSheet (desbloqueada).
 - Endpoints disponibles: `GET`, `POST`, `PATCH /:id`, `DELETE /:id` en `/api/collections`.
