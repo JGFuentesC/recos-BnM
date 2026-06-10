@@ -248,7 +248,27 @@ Usar la colección `docs/Recos-BnM-API-Collection.json`. Obtener token con: Fire
 
 ---
 
-## 13. Resumen de ejecución
+## 13. GCP Infrastructure — Verificación en consola
+
+> Responsables de referencia: **Israel Pérez** (Firestore), **Germán Pacheco** (Hosting + Cloud Run), **Manuel Serranía** (Cloud Scheduler).
+> Acceso requerido: [Firebase Console](https://console.firebase.google.com) · [Google Cloud Console](https://console.cloud.google.com) — proyecto `recos-bnm`.
+
+| # | Componente | Acción | Resultado esperado | ✅❌ | Notas |
+|---|-----------|--------|-------------------|-----|-------|
+| GCP-01 | **Firebase Auth** | Firebase Console → Authentication → Sign-in method | Proveedores **Email/Password** y **Google** habilitados y activos | | |
+| GCP-02 | **Firestore — Colecciones** | Firebase Console → Firestore Database | Existen las 4 colecciones: `users`, `content`, `swipes`, `collections` | | |
+| GCP-03 | **Firestore — Índices** | Firestore → Indexes → Composite | Índice compuesto `type + genres` en estado **Enabled** | | |
+| GCP-04 | **Firestore — Reglas** | Firestore → Rules → pestaña activa | Reglas publicadas (no en modo `allow read, write: if true`) — confirmar fecha de publicación | | |
+| GCP-05 | **Firestore — Catálogo** | Firestore → colección `content` | Al menos 20 documentos con campos: `contentId, title, cover, genres, rating, synopsis, type, score` | | |
+| GCP-06 | **Cloud Run — Backend** | GCP Console → Cloud Run → servicio `recos-bnm-api` (o nombre configurado) | Servicio en estado **OK**, última revisión desplegada, `GET /health` devuelve `{"ok":true}` | | |
+| GCP-07 | **Cloud Run — Variables de entorno** | Cloud Run → servicio → Edit & Deploy → Variables | `FIREBASE_PROJECT_ID` y credenciales de servicio configuradas como variables o secret | | |
+| GCP-08 | **Firebase Hosting — URL pública** | Firebase Console → Hosting | URL activa tipo `recos-bnm.web.app` o dominio personalizado, estado **Released** | | |
+| GCP-09 | **Cloud Scheduler — Ingest cron** | GCP Console → Cloud Scheduler | Job de ingest configurado con cron `0 4 * * *`, apuntando al servicio de ingest de Manuel, estado **Enabled** | | |
+| GCP-10 | **Cloud Run — Ingest job** | GCP Console → Cloud Run Jobs (o servicio separado) | Job de ingest de Manuel desplegado, último run sin errores críticos | | |
+
+---
+
+## 14. Resumen de ejecución
 
 Completar al finalizar la sesión de pruebas.
 
@@ -267,11 +287,12 @@ Completar al finalizar la sesión de pruebas.
 | 10. PWA/Service Worker | 5 | | | |
 | 11. CI/CD Pipeline | 5 | | | |
 | 12. Casos borde | 10 | | | |
-| **TOTAL** | **116** | | | |
+| 13. GCP Infrastructure | 10 | | | |
+| **TOTAL** | **126** | | | |
 
 ---
 
-## 14. Bugs encontrados
+## 15. Bugs encontrados
 
 | # | Sección | Descripción del bug | Severidad | Asignado a |
 |---|---------|---------------------|-----------|-----------|
@@ -279,7 +300,7 @@ Completar al finalizar la sesión de pruebas.
 
 ---
 
-## 15. Firma de validación
+## 16. Firma de validación
 
 | Rol | Nombre | Fecha | Firma |
 |-----|--------|-------|-------|
@@ -289,5 +310,5 @@ Completar al finalizar la sesión de pruebas.
 
 ---
 
-> **Versión 1.0** · Generado el 2026-06-09 · Basado en código real de `main` commit `8051c97`
+> **Versión 1.1** · Actualizado el 2026-06-09 · Basado en código real de `main` commit `8051c97`
 > → [[DevLog/DevLog_Index|DevLog del proyecto]]
