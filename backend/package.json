@@ -6,11 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-<<<<<<< HEAD
     "test": "jest --runInBand --forceExit"
-=======
-    "test": "jest"
->>>>>>> ca4eee3 (Registra ruta content y habilita tooling de tests backend)
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -19,7 +15,6 @@
     "firebase-admin": "^13.6.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "nodemon": "^3.1.10",
     "jest": "^29.7.0",
     "supertest": "^7.0.0"
@@ -27,10 +22,5 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/tests/**/*.test.js"]
-=======
-    "jest": "^29.7.0",
-    "nodemon": "^3.1.10",
-    "supertest": "^7.0.0"
->>>>>>> ca4eee3 (Registra ruta content y habilita tooling de tests backend)
   }
 }

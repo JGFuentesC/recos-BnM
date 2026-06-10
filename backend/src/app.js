@@ -29,6 +29,11 @@ if (fs.existsSync(contentRoutePath)) {
   app.use('/api/content', require('./routes/content'))
 }
 
+const collectionsRoutePath = path.join(__dirname, 'routes', 'collections.js')
+if (fs.existsSync(collectionsRoutePath)) {
+  app.use('/api/collections', require('./routes/collections'))
+}
+
 const port = Number(process.env.PORT || 3001)
 app.listen(port, () => {
   console.log(`[backend] listening on http://localhost:${port}`)
