@@ -1,6 +1,6 @@
 ---
 project: "Recos-BnM"
-version: "1.0"
+version: "2.0"
 date: "2026-06-09"
 author: "Edgar Coronel Navarrete (PM)"
 status: "Ready for execution"
@@ -15,6 +15,37 @@ tags: [qa, physical-test, checklist, sprint-1, mvp]
 > **URL de la app:** Firebase Hosting (confirmar con Germán antes de iniciar)
 > **Backend:** Cloud Run (confirmar URL en `VITE_API_URL`)
 > **Leyenda:** ✅ Pasa · ❌ Falla · ⚠️ Falla parcial · — No aplica (skip)
+
+---
+
+## 🐛 Cómo registrar y resolver bugs durante la ejecución
+
+Cuando un caso falla, sigue este proceso:
+
+1. Marca el caso con ❌ en su columna de resultado.
+2. Ve a la sección **"Bugs encontrados"** al final de este documento.
+3. Agrega una nueva fila con el formato:
+
+```
+| BUG-XXX | NEW | Sección afectada | Caso que falló (ej. S-05) | Descripción exacta del problema | Alta / Media / Baja | Sin asignar |
+```
+
+4. Abre Claude Code en tu terminal y pega este prompt:
+
+```
+Contexto: estoy ejecutando el physical test validation de recos-BnM.
+Bug registrado: BUG-XXX — [pega aquí la descripción del bug]
+Caso fallido: [ID del caso, ej. S-05]
+Archivo probable: [archivo donde crees que está el problema]
+Por favor revisa el código y propón el fix.
+```
+
+5. Una vez que Claude Code aplique el fix, actualiza el bug en la tabla:
+   - Cambia `NEW` → `FIXED`
+   - Agrega el archivo corregido en la columna "Arreglado en"
+   - Vuelve a ejecutar el caso fallido y actualiza su resultado a ✅ o ⚠️
+
+> **Severidades:** `Alta` = bloquea flujo principal · `Media` = funciona con workaround · `Baja` = cosmético / no bloquea
 
 ---
 
@@ -260,43 +291,79 @@ Usar la colección `docs/Recos-BnM-API-Collection.json`. Obtener token con: Fire
 | GCP-03 | **Firestore — Índices** | Firestore → Indexes → Composite | Índice compuesto `type + genres` en estado **Enabled** | | |
 | GCP-04 | **Firestore — Reglas** | Firestore → Rules → pestaña activa | Reglas publicadas (no en modo `allow read, write: if true`) — confirmar fecha de publicación | | |
 | GCP-05 | **Firestore — Catálogo** | Firestore → colección `content` | Al menos 20 documentos con campos: `contentId, title, cover, genres, rating, synopsis, type, score` | | |
-| GCP-06 | **Cloud Run — Backend** | GCP Console → Cloud Run → servicio `recos-bnm-api` (o nombre configurado) | Servicio en estado **OK**, última revisión desplegada, `GET /health` devuelve `{"ok":true}` | | |
-| GCP-07 | **Cloud Run — Variables de entorno** | Cloud Run → servicio → Edit & Deploy → Variables | `FIREBASE_PROJECT_ID` y credenciales de servicio configuradas como variables o secret | | |
-| GCP-08 | **Firebase Hosting — URL pública** | Firebase Console → Hosting | URL activa tipo `recos-bnm.web.app` o dominio personalizado, estado **Released** | | |
-| GCP-09 | **Cloud Scheduler — Ingest cron** | GCP Console → Cloud Scheduler | Job de ingest configurado con cron `0 4 * * *`, apuntando al servicio de ingest de Manuel, estado **Enabled** | | |
-| GCP-10 | **Cloud Run — Ingest job** | GCP Console → Cloud Run Jobs (o servicio separado) | Job de ingest de Manuel desplegado, último run sin errores críticos | | |
+| GCP-06 | **Cloud Run — Backend** | GCP Console → Cloud Run → servicio `recos-bnm-api` | Servicio en estado **OK**, última revisión desplegada, `GET /health` devuelve `{"ok":true}` | | |
+| GCP-07 | **Cloud Run — Variables de entorno** | Cloud Run → servicio → Edit & Deploy → Variables | `FIREBASE_PROJECT_ID` y credenciales de servicio configuradas | | |
+| GCP-08 | **Firebase Hosting — URL pública** | Firebase Console → Hosting | URL activa tipo `recos-bnm.web.app`, estado **Released** | | |
+| GCP-09 | **Cloud Scheduler — Ingest cron** | GCP Console → Cloud Scheduler | Job de ingest con cron `0 4 * * *`, estado **Enabled** | | |
+| GCP-10 | **Cloud Run — Ingest job** | GCP Console → Cloud Run Jobs | Job de ingest de Manuel desplegado, último run sin errores críticos | | |
 
 ---
 
-## 14. Resumen de ejecución
+## 14. 🐛 Bugs encontrados
 
-Completar al finalizar la sesión de pruebas.
+> Agregar una fila por cada fallo encontrado durante la ejecución.
+> Estado: `NEW` = recién encontrado, pendiente de fix · `IN PROGRESS` = Claude Code trabajando en ello · `FIXED` = corregido y verificado · `WONT FIX` = decisión de no corregir (con justificación)
 
-| Sección | Total | ✅ Pasan | ❌ Fallan | ⚠️ Parcial |
-|---------|-------|---------|---------|----------|
-| 0. Pre-requisitos | 7 | | | |
-| 1. Auth (Login/Register) | 16 | | | |
-| 2. Onboarding | 9 | | | |
-| 3. Tab Selector | 5 | | | |
-| 4. Feed datos reales | 5 | | | |
-| 5. SwipeDeck gestos | 13 | | | |
-| 6. DetailSheet | 16 | | | |
-| 7. Biblioteca/Colecciones | 6 | | | |
-| 8. API Postman/Bruno | 16 | | | |
-| 9. Firestore Seguridad | 3 | | | |
-| 10. PWA/Service Worker | 5 | | | |
-| 11. CI/CD Pipeline | 5 | | | |
-| 12. Casos borde | 10 | | | |
-| 13. GCP Infrastructure | 10 | | | |
-| **TOTAL** | **126** | | | |
+| ID | Estado | Sección | Caso | Descripción del problema | Severidad | Arreglado en | Responsable |
+|----|--------|---------|------|--------------------------|-----------|--------------|-------------|
+| BUG-001 | — | — | — | *(sin bugs aún — completar durante la ejecución)* | — | — | — |
+
+### Prompt para Claude Code al encontrar un bug
+
+Cuando marques un caso como ❌, abre Claude Code y pega:
+
+```
+Contexto: estoy ejecutando el physical test validation de recos-BnM (Sprint 1).
+Bug: BUG-XXX
+Caso fallido: [ID del caso, ej. S-05 — SwipeDeck: tarjeta no vuela tras soltar]
+Descripción: [qué pasó exactamente, qué esperabas que pasara]
+Archivo probable: [ej. frontend/src/components/SwipeDeck.jsx]
+Por favor revisa el código relevante y aplica el fix.
+```
 
 ---
 
-## 15. Bugs encontrados
+## 15. Resumen final de ejecución
 
-| # | Sección | Descripción del bug | Severidad | Asignado a |
-|---|---------|---------------------|-----------|-----------|
-| | | | | |
+> Completar al terminar **todos** los casos. Si hay bugs `NEW` o `IN PROGRESS` pendientes, no cerrar la sesión.
+
+### 15A. Tabla de resultados por sección
+
+| Sección | Total | ✅ Pasan | ❌ Fallan | ⚠️ Parcial | % Éxito |
+|---------|-------|---------|---------|----------|---------|
+| 0. Pre-requisitos | 7 | | | | |
+| 1. Auth (Login/Register) | 16 | | | | |
+| 2. Onboarding | 9 | | | | |
+| 3. Tab Selector | 5 | | | | |
+| 4. Feed datos reales | 5 | | | | |
+| 5. SwipeDeck gestos | 13 | | | | |
+| 6. DetailSheet | 16 | | | | |
+| 7. Biblioteca/Colecciones | 6 | | | | |
+| 8. API Postman/Bruno | 16 | | | | |
+| 9. Firestore Seguridad | 3 | | | | |
+| 10. PWA/Service Worker | 5 | | | | |
+| 11. CI/CD Pipeline | 5 | | | | |
+| 12. Casos borde | 10 | | | | |
+| 13. GCP Infrastructure | 10 | | | | |
+| **TOTAL** | **126** | | | | |
+
+### 15B. Resumen de bugs
+
+| Total bugs encontrados | Bugs FIXED | Bugs WONT FIX | Bugs pendientes (NEW / IN PROGRESS) |
+|------------------------|-----------|--------------|--------------------------------------|
+| | | | |
+
+### 15C. Conclusión de la sesión
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha de ejecución | |
+| Duración total | |
+| Ejecutado por | |
+| URL de la app probada | |
+| Commit de `main` probado | |
+| ¿App lista para entrega? | ✅ Sí · ❌ No · ⚠️ Con observaciones |
+| Observaciones finales | |
 
 ---
 
@@ -310,5 +377,5 @@ Completar al finalizar la sesión de pruebas.
 
 ---
 
-> **Versión 1.1** · Actualizado el 2026-06-09 · Basado en código real de `main` commit `8051c97`
+> **Versión 2.0** · Actualizado el 2026-06-09 · Basado en código real de `main` commit `8051c97`
 > → [[DevLog/DevLog_Index|DevLog del proyecto]]
