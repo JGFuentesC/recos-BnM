@@ -1,29 +1,36 @@
 ---
 persona: "Diana Álvarez"
-prioridad: "🟠 Normal"
+prioridad: "⚠️ Pendiente — única persona sin entregar"
 tipo: ["sin-iniciar"]
 fecha: "2026-06-07"
-wave: 4
+updated: "2026-06-10"
+estado: "pendiente"
 ---
 
-# 🟠 Alerta — Diana Álvarez
+# ⚠️ Alerta — Diana Álvarez (AÚN PENDIENTE al cierre 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **Sin entrega** — solo existe `frontend/src/pages/LibraryPlaceholder.jsx` en main (creado por Andrés)
+- **Sin rama activa** — no existe `feat/diana` ni ningún branch con su trabajo
+- **Placeholder:** muestra texto `"Pendiente de implementacion por Diana."`
+
+Diana es la **única persona del equipo que no entregó** en Sprint 1.
 
 ## Entregables planificados (Wave 4)
 - ❌ `frontend/src/pages/Library.jsx` — página de biblioteca personal
 - ❌ `frontend/src/tests/Library.test.jsx` — mínimo 3 tests
 
-## Estado actual
-No tiene branch activo con código. Existe `LibraryPlaceholder.jsx` creado por Andrés como placeholder.
-**No hay implementación real.**
-
-## Dependencias de entrada
+## Dependencias de entrada — todas resueltas
 
 | Dependencia | Estado |
 |---|---|
-| `GET /api/collections` (Christian/Imanol) | 🚨 PR #21 sin mergear |
+| `GET /api/collections` (Imanol, PR #30) | ✅ Disponible |
+| `ContentCard.jsx` (Edgar, PR #26) | ✅ Disponible |
 | Auth context (Andrés) | ✅ Disponible |
+| `useFeed` context (Juan Carlos) | ✅ Disponible |
 
-**Puede empezar** usando `LibraryPlaceholder.jsx` como base y datos mock mientras se resuelve el PR #21.
+**Todas las dependencias están en main.** Diana puede empezar desde cero usando `LibraryPlaceholder.jsx` como base.
 
 ## Entregable mínimo requerido
 
@@ -37,5 +44,15 @@ No tiene branch activo con código. Existe `LibraryPlaceholder.jsx` creado por A
 ```
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — quedan 3 días.
-Es Wave 4, depende de Wave 3 (Monserrat, Marina). Prioridad menor que ellas, pero debe arrancar ya.
+~~**Miércoles 10 jun 2026** — quedan 3 días.~~  
+**Sprint 1 CERRADO** — Diana no entregó. Escalar a Edgar (PM) para definir si el entregable pasa a Sprint 2 o si se asigna a otro colaborador.
+
+## Entregable mínimo para Sprint 2
+
+```jsx
+// frontend/src/pages/Library.jsx
+// Puede partir de LibraryPlaceholder.jsx ya en main
+// Consumir: GET /api/collections?userId=<uid>
+// Mostrar ítems agrupados por contentType (películas / libros)
+// Estado vacío si no hay colecciones
+```

@@ -1,22 +1,36 @@
 ---
 persona: "Héctor Morales"
-prioridad: "🔴 Alta"
+prioridad: "✅ Resuelto"
 tipo: ["sin-iniciar", "dependencia-bloqueada"]
 fecha: "2026-06-07"
-wave: 2
+updated: "2026-06-10"
+estado: "resuelto"
 ---
 
-# 🔴 Alerta — Héctor Morales
+# ✅ Alerta — Héctor Morales (RESUELTO 2026-06-10)
+
+## Estado al cierre del Sprint
+
+- **PR #29** (2026-06-08): `content.js`, `content.test.js`, DevLog mergeados a main
+- **PR #34** (2026-06-09): DevLog movido a la ubicación correcta en el Vault
+- **Ownership collections**: Imanol cubrió el CRUD completo (PR #30) — conflicto resuelto
+
+---
 
 ## Entregables planificados (Wave 2)
-- ❌ `backend/src/routes/content.js` — `GET /api/content/:id`
-- ❌ `backend/tests/content.test.js` — mínimo 3 tests
+- ✅ `backend/src/routes/content.js` — mergeado PR #29
+- ✅ `backend/tests/content.test.js` — mergeado PR #29
+- ✅ `Book-recos-BnM_Vault/DevLog/2026-06-07-hector-content-api.md` — mergeado PR #34
 
-## Estado actual
-Branch `feat/hrmm` solo contiene el archivo de contributor (`hector.txt`).
-**No hay código implementado.**
+## Estado original (2026-06-07)
+Branch `feat/hrmm` solo contenía el archivo de contributor (`hector.txt`).
+**No había código implementado.**
 
-## Problema de ownership con collections
+## ✅ Ownership collections — resuelto
+
+PR #30 (Imanol) mergeado. PR #21 cerrado sin conflicto.
+
+## Contexto original — Problema de ownership con collections
 
 El sprint asignaba a Héctor:
 - `POST /api/collections` — crear colección
@@ -59,4 +73,4 @@ app.use('/api/content', require('./routes/content'))
 | **Ulises Chaparro** | Endpoint disponible para QA |
 
 ## Fecha límite
-**Miércoles 10 jun 2026** — quedan 3 días.
+~~**Miércoles 10 jun 2026** — quedan 3 días.~~ ✅ Entregado antes del cierre.
