@@ -19,7 +19,7 @@ function makeSnap(id, data) {
   }
 }
 
-function fakeFirestore() {
+function mockFakeFirestore() {
   return {
     collection(name) {
       if (!store[name]) store[name] = {}
@@ -64,7 +64,7 @@ function fakeFirestore() {
 }
 
 // Timestamp falso comparable.
-const FakeTimestamp = {
+const mockFakeTimestamp = {
   now() {
     const millis = 1700000000000 + autoId
     return {
@@ -75,8 +75,8 @@ const FakeTimestamp = {
 }
 
 jest.mock('../src/firebase/admin', () => {
-  const firestore = () => fakeFirestore()
-  firestore.Timestamp = FakeTimestamp
+  const firestore = () => mockFakeFirestore()
+  firestore.Timestamp = mockFakeTimestamp
   return { firestore }
 })
 
@@ -143,6 +143,40 @@ describe('POST /api/collections', () => {
     expect(res.status).toBe(409)
     expect(res.body.error).toBe('already_exists')
   })
+
+  test('falta contentId -> 400', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentType: 'movie' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_fields')
+  })
+
+  test('contentType inválido -> 400', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'serie' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('invalid_content_type')
+  })
+
+  test('sin listName/personalNote -> aplica defaults "Guardados" y ""', async () => {
+    const created = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie' })
+    expect(created.status).toBe(201)
+
+    const list = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER })
+      .set(...bearer(USER))
+    expect(list.body).toHaveLength(1)
+    expect(list.body[0].listName).toBe('Guardados')
+    expect(list.body[0].personalNote).toBe('')
+  })
 })
 
 describe('PATCH /api/collections/:id', () => {
@@ -182,6 +216,26 @@ describe('PATCH /api/collections/:id', () => {
       collectionId: id,
       updated: { personalNote: 'Me encantó', listName: 'Favoritos' },
     })
+  })
+
+  test('update parcial -> solo el campo enviado', async () => {
+    const id = await seed(USER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({ personalNote: 'solo nota' })
+    expect(res.status).toBe(200)
+    expect(res.body.updated).toEqual({ personalNote: 'solo nota' })
+  })
+
+  test('sin campos -> 400', async () => {
+    const id = await seed(USER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({})
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('no_fields')
   })
 })
 
@@ -249,5 +303,36 @@ describe('GET /api/collections', () => {
       .query({ userId: OTHER })
       .set(...bearer(USER))
     expect(res.status).toBe(403)
+  })
+
+  test('falta userId -> 400', async () => {
+    const res = await request(app)
+      .get('/api/collections')
+      .set(...bearer(USER))
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_userId')
+  })
+
+  test('type inválido -> 400', async () => {
+    const res = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER, type: 'serie' })
+      .set(...bearer(USER))
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('invalid_type')
+  })
+
+  test('filtro listName -> solo esa lista', async () => {
+    await request(app).post('/api/collections').set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm2', contentType: 'movie', listName: 'Favoritos' })
+
+    const res = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER, listName: 'Favoritos' })
+      .set(...bearer(USER))
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveLength(1)
+    expect(res.body[0].listName).toBe('Favoritos')
+    expect(res.body[0].contentId).toBe('m2')
   })
 })
