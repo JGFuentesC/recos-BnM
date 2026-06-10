@@ -47,6 +47,7 @@ jobs:
         working-directory: frontend
 
       - name: Desplegar a Firebase Hosting
+        if: github.event_name == 'push'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
