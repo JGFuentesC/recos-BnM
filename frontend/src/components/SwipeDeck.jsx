@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import ContentCard from './ContentCard'
 import { useAuth } from '../contexts/AuthContext'
 import { useFeed } from '../contexts/FeedContext'
+import DetailSheet from './DetailSheet'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 const SWIPE_THRESHOLD = 80
@@ -202,22 +203,15 @@ export default function SwipeDeck() {
         )
       })}
 
-      {/*
-        DetailSheet — integrar cuando Marina entregue DetailSheet.jsx
-        Descomentar y agregar import cuando esté listo:
-
-        import DetailSheet from './DetailSheet'
-
-        {selectedContentId && (
-          <DetailSheet
-            isOpen={!!selectedContentId}
-            contentId={selectedContentId}
-            onClose={() => setSelectedContentId(null)}
-            onSaved={() => setSelectedContentId(null)}
-            onDislike={() => setSelectedContentId(null)}
-          />
-        )}
-      */}
+      {selectedContentId && (
+        <DetailSheet
+          isOpen={!!selectedContentId}
+          contentId={selectedContentId}
+          onClose={() => setSelectedContentId(null)}
+          onSaved={() => setSelectedContentId(null)}
+          onDislike={() => setSelectedContentId(null)}
+        />
+      )}
     </div>
   )
 }
