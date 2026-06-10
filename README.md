@@ -373,3 +373,7 @@ python -m pytest ingest/tests/test_tmdb_ingest.py -v
 
 Ver `docs/TESTING_HU3.1.md` para guía de pruebas manuales.  
 Ver `docs/SECURITY-AUDIT-2026-06-04.md` para auditoría de seguridad.
+
+---
+
+*Proyecto desarrollado para Programación Avanzada — MTIIA*
