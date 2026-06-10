@@ -19,7 +19,9 @@ jobs:
           python-version: '3.10'
 
       - name: Instalar dependencias de Ingest
-        run: pip install -r ingest/requirements.txt
+        run: |
+          pip install -r ingest/requirements.txt
+          pip install pytest
 
       - name: Correr pruebas de Ingest (pytest de Manuel)
         run: pytest ingest/tests/
