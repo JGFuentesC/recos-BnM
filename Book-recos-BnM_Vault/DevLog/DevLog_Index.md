@@ -37,6 +37,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-09-edgar-contentcard-test | 2026-06-09 (sesión 14)]] | ContentCard.test.jsx (8 casos HU3.2) + setup vitest/jsdom en vite.config.js | Claude Code (claude-sonnet-4-6) + Edgar Coronel Navarrete |
 | [[DevLog/2026-06-09-marina-detail-sheet | 2026-06-09 (sesión 13)]] | Wave 3 frontend: `DetailSheet.jsx` bottom sheet standalone — animación CSS slide-up/down sin framer-motion, fetch GET /api/content/:id con auth, Guardar (POST /api/collections + toast), No me interesa (POST /api/swipe fire-and-forget), Compartir (Web Share API + clipboard fallback), manejo de errores, atribución TMDB, watchProviders compliance. JSDoc de integración para Monserrat. | Claude Code (claude-sonnet-4-6) + Marina García del Buey |
 | [[DevLog/2026-06-09-monserrat-detail-integration | 2026-06-09 (sesión 14)]] | Wave 3 frontend: integración de `DetailSheet` en `SwipeDeck.jsx` — import agregado + bloque JSX descomentado. Checklist de entrega completo: SwipeDeck, Feed.jsx, TabSelector, DetailSheet integrados. | Claude Code (claude-sonnet-4-6) + Monserrat Miranda Olivas |
+| [[DevLog/2026-06-10-juan-carlos-security | 2026-06-10 (sesión 15)]] | Security hardening: confirmación de rotación de API keys (TMDB, Google Books, Firebase), eliminación de `jc.env` y `.DS_Store` del tracking git, endurecimiento de `.gitignore`, PR `fix/remove-jc-env` → `main`. Hallazgo: key hardcodeada en HTML de Andrés. | Claude Code (big-pickle) + Juan Carlos Macías |
 
 ---
 
@@ -96,4 +97,3 @@ tags: [devlog, sprint-1]
 | `model`            | `claude-sonnet-4-6` · `gpt-4o` · `gemini-2.0` · etc.     | Recomendado |
 | `session_duration` | Estimado en horas (`"2h"`, `"45min"`)                    | ✅          |
 
-| 2026-06-07 | Edgar Coronel Navarrete | ContentCard component + Tailwind setup | [ver](2026-06-07-edgar-content-card.md) | sprint-1, wave-2 |
