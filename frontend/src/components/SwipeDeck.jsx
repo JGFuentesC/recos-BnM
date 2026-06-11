@@ -205,12 +205,22 @@ export default function SwipeDeck() {
 
       {selectedContentId && (
         <DetailSheet
-          isOpen={!!selectedContentId}
-          contentId={selectedContentId}
-          onClose={() => setSelectedContentId(null)}
-          onSaved={() => setSelectedContentId(null)}
-          onDislike={() => setSelectedContentId(null)}
-        />
+        isOpen={!!selectedContentId}
+        contentId={selectedContentId}
+        onClose={() => setSelectedContentId(null)}
+        onSaved={() => {
+          // 1. Cerramos el modal flotante
+          setSelectedContentId(null);
+          // 2. 🚀 Avanzamos el mazo a la siguiente película usando el índice nativo
+          setCurrentIndex(prev => prev + 1);
+        }}
+        onDislike={() => {
+          // 1. Cerramos el modal flotante
+          setSelectedContentId(null);
+          // 2. 🚀 Avanzamos el mazo a la siguiente película usando el índice nativo
+          setCurrentIndex(prev => prev + 1);
+        }}
+      />
       )}
     </div>
   )

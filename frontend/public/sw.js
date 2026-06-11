@@ -70,8 +70,12 @@ async function cacheFirstWithNetwork(request) {
     return new Response('Offline', { status: 503 })
   }
 }
-
 async function networkFirstWithCache(request) {
+  // 🚀 REGLA DE SALVACIÓN: Si no es una petición de lectura (GET), ve directo a internet sin tocar la caché
+  if (request.method !== 'GET') {
+    return fetch(request);
+  }
+
   try {
     const response = await fetch(request)
     if (response.ok) {
