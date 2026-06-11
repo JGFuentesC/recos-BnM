@@ -24,3 +24,9 @@ feat-manuel.md
 .obsidian/
 .DS_Store
 *.log
+serviceAccountKey.json
+backend/src/firebase/serviceAccountKey.json
+ingest/serviceAccountKey.json
+backend/serviceAccountKey.json
+ingest/serviceAccountKey.json
+serviceAccountKey.json
