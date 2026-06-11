@@ -16,7 +16,9 @@ dist/
 opencodesession.txt
 .pytest_cache/
 docs/gap-analysis.md
-docs/SECURITY-AUDIT-*.md
+docs/SECURITY-AUDIT-2026-06-04.md
+docs/SECURITY-AUDIT-2026-06-05.md
+docs/SECURITY-AUDIT-2026-06-10m.md
 feat-manuel.md
 .obsidian/
 .DS_Store
