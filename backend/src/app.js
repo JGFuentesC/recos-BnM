@@ -1,8 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
-const fs = require('fs')
-const path = require('path')
 const auth = require('./middleware/auth')
 
 dotenv.config()
@@ -24,10 +22,10 @@ app.use('/api/feed',  require('./routes/feed'))
 app.use('/api/swipe', require('./routes/swipe'))
 
 // Wave 2 — Héctor Morales
-const contentRoutePath = path.join(__dirname, 'routes', 'content.js')
-if (fs.existsSync(contentRoutePath)) {
-  app.use('/api/content', require('./routes/content'))
-}
+app.use('/api/content', require('./routes/content'))
+
+// Wave 2 — Christian Ruiz
+app.use('/api/collections', require('./routes/collections'))
 
 const collectionsRoutePath = path.join(__dirname, 'routes', 'collections.js')
 if (fs.existsSync(collectionsRoutePath)) {

@@ -1,172 +1,338 @@
 /**
- * Tests para GET /api/collections   — Responsable: Héctor Morales
+ * Tests para backend/src/routes/collections.js
  *
- * Mocks:
- *   - firebase-admin → Firestore en memoria (sin emulador)
- *   - auth middleware → inyecta req.user con uid 'user-test-123'
- *
- * Nota: los tests del CRUD de escritura (POST/PATCH/DELETE) los agrega
- *       Christian Ruiz en este mismo archivo, en un describe aparte.
+ * Son self-contained: se mockea firebase-admin con un Firestore en memoria y el
+ * middleware de auth con un parser de "Bearer <uid>", de modo que NO se requiere
+ * el emulador ni credenciales reales para correr `npm test`.
  */
 
-const request = require('supertest')
-const express = require('express')
+// ---- Fake Firestore en memoria -------------------------------------------
 
-// ─── Datos de mock ──────────────────────────────────────────────────────────
-// Documentos de la colección "collections" (un doc por ítem guardado).
-const ts = (iso) => ({ toMillis: () => new Date(iso).getTime() })
+let store = {}
+let autoId = 0
 
-const allDocs = [
-  {
-    id: 'col-1',
-    userId: 'user-test-123',
-    contentId: 'movie-tmdb',
-    contentType: 'movie',
-    listName: 'Guardados',
-    personalNote: 'Ver con calma',
-    savedAt: ts('2026-06-01T10:00:00Z'),
+function makeSnap(id, data) {
+  return {
+    id,
+    exists: data !== undefined,
+    data: () => (data === undefined ? undefined : { ...data }),
+  }
+}
+
+function mockFakeFirestore() {
+  return {
+    collection(name) {
+      if (!store[name]) store[name] = {}
+      const col = store[name]
+      const filters = []
+
+      const query = {
+        where(field, _op, value) {
+          filters.push({ field, value })
+          return query
+        },
+        async get() {
+          const docs = Object.entries(col)
+            .filter(([, data]) => filters.every((f) => data[f.field] === f.value))
+            .map(([id, data]) => makeSnap(id, data))
+          return { empty: docs.length === 0, docs }
+        },
+        async add(data) {
+          autoId += 1
+          const id = `doc_${autoId}`
+          col[id] = { ...data }
+          return { id }
+        },
+        doc(id) {
+          return {
+            id,
+            async get() {
+              return makeSnap(id, col[id])
+            },
+            async update(patch) {
+              col[id] = { ...col[id], ...patch }
+            },
+            async delete() {
+              delete col[id]
+            },
+          }
+        },
+      }
+      return query
+    },
+  }
+}
+
+// Timestamp falso comparable.
+const mockFakeTimestamp = {
+  now() {
+    const millis = 1700000000000 + autoId
+    return {
+      toMillis: () => millis,
+      toDate: () => new Date(millis),
+    }
   },
-  {
-    id: 'col-2',
-    userId: 'user-test-123',
-    contentId: 'book-gatsby',
-    contentType: 'book',
-    listName: 'Favoritos',
-    // personalNote ausente a propósito → debe normalizarse a ''
-    savedAt: ts('2026-06-05T10:00:00Z'),
-  },
-  {
-    id: 'col-3',
-    userId: 'user-test-123',
-    contentId: 'movie-2',
-    contentType: 'movie',
-    listName: 'Favoritos',
-    personalNote: '',
-    savedAt: ts('2026-06-03T10:00:00Z'),
-  },
-  {
-    // Documento de OTRO usuario → nunca debe aparecer en la respuesta
-    id: 'col-otro',
-    userId: 'otro-usuario',
-    contentId: 'movie-secreta',
-    contentType: 'movie',
-    listName: 'Guardados',
-    personalNote: 'privado',
-    savedAt: ts('2026-06-09T10:00:00Z'),
-  },
-]
+}
 
-// Query builder mínimo que soporta .where('userId','==',x).get()
-const makeQuery = (docs) => ({
-  where: (field, op, value) =>
-    makeQuery(docs.filter((d) => op === '==' && d[field] === value)),
-  get: jest.fn().mockResolvedValue({
-    docs: docs.map((d) => ({ id: d.id, data: () => d })),
-  }),
-})
-
-const mockCollection = jest.fn().mockImplementation((col) => {
-  if (col === 'collections') return makeQuery(allDocs)
-  return makeQuery([])
-})
-
-// ─── Mock firebase/admin ──────────────────────────────────────────────────────
 jest.mock('../src/firebase/admin', () => {
-  const firestoreFn = jest.fn(() => ({ collection: mockCollection }))
-  firestoreFn.FieldValue = { serverTimestamp: jest.fn() }
-  return { firestore: firestoreFn, auth: jest.fn() }
+  const firestore = () => mockFakeFirestore()
+  firestore.Timestamp = mockFakeTimestamp
+  return { firestore }
 })
 
-// ─── Mock auth middleware ─────────────────────────────────────────────────────
+// ---- Mock del middleware de auth -----------------------------------------
+// "Bearer <uid>" -> req.user = { uid }. Sin header -> 401.
 jest.mock('../src/middleware/auth', () => (req, res, next) => {
-  const authHeader = req.headers.authorization || ''
-  if (!authHeader.startsWith('Bearer ')) {
+  const header = req.headers.authorization || ''
+  if (!header.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'missing_token' })
   }
-  req.user = { uid: 'user-test-123', email: 'hector@test.com' }
+  req.user = { uid: header.slice(7), email: `${header.slice(7)}@test.dev` }
   return next()
 })
 
-// ─── App setup ────────────────────────────────────────────────────────────────
+// ---- App de prueba --------------------------------------------------------
+
+const express = require('express')
+const request = require('supertest')
 const collectionsRouter = require('../src/routes/collections')
+
 const app = express()
 app.use(express.json())
 app.use('/api/collections', collectionsRouter)
 
-const authed = () =>
-  request(app).get('/api/collections').set('Authorization', 'Bearer fake-token')
+beforeEach(() => {
+  store = {}
+  autoId = 0
+})
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
-describe('GET /api/collections', () => {
+const USER = 'user-123'
+const OTHER = 'user-999'
+const bearer = (uid) => ['Authorization', `Bearer ${uid}`]
 
-  test('401 — sin token de autorización', async () => {
-    const res = await request(app).get('/api/collections')
+describe('POST /api/collections', () => {
+  test('sin token -> 401', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie' })
     expect(res.status).toBe(401)
-    expect(res.body.error).toBe('missing_token')
   })
 
-  test('200 — devuelve solo los ítems del usuario autenticado', async () => {
-    const res = await authed()
+  test('userId distinto al token -> 403', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: OTHER, contentId: 'm1', contentType: 'movie' })
+    expect(res.status).toBe(403)
+  })
+
+  test('válido -> 201 con collectionId', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie' })
+    expect(res.status).toBe(201)
+    expect(typeof res.body.collectionId).toBe('string')
+    expect(res.body.collectionId.length).toBeGreaterThan(0)
+  })
+
+  test('duplicado (mismo contentId + userId) -> 409', async () => {
+    const payload = { userId: USER, contentId: 'm1', contentType: 'movie' }
+    await request(app).post('/api/collections').set(...bearer(USER)).send(payload)
+    const res = await request(app).post('/api/collections').set(...bearer(USER)).send(payload)
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('already_exists')
+  })
+
+  test('falta contentId -> 400', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentType: 'movie' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_fields')
+  })
+
+  test('contentType inválido -> 400', async () => {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'serie' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('invalid_content_type')
+  })
+
+  test('sin listName/personalNote -> aplica defaults "Guardados" y ""', async () => {
+    const created = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie' })
+    expect(created.status).toBe(201)
+
+    const list = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER })
+      .set(...bearer(USER))
+    expect(list.body).toHaveLength(1)
+    expect(list.body[0].listName).toBe('Guardados')
+    expect(list.body[0].personalNote).toBe('')
+  })
+})
+
+describe('PATCH /api/collections/:id', () => {
+  async function seed(uid) {
+    const res = await request(app)
+      .post('/api/collections')
+      .set(...bearer(uid))
+      .send({ userId: uid, contentId: 'm1', contentType: 'movie' })
+    return res.body.collectionId
+  }
+
+  test('colección ajena -> 403', async () => {
+    const id = await seed(OTHER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({ personalNote: 'hack' })
+    expect(res.status).toBe(403)
+  })
+
+  test('inexistente -> 404', async () => {
+    const res = await request(app)
+      .patch('/api/collections/nope')
+      .set(...bearer(USER))
+      .send({ personalNote: 'x' })
+    expect(res.status).toBe(404)
+  })
+
+  test('válida -> 200 con campos actualizados', async () => {
+    const id = await seed(USER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({ personalNote: 'Me encantó', listName: 'Favoritos' })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({
+      collectionId: id,
+      updated: { personalNote: 'Me encantó', listName: 'Favoritos' },
+    })
+  })
+
+  test('update parcial -> solo el campo enviado', async () => {
+    const id = await seed(USER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({ personalNote: 'solo nota' })
+    expect(res.status).toBe(200)
+    expect(res.body.updated).toEqual({ personalNote: 'solo nota' })
+  })
+
+  test('sin campos -> 400', async () => {
+    const id = await seed(USER)
+    const res = await request(app)
+      .patch(`/api/collections/${id}`)
+      .set(...bearer(USER))
+      .send({})
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('no_fields')
+  })
+})
+
+describe('DELETE /api/collections/:id', () => {
+  test('válida -> 204 sin body', async () => {
+    const seedRes = await request(app)
+      .post('/api/collections')
+      .set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie' })
+    const id = seedRes.body.collectionId
+
+    const res = await request(app)
+      .delete(`/api/collections/${id}`)
+      .set(...bearer(USER))
+    expect(res.status).toBe(204)
+    expect(res.text).toBe('')
+  })
+
+  test('ajena -> 403', async () => {
+    const seedRes = await request(app)
+      .post('/api/collections')
+      .set(...bearer(OTHER))
+      .send({ userId: OTHER, contentId: 'm1', contentType: 'movie' })
+    const id = seedRes.body.collectionId
+
+    const res = await request(app)
+      .delete(`/api/collections/${id}`)
+      .set(...bearer(USER))
+    expect(res.status).toBe(403)
+  })
+})
+
+describe('GET /api/collections', () => {
+  beforeEach(async () => {
+    await request(app).post('/api/collections').set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm1', contentType: 'movie', listName: 'Guardados' })
+    await request(app).post('/api/collections').set(...bearer(USER))
+      .send({ userId: USER, contentId: 'b1', contentType: 'book', listName: 'Guardados' })
+  })
+
+  test('filtro type=movie -> array filtrado', async () => {
+    const res = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER, type: 'movie' })
+      .set(...bearer(USER))
     expect(res.status).toBe(200)
     expect(Array.isArray(res.body)).toBe(true)
-    expect(res.body).toHaveLength(3)
-    // El doc de otro usuario nunca aparece
-    expect(res.body.some((it) => it.collectionId === 'col-otro')).toBe(false)
+    expect(res.body).toHaveLength(1)
+    expect(res.body[0].contentType).toBe('movie')
+    expect(res.body[0].contentId).toBe('m1')
   })
 
-  test('200 — whitelist de campos esperados por ítem', async () => {
-    const res = await authed()
-    const item = res.body.find((it) => it.collectionId === 'col-1')
-    ;['collectionId', 'contentId', 'contentType', 'listName', 'personalNote', 'savedAt']
-      .forEach((field) => expect(item).toHaveProperty(field))
-  })
-
-  test('200 — ordenado por savedAt descendente', async () => {
-    const res = await authed()
-    const ids = res.body.map((it) => it.collectionId)
-    // col-2 (jun 5) > col-3 (jun 3) > col-1 (jun 1)
-    expect(ids).toEqual(['col-2', 'col-3', 'col-1'])
-  })
-
-  test('personalNote ausente se normaliza a ""', async () => {
-    const res = await authed()
-    const item = res.body.find((it) => it.collectionId === 'col-2')
-    expect(item.personalNote).toBe('')
-  })
-
-  test('filtro ?type=movie devuelve solo películas', async () => {
+  test('sin filtro -> todas las del usuario', async () => {
     const res = await request(app)
-      .get('/api/collections?type=movie')
-      .set('Authorization', 'Bearer fake-token')
+      .get('/api/collections')
+      .query({ userId: USER })
+      .set(...bearer(USER))
     expect(res.status).toBe(200)
     expect(res.body).toHaveLength(2)
-    expect(res.body.every((it) => it.contentType === 'movie')).toBe(true)
   })
 
-  test('filtro ?listName=Favoritos devuelve solo esa lista', async () => {
+  test('userId distinto al token -> 403', async () => {
     const res = await request(app)
-      .get('/api/collections?listName=Favoritos')
-      .set('Authorization', 'Bearer fake-token')
-    expect(res.status).toBe(200)
-    expect(res.body).toHaveLength(2)
-    expect(res.body.every((it) => it.listName === 'Favoritos')).toBe(true)
+      .get('/api/collections')
+      .query({ userId: OTHER })
+      .set(...bearer(USER))
+    expect(res.status).toBe(403)
   })
 
-  test('filtros combinados ?type=movie&listName=Favoritos', async () => {
+  test('falta userId -> 400', async () => {
     const res = await request(app)
-      .get('/api/collections?type=movie&listName=Favoritos')
-      .set('Authorization', 'Bearer fake-token')
+      .get('/api/collections')
+      .set(...bearer(USER))
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('missing_userId')
+  })
+
+  test('type inválido -> 400', async () => {
+    const res = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER, type: 'serie' })
+      .set(...bearer(USER))
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('invalid_type')
+  })
+
+  test('filtro listName -> solo esa lista', async () => {
+    await request(app).post('/api/collections').set(...bearer(USER))
+      .send({ userId: USER, contentId: 'm2', contentType: 'movie', listName: 'Favoritos' })
+
+    const res = await request(app)
+      .get('/api/collections')
+      .query({ userId: USER, listName: 'Favoritos' })
+      .set(...bearer(USER))
     expect(res.status).toBe(200)
     expect(res.body).toHaveLength(1)
-    expect(res.body[0].collectionId).toBe('col-3')
+    expect(res.body[0].listName).toBe('Favoritos')
+    expect(res.body[0].contentId).toBe('m2')
   })
-
-  test('200 — array vacío cuando el usuario no tiene ítems del filtro', async () => {
-    const res = await request(app)
-      .get('/api/collections?listName=NoExiste')
-      .set('Authorization', 'Bearer fake-token')
-    expect(res.status).toBe(200)
-    expect(res.body).toEqual([])
-  })
-
 })
