@@ -1,9 +1,22 @@
 import time
 import requests
+import firebase_admin
+from firebase_admin import credentials, firestore
 from config import get_tmdb_api_key
 
 TMDB_BASE = "https://api.themoviedb.org/3"
 TMDB_ATTRIBUTION = "This product uses the TMDB API but is not endorsed or certified by TMDB."
+
+# ---------------------------------------------------------
+# 💻 INICIALIZACIÓN DE FIREBASE ADMIN SDK
+# ---------------------------------------------------------
+# Revisa de forma segura si la app ya fue inicializada previamente
+if not firebase_admin._apps:
+    # Se asume que el archivo serviceAccountKey.json está en la raíz de la carpeta /ingest
+    cred = credentials.Certificate("serviceAccountKey.json")
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 
 class TMDBClient:
@@ -58,25 +71,66 @@ class TMDBClient:
         top_rated = self.get_top_rated_movies(max_pages=5)
         seen_ids: set[int] = set()
         candidates = []
+        
         for m in popular + top_rated:
             mid = m["id"]
             if mid not in seen_ids:
                 seen_ids.add(mid)
                 candidates.append(m)
+                
         print(f"[TMDB] {len(candidates)} unique candidates ({len(popular)} popular + {len(top_rated)} top_rated)")
+        
         items = []
+        content_ref = db.collection("content") # Referencia a la colección unificada de Firestore
+        
         for i, movie in enumerate(candidates):
             if len(items) >= target:
                 break
             try:
                 details = self.get_movie_details(movie["id"])
                 providers = self.get_watch_providers(movie["id"])
-                items.append({"details": details, "providers": providers})
+                
+                # ---------------------------------------------------------
+                # 📊 MAPEO DE DATOS BAJO EL ESTÁNDAR DEL FRONTEND
+                # ---------------------------------------------------------
+                poster_path = details.get("poster_path")
+                cover_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else None
+                genres_list = [g["name"] for g in details.get("genres", [])] if details.get("genres") else []
+                
+                movie_payload = {
+                    "title": details.get("title"),
+                    "synopsis": details.get("overview"),
+                    "cover": cover_url,
+                    "type": "movie",  # Discriminador crítico para la separación de Libros/Películas
+                    "release_date": details.get("release_date"),
+                    "rating": details.get("vote_average"),
+                    "genres": genres_list,
+                    "providers": providers,
+                    "tmdb_id": details.get("id"),
+                    "updated_at": firestore.SERVER_TIMESTAMP
+                }
+                
+                # ---------------------------------------------------------
+                # 🚀 INYECCIÓN DIRECTA A FIRESTORE (Evita duplicados por ID de TMDB)
+                # ---------------------------------------------------------
+                doc_id = f"movie_{details.get('id')}"
+                content_ref.document(doc_id).set(movie_payload)
+                
+                items.append(movie_payload)
                 safe_title = (details.get('title', '?') or '?').encode('utf-8', errors='replace').decode('utf-8')
-                print(f"[TMDB] {i+1}/{len(candidates)}: {safe_title}")
+                print(f"[Firestore Ingest] {i+1}/{len(candidates)}: Guardada exitosamente -> {safe_title}")
+                
                 time.sleep(0.25)
             except requests.HTTPError as e:
                 print(f"[TMDB] Error on movie {movie['id']}: {e}")
                 continue
-        print(f"[TMDB] Fetched {len(items)} movies ({TMDB_ATTRIBUTION})")
+                
+        print(f"[TMDB] Fetched and Injected {len(items)} movies ({TMDB_ATTRIBUTION})")
         return items
+
+
+# Orquestador de ejecución directa en terminal
+if __name__ == "__main__":
+    client = TMDBClient()
+    # Ejecuta la extracción e inyección de las primeras 300 películas
+    client.fetch_all(target=300)
