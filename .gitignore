@@ -1,7 +1,8 @@
-.env
+# Secrets — nunca commitear ningún .env real
 *.env
-jc.env
-env.jc
+*.env.*
+!*.env.example
+.DS_Store
 firebase-debug.log
 firestore-debug.log
 .firebase/
