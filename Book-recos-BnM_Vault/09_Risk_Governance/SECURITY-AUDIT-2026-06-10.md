@@ -6,6 +6,7 @@ skill: ".skills/cybersec/SKILL.md"
 stack: "Node.js / Express 5 / Firebase Auth / Firestore / React 19 / Vite"
 scope: "Rama main — historial de commits + código actual + dependencias"
 auditoria_anterior: "docs/SECURITY-AUDIT-2026-06-04.md (HIGH 0, MEDIUM 0, LOW 2 fixed)"
+movido_a_vault: "2026-06-11 — Edgar Coronel (PM), MEDIUM-05"
 ---
 
 # Security Audit — Recos-BnM
@@ -342,7 +343,7 @@ admin.initializeApp({ projectId })
 | 6 | Agregar `express-rate-limit` | Héctor / Luis |
 | 7 | Agregar `helmet` | Andrés |
 | 8 | Throw explícito si `FIREBASE_PROJECT_ID` no está definido | Luis / Andrés |
-| 9 | Mover reportes de seguridad al Vault (no en .gitignore) | Edgar (PM) |
+| 9 | Mover reportes de seguridad al Vault (no en .gitignore) | Edgar (PM) ✅ HECHO 2026-06-11 |
 
 ---
 
@@ -365,4 +366,5 @@ admin.initializeApp({ projectId })
 
 ---
 
-*Generado: 2026-06-10 | Basado en: git log de main (51 commits), npm audit backend + frontend, análisis estático manual de 8 archivos de rutas y middleware*
+*Generado: 2026-06-10 | Basado en: git log de main (51 commits), npm audit backend + frontend, análisis estático manual de 8 archivos de rutas y middleware*  
+*Movido a Vault: 2026-06-11 por Edgar Coronel (PM) — resolución MEDIUM-05*
