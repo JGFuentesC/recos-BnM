@@ -66,7 +66,7 @@ export default function Library() {
   const [loading, setLoading] = useState(USE_API)
   const [error, setError] = useState(false)
   const [enriching, setEnriching] = useState(new Set())
-  const [toast, setToast] = useState(false)
+  const [toast, setToast] = useState(null)
   const [customLists, setCustomLists] = useState([])
   const [typeFilter, setTypeFilter] = useState('all')
   const [listFilter, setListFilter] = useState('all')
@@ -170,9 +170,9 @@ export default function Library() {
         if (response.ok && method === 'PATCH') {
           clearTimeout(showTimer)
           showTimer = setTimeout(() => {
-            setToast(true)
+            setToast({ msg: '✓ Nota guardada' })
             clearTimeout(hideTimer)
-            hideTimer = setTimeout(() => setToast(false), 3000)
+            hideTimer = setTimeout(() => setToast(null), 3000)
           }, 2000)
         }
         return response
@@ -220,6 +220,30 @@ export default function Library() {
 
   function handleCreateList(name) {
     setCustomLists((prev) => (prev.includes(name) ? prev : [...prev, name]))
+  }
+
+  async function handleShareList(listName) {
+    const item = items.find((i) => i.listName === listName)
+    if (!item) return
+    try {
+      const token = await currentUser.getIdToken()
+      const res = await fetch(
+        `${API_BASE}/api/collections/${item.collectionId}/share`,
+        { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (!res.ok) throw new Error(`${res.status}`)
+      const { shareUrl } = await res.json()
+      if (navigator.share) {
+        await navigator.share({ title: listName, url: shareUrl })
+      } else {
+        await navigator.clipboard.writeText(shareUrl)
+        setToast({ msg: '¡Link copiado!' })
+        setTimeout(() => setToast(null), 3000)
+      }
+    } catch {
+      setToast({ msg: 'Error al compartir', err: true })
+      setTimeout(() => setToast(null), 3000)
+    }
   }
 
   if (loading) {
@@ -271,13 +295,21 @@ export default function Library() {
           Todas
         </button>
         {uniqueLists.map((list) => (
-          <button
-            key={list}
-            style={{ ...s.pill, ...(listFilter === list ? s.pillActive : {}) }}
-            onClick={() => setListFilter(list)}
-          >
-            {list}
-          </button>
+          <div key={list} style={s.listChipWrap}>
+            <button
+              style={{ ...s.pill, ...(listFilter === list ? s.pillActive : {}) }}
+              onClick={() => setListFilter(list)}
+            >
+              {list}
+            </button>
+            <button
+              style={s.shareBtn}
+              onClick={(e) => { e.stopPropagation(); handleShareList(list) }}
+              aria-label={`Compartir lista ${list}`}
+            >
+              ↗
+            </button>
+          </div>
         ))}
       </div>
 
@@ -330,7 +362,9 @@ export default function Library() {
       )}
 
       {toast && (
-        <div style={s.toast}>✓ Nota guardada</div>
+        <div style={{ ...s.toast, ...(toast.err ? s.toastErr : {}) }}>
+          {toast.msg}
+        </div>
       )}
     </div>
   )
@@ -445,6 +479,21 @@ const s = {
     color: '#310a00',
   },
   list: { paddingTop: 4 },
+  listChipWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  shareBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 14,
+    color: 'rgba(242,239,237,0.45)',
+    padding: '0 2px 0 4px',
+    lineHeight: 1,
+    WebkitTapHighlightColor: 'transparent',
+  },
   skeletonCard: {
     display: 'flex',
     alignItems: 'flex-start',
@@ -484,6 +533,11 @@ const s = {
     boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
     animation: 'fadeInUp 0.25s ease',
     fontFamily: 'inherit',
+  },
+  toastErr: {
+    background: '#3a1414',
+    border: '1px solid rgba(248,113,113,0.25)',
+    color: '#f87171',
   },
   spinner: {
     width: 40,
