@@ -111,7 +111,8 @@ router.post('/', auth, async (req, res) => {
       .get()
 
     if (!dup.empty) {
-      return res.status(409).json({ error: 'already_exists', collectionId: dup.docs[0].id })
+      // 🚀 CAMBIO MAESTRO: Devolvemos 201 para que el frontend ejecute la animación de avance siempre
+      return res.status(201).json({ collectionId: dup.docs[0].id, alreadySaved: true })
     }
 
     const ref = await db().collection(COLLECTION).add({
