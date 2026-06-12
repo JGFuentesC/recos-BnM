@@ -66,6 +66,7 @@ export default function Library() {
   const [loading, setLoading] = useState(USE_API)
   const [error, setError] = useState(false)
   const [enriching, setEnriching] = useState(new Set())
+  const [toast, setToast] = useState(false)
   const [customLists, setCustomLists] = useState([])
   const [typeFilter, setTypeFilter] = useState('all')
   const [listFilter, setListFilter] = useState('all')
@@ -74,7 +75,7 @@ export default function Library() {
 
   useEffect(() => {
     const style = document.createElement('style')
-    style.textContent = '@keyframes spin { to { transform: rotate(360deg) } } @keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }'
+    style.textContent = '@keyframes spin { to { transform: rotate(360deg) } } @keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } } @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }'
     document.head.appendChild(style)
     return () => style.remove()
   }, [])
@@ -147,6 +148,43 @@ export default function Library() {
 
     fetchCollections()
     return () => { cancelled = true }
+  }, [currentUser])
+
+  // CollectionItem owns its fetch calls and can't be modified (see CLAUDE.md),
+  // so we inject the Bearer token here for any PATCH/DELETE to /api/collections/.
+  useEffect(() => {
+    if (!USE_API || !currentUser) return
+    const original = window.fetch.bind(window)
+    let showTimer = null
+    let hideTimer = null
+
+    window.fetch = async (input, init) => {
+      const url = input instanceof Request ? input.url : String(input)
+      const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase()
+      if (url.startsWith(`${API_BASE}/api/collections/`) && (method === 'PATCH' || method === 'DELETE')) {
+        const token = await currentUser.getIdToken()
+        const response = await original(input, {
+          ...init,
+          headers: { ...(init?.headers ?? {}), Authorization: `Bearer ${token}` },
+        })
+        if (response.ok && method === 'PATCH') {
+          clearTimeout(showTimer)
+          showTimer = setTimeout(() => {
+            setToast(true)
+            clearTimeout(hideTimer)
+            hideTimer = setTimeout(() => setToast(false), 3000)
+          }, 2000)
+        }
+        return response
+      }
+      return original(input, init)
+    }
+
+    return () => {
+      window.fetch = original
+      clearTimeout(showTimer)
+      clearTimeout(hideTimer)
+    }
   }, [currentUser])
 
   const uniqueLists = [...new Set([...items.map((i) => i.listName), ...customLists])]
@@ -290,6 +328,10 @@ export default function Library() {
           onClose={() => setMoveTarget(null)}
         />
       )}
+
+      {toast && (
+        <div style={s.toast}>✓ Nota guardada</div>
+      )}
     </div>
   )
 }
@@ -426,6 +468,22 @@ const s = {
     background: 'linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%)',
     backgroundSize: '200% 100%',
     animation: 'shimmer 1.4s infinite',
+  },
+  toast: {
+    position: 'fixed',
+    bottom: 96,
+    right: 16,
+    background: '#14532d',
+    border: '1px solid rgba(74,222,128,0.25)',
+    color: '#4ade80',
+    padding: '10px 16px',
+    borderRadius: 10,
+    fontSize: 14,
+    fontWeight: 600,
+    zIndex: 300,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+    animation: 'fadeInUp 0.25s ease',
+    fontFamily: 'inherit',
   },
   spinner: {
     width: 40,
