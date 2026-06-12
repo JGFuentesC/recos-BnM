@@ -1,15 +1,16 @@
 ---
 proyecto: "Recos-BnM"
 fecha: "2026-06-10"
-relacionado: "docs/SECURITY-AUDIT-2026-06-10.md"
+relacionado: "09_Risk_Governance/SECURITY-AUDIT-2026-06-10.md"
 poc1: "2026-06-12"
 poc2_final: "2026-06-15"
+movido_a_vault: "2026-06-11 — Edgar Coronel (PM), MEDIUM-05"
 ---
 
 # Plan de Remediación de Seguridad — Sprint 1
 ## Recos-BnM · 10 jun 2026
 
-> Basado en `docs/SECURITY-AUDIT-2026-06-10.md`  
+> Basado en `09_Risk_Governance/SECURITY-AUDIT-2026-06-10.md`  
 > **Security Clearance bloqueado** por 3 hallazgos HIGH activos.  
 > Este documento asigna cada corrección a la persona responsable con los comandos exactos a ejecutar.
 
@@ -313,7 +314,7 @@ module.exports = admin
 
 **Deadline: Sprint 2**
 
-El Admin SDK escribe en `content/` sin pasar por las reglas de Firestore. Aunque las reglas dicen `allow write: if false` para clientes, el Admin SDK es inmune. Si las credenciales del servicio de ingest se comprometen, un atacante puede escribir contenido malicioso en la base de datos.
+El Admin SDK escribe en `content/` sin pasar por las reglas de Firestore. Aunque las reglas dicen `allow write: if false` para clientes, el Admin SDK es inmune. Si las credenciales del servicio de ingest se comprometen, puede escribir contenido malicioso en la base de datos.
 
 **Acción recomendada:** El schema de validación ya existe en `ingest/src/models.py`. Agregar validación explícita antes del batch write en `ingest/src/main.py`:
 
@@ -335,37 +336,9 @@ if len(valid_items) < len(items):
 
 **Hallazgo asignado:** MEDIUM-05 — Auditorías de seguridad excluidas de git
 
-### MEDIUM-05 — Reportes de seguridad en .gitignore
+### MEDIUM-05 — Reportes de seguridad en .gitignore ✅ RESUELTO 2026-06-11
 
-**Deadline: hoy martes 10 jun** (decisión de PM)
-
-El `.gitignore` actual excluye todos los reportes de seguridad del historial de git:
-```
-docs/SECURITY-AUDIT-2026-06-04.md   ← invisible para el equipo
-docs/SECURITY-AUDIT-2026-06-05.md   ← invisible para el equipo
-# + este nuevo reporte tampoco puede commitearse
-```
-
-**Opciones (Edgar decide):**
-
-**Opción A — Mover reportes al Vault (recomendado):**
-```bash
-# Editar .gitignore — eliminar las líneas de SECURITY-AUDIT
-# Los reportes van a: Book-recos-BnM_Vault/09_Risk_Governance/
-mkdir -p Book-recos-BnM_Vault/09_Risk_Governance
-mv docs/SECURITY-AUDIT-*.md Book-recos-BnM_Vault/09_Risk_Governance/
-git add .gitignore Book-recos-BnM_Vault/09_Risk_Governance/
-git commit -m "docs(security): mueve reportes de auditoría al Vault"
-```
-
-**Opción B — Mantener en docs/ pero quitar del .gitignore:**
-```bash
-# Eliminar estas líneas de .gitignore:
-# docs/SECURITY-AUDIT-2026-06-04.md
-# docs/SECURITY-AUDIT-2026-06-05.md
-git add .gitignore docs/SECURITY-AUDIT-*.md
-git commit -m "docs(security): agrega reportes de auditoría al historial"
-```
+**Acción ejecutada:** Archivos movidos a `Book-recos-BnM_Vault/09_Risk_Governance/` y `.gitignore` actualizado con patrones glob para cubrir futuros reportes.
 
 ---
 
@@ -379,7 +352,7 @@ git commit -m "docs(security): agrega reportes de auditoría al historial"
 
 El endpoint `GET /health` es público y no requiere auth. Está bien para load balancers de Cloud Run, pero debe documentarse como decisión explícita.
 
-**Acción:** Agregar comentario en `backend/src/app.js` y en `docs/SYSTEM_HEARTBEAT.md`:
+**Acción:** Agregar comentario en `backend/src/app.js`:
 
 ```js
 // Endpoint público — usado por Cloud Run health checks y monitoreo
@@ -387,33 +360,6 @@ El endpoint `GET /health` es público y no requiere auth. Está bien para load b
 app.get('/health', (req, res) => {
   res.json({ ok: true })
 })
-```
-
----
-
-## 👤 Andrés González `Agh28` — npm audit fix (HIGH-02)
-
-### HIGH-02 — React Router XSS via Open Redirect
-
-**Deadline: hoy martes 10 jun**
-
-```bash
-cd frontend
-npm audit fix
-
-# Si npm audit fix no resuelve automáticamente:
-npm install react-router-dom@latest
-npm audit  # verificar que los 3 HIGH desaparecieron
-
-# Hacer commit:
-git add frontend/package.json frontend/package-lock.json
-git commit -m "fix(deps): actualiza react-router-dom — corrige CVE XSS Open Redirect"
-```
-
-**Verificar que la app sigue funcionando:**
-```bash
-npm run dev
-# Probar: login → onboarding → feed → swipe
 ```
 
 ---
@@ -436,13 +382,13 @@ ALTA PRIORIDAD (antes de PoC 1 — vie 12 jun)
   ☐ Andrés       — Configurar 7 GitHub Secrets con keys rotadas
   ☐ Germán       — firebase login:ci → agregar FIREBASE_TOKEN a GitHub Secrets
   ☐ Germán       — Verificar CI/CD verde después del push
+  ✅ Edgar (PM)  — Mover reportes de auditoría al Vault (MEDIUM-05) — HECHO 2026-06-11
 
 SPRINT 2 (lun 15 jun en adelante)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ☐ Germán       — Agregar express-rate-limit (global + /api/swipe)
   ☐ Luis         — Throw explícito si FIREBASE_PROJECT_ID no está definido
   ☐ Imanol       — Validación de schema antes de batch write en ingest
-  ☐ Edgar (PM)   — Decidir dónde van los reportes de seguridad (Vault vs docs/)
   ☐ Israel       — Documentar /health como intencional en SYSTEM_HEARTBEAT
 ```
 
@@ -462,4 +408,5 @@ El clearance se otorga cuando se completen los siguientes 5 items críticos:
 
 ---
 
-*Generado: 2026-06-10 | Basado en SECURITY-AUDIT-2026-06-10.md*
+*Generado: 2026-06-10 | Basado en SECURITY-AUDIT-2026-06-10.md*  
+*Movido a Vault: 2026-06-11 por Edgar Coronel (PM) — resolución MEDIUM-05*
