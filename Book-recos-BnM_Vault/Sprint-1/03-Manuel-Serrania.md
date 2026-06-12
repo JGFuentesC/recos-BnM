@@ -185,11 +185,11 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 
 ## ✅ Checklist de entrega
 
-- [ ] `ingest/tmdb_ingest.py` — ≥300 películas en Firestore emulador
-- [ ] `ingest/books_ingest.py` — ≥200 libros en Firestore emulador
-- [ ] `ingest/Dockerfile` + `requirements.txt`
-- [ ] `backend/src/services/scoring.js` — función `scoreCandidates` exportada
-- [ ] Total ≥500 docs en colección `content`
+- [x] `ingest/tmdb_ingest.py` — ≥300 películas en Firestore
+- [x] `ingest/books_ingest.py` — ≥200 libros en Firestore
+- [x] `ingest/Dockerfile` + `requirements.txt`
+- [x] `backend/src/services/scoring.js` — función `scoreCandidates` exportada
+- [x] Total ≥500 docs en colección `content` (552 en producción)
 - [ ] PR abierto con screenshot del emulador mostrando el conteo
 
 ---
@@ -332,7 +332,7 @@ TAREA 4 — Tests de buildGenreAffinity en backend/tests/
 
 ### ✅ Checklist Fase 2
 
-- [ ] Ingest ejecutado en **producción** (no emulador) — ≥500 docs en `content` prod
+- [x] Ingest ejecutado en **producción** (no emulador) — 552 docs en `content` prod
 - [x] `backend/src/services/scoring.js` — agrega `buildGenreAffinity` (NO reescribir `computeScore`)
 - [x] `module.exports` incluye `buildGenreAffinity` en el mismo archivo
 - [x] `ingest/src/tmdb_ingest.py` — campo `titleLower` en payload de película
