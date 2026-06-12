@@ -1,8 +1,22 @@
+import sys
 import time
 import requests
+import firebase_admin
+from firebase_admin import credentials, firestore
 from config import get_google_books_api_key
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 BOOKS_BASE = "https://www.googleapis.com/books/v1"
+
+# ---------------------------------------------------------
+# 💻 INICIALIZACIÓN DE FIREBASE ADMIN SDK
+# ---------------------------------------------------------
+if not firebase_admin._apps:
+    cred = credentials.Certificate("serviceAccountKey.json")
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 
 class GoogleBooksClient:
@@ -62,8 +76,30 @@ class GoogleBooksClient:
                         if vid and vid not in seen_ids:
                             seen_ids.add(vid)
                             items.append(vol)
-                            safe_title = (vol.get('volumeInfo', {}).get('title', '?') or '?').encode('utf-8', errors='replace').decode('utf-8')
-                            print(f"[Books] {len(items)}: {safe_title}")
+
+                            vol_info = vol.get("volumeInfo", {})
+                            image_links = vol_info.get("imageLinks") or {}
+                            categories = vol_info.get("categories") or ["General"]
+
+                            book_payload = {
+                                "title": vol_info.get("title"),
+                                "titleLower": (vol_info.get("title") or "").lower(),
+                                "synopsis": vol_info.get("description"),
+                                "cover": image_links.get("thumbnail"),
+                                "type": "book",
+                                "release_date": vol_info.get("publishedDate"),
+                                "rating": (vol_info.get("averageRating") or 0) * 2,
+                                "genres": categories,
+                                "providers": [],
+                                "google_books_id": vid,
+                                "updated_at": firestore.SERVER_TIMESTAMP
+                            }
+
+                            doc_id = f"book_{vid}"
+                            db.collection("content").document(doc_id).set(book_payload)
+
+                            safe_title = (vol_info.get('title', '?') or '?').encode('utf-8', errors='replace').decode('utf-8')
+                            print(f"[Firestore Ingest] {len(items)}: Guardada exitosamente -> {safe_title}")
                             if len(items) >= target:
                                 break
                     if len(items) >= target:
@@ -74,5 +110,11 @@ class GoogleBooksClient:
                 print(f"[Books] Error on category '{category}': {e}")
                 continue
 
-        print(f"[Books] Fetched {len(items)} books")
+        print(f"[Books] Fetched and Injected {len(items)} books")
         return items
+
+
+# Orquestador de ejecución directa en terminal
+if __name__ == "__main__":
+    client = GoogleBooksClient()
+    client.fetch_all(target=250)
