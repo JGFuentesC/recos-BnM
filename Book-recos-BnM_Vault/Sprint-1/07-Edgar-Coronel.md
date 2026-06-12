@@ -168,3 +168,130 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] Animación de entrada (200ms)
 - [ ] `frontend/src/pages/MockFeed.jsx` — 4 tarjetas de prueba
 - [ ] Se ve bien en 375px de ancho
+
+---
+
+## 🚀 Fase 2 — Rol PM + Pantalla About (Jun 13–15, 2026)
+
+> **Como PM**, tu misión en Fase 2 es coordinar el deploy del POC 1 y construir la pantalla "About" requerida por la licencia de TMDB (P3 Fase 2).
+
+### 🎯 Tu misión Fase 2
+
+**Prioridad 0 — Coordinación deploy POC 1 (Jueves 12 jun):**
+
+1. Confirmar con Germán que los GitHub Secrets están configurados (7 secrets)
+2. Confirmar con Israel que `firebase deploy --only firestore:rules,firestore:indexes` fue exitoso
+3. Confirmar con Manuel que el ingest corrió en producción (≥500 docs en `content`)
+4. Hacer push a `main` para activar el CI/CD y obtener la URL de Firebase Hosting
+5. Confirmar la URL con todo el equipo antes del viernes
+
+**Tarea 1 — Seguridad: mover auditorías al Vault (MEDIUM-05):**
+
+```bash
+# Mover los reportes de seguridad del .gitignore al Vault
+# 1. Editar .gitignore — eliminar estas líneas si existen:
+#    docs/SECURITY-AUDIT-*.md
+#    docs/REMEDIATION-PLAN-*.md
+# 2. Verificar que los archivos ya están en Book-recos-BnM_Vault/09_Risk_Governance/
+# 3. Si no existen, moverlos: docs/SECURITY-AUDIT-2026-06-10.md → Vault/09_Risk_Governance/
+```
+
+**Tarea 2 — Pantalla About con atribución TMDB (Fase 2 P3):**
+
+Crear `frontend/src/pages/About.jsx` con la atribución requerida por la licencia de TMDB y el equipo del proyecto.
+
+```javascript
+// frontend/src/pages/About.jsx
+export default function About() {
+  return (
+    <div style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+        Acerca de Recos BnM
+      </h1>
+      
+      <section style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '18px', marginBottom: '8px' }}>Equipo</h2>
+        <p>Desarrollado por el equipo de Recos BnM — ITAM 2026.</p>
+      </section>
+      
+      <section style={{ marginBottom: '24px', padding: '16px', 
+                        backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+        <h2 style={{ fontSize: '16px', marginBottom: '8px' }}>Atribución de datos</h2>
+        
+        {/* Logo TMDB — imagen oficial requerida por licencia */}
+        <img 
+          src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_long_1-8ba2ac31f354005783fab473602c34c3f4fd207ac81b7ee3f432b435d95160de.svg"
+          alt="The Movie Database (TMDB)"
+          style={{ width: '120px', marginBottom: '8px' }}
+        />
+        <p style={{ fontSize: '13px', color: '#555', marginBottom: '8px' }}>
+          This product uses the TMDB API but is not endorsed or certified by TMDB.
+        </p>
+        <p style={{ fontSize: '13px', color: '#555' }}>
+          Los datos de películas, calificaciones y disponibilidad de streaming son proporcionados por 
+          <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer"> The Movie Database (TMDB)</a>.
+        </p>
+      </section>
+      
+      <section style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '16px', marginBottom: '8px' }}>Datos de libros</h2>
+        <p style={{ fontSize: '13px', color: '#555' }}>
+          Los datos de libros son proporcionados por la 
+          <a href="https://books.google.com" target="_blank" rel="noopener noreferrer"> Google Books API</a>.
+        </p>
+      </section>
+    </div>
+  )
+}
+```
+
+> ⚠️ La ruta `/about` debe registrarse en `App.jsx` (es tuyo según CLAUDE.md). Agregar:
+> ```javascript
+> <Route path="/about" element={<About />} />
+> ```
+
+**Tarea 3 — Agregar acceso a "About" desde BottomNav (coordinación con Diana):**
+
+Diana creó `BottomNav.jsx`. Pedirle que agregue un ícono "ℹ️" o "?" que navegue a `/about`. O bien agregarla como enlace en el footer de la pantalla de Login.
+
+**Tarea 4 — Preparar deck de demo para el Dr.:**
+
+Asegurarse de que la demo del Lunes cubra:
+1. Registro + onboarding (Fase 1)
+2. Feed con scoring real de TMDB (Fase 1)
+3. Swipe + biblioteca (Fase 1)
+4. Feed con afinidad histórica después de 10+ swipes (Fase 2)
+5. Compartir lista (Fase 2)
+6. Pantalla About con atribución TMDB (Fase 2 P3)
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Edgar Coronel, PM. Tengo acceso a frontend/src/pages/ y frontend/src/components/.
+
+TAREA 1 — Crear frontend/src/pages/About.jsx
+Pantalla de créditos y atribuciones con:
+- Logo oficial de TMDB (imagen de themoviedb.org)
+- Texto de atribución requerido: "This product uses the TMDB API but is not endorsed or certified by TMDB"
+- Link a themoviedb.org
+- Mención de Google Books API
+- Nombres del equipo (lista simple)
+- Diseño limpio, mobile-first, sin librerías externas
+
+TAREA 2 — Agregar ruta /about en frontend/src/App.jsx
+Importar About y agregar <Route path="/about" element={<About />} />
+La ruta NO necesita ser protegida (acceso público, sin login).
+
+TAREA 3 — Verificar .gitignore
+Leer el .gitignore en la raíz del repo. Si hay líneas como "docs/SECURITY-AUDIT*" o "docs/REMEDIATION*",
+reportarme el contenido exacto para que yo decida si eliminarlas.
+No modificar .gitignore sin mi confirmación.
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] Deploy POC 1 coordinado — URL de Firebase Hosting confirmada con el equipo
+- [ ] `frontend/src/pages/About.jsx` — logo TMDB + atribución completa
+- [ ] Ruta `/about` registrada en `App.jsx`
+- [ ] `.gitignore` revisado — auditorías de seguridad no ignoradas
+- [ ] Deck de demo preparado con los 6 puntos de demostración

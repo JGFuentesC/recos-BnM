@@ -203,3 +203,145 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `README.md` — variables de entorno documentadas
 - [ ] **"Hello World" desplegado en Firebase Hosting antes del sábado 7**
 - [ ] URL pública compartida con el equipo
+
+---
+
+## 🚀 Fase 2 — CI/CD Cloud Run + FCM (Jun 13–15, 2026)
+
+> **Eres el dueño del pipeline y la infra de comunicaciones.** Tienes dos misiones críticas de Fase 2: agregar el deploy del backend (Cloud Run) al CI/CD, y configurar Firebase Cloud Messaging para las notificaciones push.
+
+### 🎯 Tu misión Fase 2
+
+**Prioridad 0 — Secrets de Fase 1 faltantes (Jueves 12 jun, HOY URGENTE):**
+
+Ir a GitHub → Settings → Secrets and variables → Actions. Agregar si no existen:
+
+| Secret | Cómo obtenerlo |
+|--------|----------------|
+| `FIREBASE_SERVICE_ACCOUNT` | Firebase Console → Project Settings → Service Accounts → Generate new private key → copiar JSON completo |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase Console → Project Settings → General → Your apps |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase Console → Project Settings → General |
+| `VITE_FIREBASE_APP_ID` | Firebase Console → Project Settings → General |
+
+Verificar que existen los 7 secrets: `FIREBASE_SERVICE_ACCOUNT`, `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`.
+
+**Tarea 1 — Agregar job de Cloud Run al deploy.yml:**
+
+```yaml
+# Agregar al final de .github/workflows/deploy.yml, después del job de Firebase Hosting:
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy  # Después de que el frontend se deployó
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: recos-bnm-api
+          region: us-central1
+          source: backend/
+          env_vars: |
+            FIREBASE_PROJECT_ID=proyectofinal-71637
+            ALLOWED_ORIGINS=https://recos-bnm.web.app
+            NODE_ENV=production
+```
+
+**Tarea 2 — FCM: configurar Firebase Cloud Messaging:**
+
+1. Firebase Console → Project Settings → Cloud Messaging → Web Push certificates → Generate key pair
+2. Copiar la VAPID key pública
+3. Agregar a GitHub Secrets: `VITE_FIREBASE_VAPID_KEY` = la VAPID key
+4. Agregar al workflow en el paso "Build":
+   ```yaml
+   VITE_FIREBASE_VAPID_KEY: ${{ secrets.VITE_FIREBASE_VAPID_KEY }}
+   ```
+
+**Tarea 3 — FCM push handler en `sw.js`:**
+
+Agregar el manejador de mensajes push al Service Worker existente:
+
+```javascript
+// Agregar al final de frontend/public/sw.js
+
+// Firebase Messaging: recibir notificaciones en background
+self.addEventListener('push', event => {
+  const data = event.data?.json() ?? {}
+  const title   = data.notification?.title   ?? 'Recos BnM'
+  const options  = {
+    body:    data.notification?.body   ?? 'Tienes nuevas recomendaciones',
+    icon:    '/icons/icon-192.png',
+    badge:   '/icons/badge-72.png',
+    data:    { url: data.data?.url ?? '/' },
+    actions: [{ action: 'open', title: 'Ver ahora' }]
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  const url = event.notification.data?.url ?? '/'
+  event.waitUntil(clients.openWindow(url))
+})
+```
+
+**Tarea 4 — Agregar Cloud Scheduler para ingest nocturno (confirmación con Manuel):**
+
+Si Manuel ya tiene el ingest como Cloud Run Job, configurar el trigger:
+
+```bash
+# Ejecutar desde GCP Console Cloud Shell o con gcloud:
+gcloud scheduler jobs create http ingest-nocturno \
+  --schedule "0 4 * * *" \
+  --uri "https://[URL-INGEST-JOB]/run" \
+  --http-method POST \
+  --oidc-service-account-email [SA-EMAIL] \
+  --time-zone "America/Mexico_City" \
+  --location us-central1
+```
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Germán Pacheco, dueño de .github/workflows/deploy.yml y frontend/public/sw.js.
+
+TAREA 1 — Actualizar .github/workflows/deploy.yml
+Agregar el job deploy-backend después del job build-and-deploy:
+- Usa google-github-actions/auth@v2 con credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+- Usa google-github-actions/deploy-cloudrun@v2
+- Service: recos-bnm-api, region: us-central1, source: backend/
+- Env vars: FIREBASE_PROJECT_ID=proyectofinal-71637, ALLOWED_ORIGINS=https://recos-bnm.web.app, NODE_ENV=production
+- needs: build-and-deploy (secuencial, después del frontend)
+
+TAREA 2 — Agregar variable VITE_FIREBASE_VAPID_KEY al job build-and-deploy
+En el paso "Build", agregar: VITE_FIREBASE_VAPID_KEY: ${{ secrets.VITE_FIREBASE_VAPID_KEY }}
+
+TAREA 3 — Actualizar frontend/public/sw.js
+Agregar al final del archivo el manejador de push notifications:
+- 'push' event listener: mostrar notificación con self.registration.showNotification()
+- 'notificationclick' event listener: cerrar notif y abrir clients.openWindow(url)
+- El icono de la notificación: '/icons/icon-192.png'
+- El body por default: 'Tienes nuevas recomendaciones'
+
+⚠️ No romper el caché de shell ni el caché de collections que ya existen en sw.js.
+Solo agregar los dos event listeners al final.
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] GitHub Secrets: 7 secrets configurados (incluyendo `FIREBASE_SERVICE_ACCOUNT`)
+- [ ] `.github/workflows/deploy.yml` — job `deploy-backend` para Cloud Run
+- [ ] `VITE_FIREBASE_VAPID_KEY` en GitHub Secrets + en el paso Build del workflow
+- [ ] `frontend/public/sw.js` — push handler y notificationclick handler agregados
+- [ ] CI/CD verde en el último push a `main`
+- [ ] URL de Firebase Hosting compartida con el equipo
+- [ ] URL de Cloud Run confirmada con Israel y Edgar
