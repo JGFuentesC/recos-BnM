@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const express = require('express')
 const admin = require('../firebase/admin')
 const auth = require('../middleware/auth')
@@ -127,6 +128,105 @@ router.post('/', auth, async (req, res) => {
     return res.status(201).json({ collectionId: ref.id })
   } catch (error) {
     console.error('[collections] POST error', error)
+    return res.status(500).json({ error: 'internal_error' })
+  }
+})
+
+/**
+ * GET /api/collections/share/:token  (PÚBLICO — sin authMiddleware)
+ * Devuelve la colección compartida si shareToken coincide y isPublic == true.
+ *
+ * ⚠️ Debe declararse ANTES de cualquier ruta GET /:id para que Express no
+ * interprete 'share' como un :id.
+ */
+router.get('/share/:token', async (req, res) => {
+  try {
+    const { token } = req.params
+
+    const snapshot = await db()
+      .collection(COLLECTION)
+      .where('shareToken', '==', token)
+      .where('isPublic', '==', true)
+      .limit(1)
+      .get()
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: 'not_found' })
+    }
+
+    const doc = snapshot.docs[0]
+    const data = doc.data()
+    return res.status(200).json({
+      collectionId: doc.id,
+      listName: data.listName,
+      contentId: data.contentId,
+      contentType: data.contentType,
+      savedAt: serializeSavedAt(data.savedAt),
+      personalNote: data.personalNote,
+    })
+  } catch (error) {
+    console.error('[collections] GET share error', error)
+    return res.status(500).json({ error: 'internal_error' })
+  }
+})
+
+/**
+ * POST /api/collections/:id/share
+ * Genera un shareToken y marca la colección como pública.
+ */
+router.post('/:id/share', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const ref = db().collection(COLLECTION).doc(id)
+    const snap = await ref.get()
+
+    if (!snap.exists) {
+      return res.status(404).json({ error: 'not_found' })
+    }
+    if (snap.data().userId !== req.user.uid) {
+      return res.status(403).json({ error: 'forbidden' })
+    }
+
+    const shareToken = crypto.randomBytes(16).toString('hex')
+    await ref.update({ shareToken, isPublic: true })
+
+    return res.status(201).json({
+      shareToken,
+      shareUrl: `${process.env.FRONTEND_URL || ''}/shared/${shareToken}`,
+    })
+  } catch (error) {
+    console.error('[collections] POST share error', error)
+    return res.status(500).json({ error: 'internal_error' })
+  }
+})
+
+/**
+ * DELETE /api/collections/:id/share
+ * Revoca el compartido: elimina shareToken y marca isPublic = false.
+ *
+ * ⚠️ Debe declararse ANTES de DELETE /:id (ruta de un solo segmento).
+ */
+router.delete('/:id/share', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const ref = db().collection(COLLECTION).doc(id)
+    const snap = await ref.get()
+
+    if (!snap.exists) {
+      return res.status(404).json({ error: 'not_found' })
+    }
+    if (snap.data().userId !== req.user.uid) {
+      return res.status(403).json({ error: 'forbidden' })
+    }
+
+    await ref.update({
+      shareToken: admin.firestore.FieldValue.delete(),
+      isPublic: false,
+    })
+
+    return res.status(204).send()
+  } catch (error) {
+    console.error('[collections] DELETE share error', error)
     return res.status(500).json({ error: 'internal_error' })
   }
 })
