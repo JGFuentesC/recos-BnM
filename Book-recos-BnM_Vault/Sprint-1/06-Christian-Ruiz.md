@@ -149,3 +149,140 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] 403 si intenta modificar colección ajena
 - [ ] Tests cubriendo los casos anteriores
 - [ ] Ruta registrada en `app.js`
+
+---
+
+## 🚀 Fase 2 — Engagement (Jun 13–15, 2026)
+
+> **Feature P2 de Fase 2:** Listas compartibles. Los usuarios podrán generar un link público de sus listas y compartirlo con cualquier persona (sin necesidad de login para ver).
+
+### 🎯 Tu misión Fase 2
+
+**Tarea 1 — Endpoint `POST /api/collections/:id/share` (genera share link):**
+
+```javascript
+// backend/src/routes/collections.js — agregar al final del router existente
+
+// POST /api/collections/:id/share — genera un token de compartir para una lista
+router.post('/:id/share', auth, async (req, res) => {
+  const { id } = req.params
+  
+  try {
+    const docRef = db.collection('collections').doc(id)
+    const snap   = await docRef.get()
+    
+    if (!snap.exists)                             return res.status(404).json({ error: 'Not found' })
+    if (snap.data().userId !== req.user.uid)      return res.status(403).json({ error: 'Forbidden' })
+    
+    // Generar token único (usar crypto nativo de Node.js)
+    const { randomBytes } = require('crypto')
+    const shareToken = randomBytes(16).toString('hex')
+    
+    await docRef.update({ shareToken, isPublic: true })
+    
+    const shareUrl = `${process.env.FRONTEND_URL || 'https://recos-bnm.web.app'}/shared/${shareToken}`
+    res.json({ shareToken, shareUrl })
+  } catch (err) {
+    res.status(500).json({ error: 'Error al generar link de compartir' })
+  }
+})
+```
+
+**Tarea 2 — Endpoint `GET /api/collections/share/:token` (acceso público sin auth):**
+
+```javascript
+// GET /api/collections/share/:token — NO requiere auth, acceso público
+router.get('/share/:token', async (req, res) => {
+  const { token } = req.params
+  
+  try {
+    const snap = await db.collection('collections')
+      .where('shareToken', '==', token)
+      .where('isPublic', '==', true)
+      .limit(1)
+      .get()
+    
+    if (snap.empty) return res.status(404).json({ error: 'Lista no encontrada o no pública' })
+    
+    const doc   = snap.docs[0]
+    const data  = doc.data()
+    
+    // Devolver la lista con info básica (sin datos privados del usuario)
+    res.json({
+      collectionId: doc.id,
+      listName:     data.listName,
+      contentId:    data.contentId,
+      contentType:  data.contentType,
+      savedAt:      data.savedAt,
+      personalNote: data.personalNote  // Incluir la nota — el dueño eligió compartir
+    })
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener lista compartida' })
+  }
+})
+```
+
+**Tarea 3 — Endpoint `DELETE /api/collections/:id/share` (revocar acceso público):**
+
+```javascript
+// DELETE /api/collections/:id/share — revocar compartir (solo el dueño)
+router.delete('/:id/share', auth, async (req, res) => {
+  const { id } = req.params
+  const docRef  = db.collection('collections').doc(id)
+  const snap    = await docRef.get()
+  
+  if (!snap.exists)                        return res.status(404).json({ error: 'Not found' })
+  if (snap.data().userId !== req.user.uid) return res.status(403).json({ error: 'Forbidden' })
+  
+  await docRef.update({ shareToken: admin.firestore.FieldValue.delete(), isPublic: false })
+  res.status(204).send()
+})
+```
+
+**Tarea 4 — Coordinar con Diana Álvarez y Israel Pérez:**
+
+- **Diana**: necesita el endpoint `/api/collections/:id/share` para el botón "Compartir lista" en Library.jsx
+- **Israel**: ya actualizó las reglas de Firestore para permitir lectura pública cuando `isPublic == true`
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Christian Ruiz, responsable de /api/collections.
+
+TAREA 1 — Agregar 3 nuevos endpoints a backend/src/routes/collections.js:
+
+1. POST /:id/share (con authMiddleware)
+   - Verificar que el doc existe y que userId == req.user.uid
+   - Generar shareToken = require('crypto').randomBytes(16).toString('hex')
+   - Hacer update({ shareToken, isPublic: true })
+   - Responder { shareToken, shareUrl: process.env.FRONTEND_URL + '/shared/' + shareToken }
+
+2. GET /share/:token (SIN authMiddleware — acceso público)
+   - IMPORTANTE: este route debe definirse ANTES de GET /:id para que Express no confunda 'share' con un :id
+   - Query: collections donde shareToken == token Y isPublic == true, limit 1
+   - Si no hay resultados → 404
+   - Responder: { collectionId, listName, contentId, contentType, savedAt, personalNote }
+
+3. DELETE /:id/share (con authMiddleware)
+   - Verificar ownership (userId == req.user.uid)
+   - Update({ shareToken: FieldValue.delete(), isPublic: false })
+   - Responder 204
+
+TAREA 2 — Agregar tests para los 3 nuevos endpoints:
+- POST share → 201 con shareToken y shareUrl
+- GET share/:token válido → 200 con datos de colección
+- GET share/:token inexistente → 404
+- DELETE share → 204
+
+⚠️ El order de los routes importa: definir GET /share/:token ANTES de GET /:id
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] `POST /api/collections/:id/share` → genera shareToken y shareUrl
+- [ ] `GET /api/collections/share/:token` → sin auth, devuelve lista pública
+- [ ] `DELETE /api/collections/:id/share` → revoca acceso, borra shareToken
+- [ ] Orden correcto de routes (share antes que :id)
+- [ ] Tests para los 3 nuevos endpoints
+- [ ] Coordinado con Diana: ella tiene el shareUrl para el botón de compartir
+- [ ] Coordinado con Israel: reglas Firestore permiten lectura pública
