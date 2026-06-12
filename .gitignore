@@ -1,7 +1,8 @@
-.env
+# Secrets — nunca commitear ningún .env real
 *.env
-jc.env
-env.jc
+*.env.*
+!*.env.example
+.DS_Store
 firebase-debug.log
 firestore-debug.log
 .firebase/
@@ -18,6 +19,14 @@ opencodesession.txt
 docs/gap-analysis.md
 docs/SECURITY-AUDIT-2026-06-04.md
 docs/SECURITY-AUDIT-2026-06-05.md
+docs/SECURITY-AUDIT-2026-06-10m.md
 feat-manuel.md
 .obsidian/
-docs/MANUEL_CORRECTIONS_HEARTBEAT.md
+.DS_Store
+*.log
+serviceAccountKey.json
+backend/src/firebase/serviceAccountKey.json
+ingest/serviceAccountKey.json
+backend/serviceAccountKey.json
+ingest/serviceAccountKey.json
+serviceAccountKey.json

@@ -64,9 +64,20 @@ router.get('/', authMiddleware, async (req, res) => {
       .where('userId', '==', userId)
       .get()
 
-    const swipedIds = new Set(swipesSnap.docs.map(doc => doc.data().contentId))
+    // 🚀 NUEVO: También traemos las películas que ya guardó en favoritos
+    const collectionsSnap = await db
+      .collection('collections')
+      .where('userId', '==', userId)
+      .get()
 
-    // 4. Filtrar los ya vistos
+    // ✨ Mantenemos la estructura original del Set para máxima eficiencia en memoria
+    // Combinamos los arrays de IDs de ambas colecciones usando el operador spread (...)
+    const swipedIds = new Set([
+      ...swipesSnap.docs.map(doc => doc.data().contentId),
+      ...collectionsSnap.docs.map(doc => doc.data().contentId)
+    ])
+
+    // 4. Filtrar los ya vistos (Se mantiene EXACTAMENTE igual a como estaba, manteniendo tu optimización)
     const unseen = candidates.filter(item => !swipedIds.has(item.contentId))
 
     // 5. Aplicar scoring con afinidad de géneros del usuario

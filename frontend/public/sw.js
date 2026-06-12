@@ -21,13 +21,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => {
-            return (
-              (name === SHELL_CACHE || name === COLLECTIONS_CACHE) &&
-              name !== SHELL_CACHE &&
-              name !== COLLECTIONS_CACHE
-            )
-          })
+          .filter((name) => name !== SHELL_CACHE && name !== COLLECTIONS_CACHE)
           .map((name) => caches.delete(name))
       )
     })
@@ -70,8 +64,12 @@ async function cacheFirstWithNetwork(request) {
     return new Response('Offline', { status: 503 })
   }
 }
-
 async function networkFirstWithCache(request) {
+  // 🚀 REGLA DE SALVACIÓN: Si no es una petición de lectura (GET), ve directo a internet sin tocar la caché
+  if (request.method !== 'GET') {
+    return fetch(request);
+  }
+
   try {
     const response = await fetch(request)
     if (response.ok) {
@@ -112,3 +110,22 @@ async function networkFirst(request) {
     return new Response('Offline', { status: 503 })
   }
 }
+
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() ?? {}
+  const title = data.notification?.title ?? 'Recos BnM'
+  const options = {
+    body: data.notification?.body ?? 'Tienes nuevas recomendaciones',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/badge-72.png',
+    data: { url: data.data?.url ?? '/' },
+    actions: [{ action: 'open', title: 'Ver ahora' }],
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = event.notification.data?.url ?? '/'
+  event.waitUntil(clients.openWindow(url))
+})

@@ -169,3 +169,164 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `backend/src/middleware/auth.js` — verifica Firebase ID Token
 - [ ] Doc `users/{uid}` creado en Firestore al primer login
 - [ ] Test: 401 sin token, 200 con token válido
+
+---
+
+## 🚀 Fase 2 — Engagement (Jun 13–15, 2026)
+
+> **Eres responsable de dos cosas críticas:** cerrar la deuda de seguridad de Fase 1 y agregar el soporte de notificaciones push (FCM) en el frontend.
+
+### 🎯 Tu misión Fase 2
+
+**Prioridad 0-A — Instalar seguridad en backend (Jueves 12 jun, URGENTE — BLOQUEA EL DEPLOY):**
+
+> ⚠️ `backend/package.json` no tiene `helmet` ni `express-rate-limit`. La app no puede ir a GCP sin esto.
+
+```bash
+# Instalar dependencias de seguridad en backend
+cd backend
+npm install helmet express-rate-limit
+```
+
+Luego, editar `backend/src/app.js` — agregar DESPUÉS de `require` y ANTES de las rutas:
+
+```javascript
+require('dotenv').config()
+const express    = require('express')
+const cors       = require('cors')
+const helmet     = require('helmet')
+const rateLimit  = require('express-rate-limit')
+const auth       = require('./middleware/auth')
+
+const app = express()
+
+// Seguridad HTTP
+app.use(helmet())
+
+// CORS restrictivo — solo orígenes conocidos
+const ALLOWED = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')
+app.use(cors({
+  origin: (origin, cb) => (!origin || ALLOWED.includes(origin)) ? cb(null, true) : cb(new Error('CORS')),
+  credentials: true,
+}))
+
+// Body limit
+app.use(express.json({ limit: '10kb' }))
+
+// Rate limiting
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }))
+app.use('/api/swipe', rateLimit({ windowMs: 60 * 1000, max: 30 }))
+```
+
+**Prioridad 0-B — Cierre de seguridad frontend (Jueves 12 jun, URGENTE):**
+
+```bash
+# 1. Parchar vulnerabilidad HIGH-02 React Router XSS
+cd frontend
+npm audit fix
+# Si persiste: npm install react-router-dom@latest
+
+# 2. Verificar que quedó en 0 HIGH/CRITICAL
+npm audit --audit-level=high
+```
+
+**Prioridad 0 — GitHub Secrets (Jueves 12 jun, con Germán):**
+
+Ir a GitHub → Settings → Secrets and variables → Actions. Confirmar que existen:
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`  
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `FIREBASE_SERVICE_ACCOUNT` ← JSON completo del service account (Germán lo tiene)
+
+**Tarea 1 — FCM Token: solicitar permisos y guardar en Firestore (Fase 2 notificaciones):**
+
+Cuando el usuario inicia sesión, solicitar permiso de notificaciones y guardar el FCM token en Firestore. Agregar a `AuthContext.jsx` o crear `frontend/src/hooks/usePushNotifications.js`:
+
+```javascript
+// frontend/src/hooks/usePushNotifications.js
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from '../firebase/config'
+
+export const usePushNotifications = (currentUser) => {
+  const requestPermission = async () => {
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') return null
+    
+    const messaging = getMessaging()
+    const token = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+    })
+    
+    if (token && currentUser) {
+      await updateDoc(doc(db, 'users', currentUser.uid), {
+        fcmToken: token,
+        notificationsEnabled: true
+      })
+    }
+    return token
+  }
+  
+  return { requestPermission }
+}
+```
+
+Agregar en `frontend/src/firebase/config.js` la inicialización de Firebase Messaging:
+
+```javascript
+import { getMessaging } from 'firebase/messaging'
+export const messaging = getMessaging(app)
+```
+
+**Tarea 2 — Configurar variable de entorno VITE_FIREBASE_VAPID_KEY:**
+
+Germán genera la VAPID key en Firebase Console → Cloud Messaging → Web configuration.
+Agregar al `.env.local` del frontend y al secret de GitHub como `VITE_FIREBASE_VAPID_KEY`.
+
+**Tarea 3 — Push notification en sw.js (coordinación con Germán):**
+
+⚠️ `frontend/public/sw.js` es de Germán. Solo confirma que el SW registrado en `main.jsx` incluye el manejador de push. Si no está, notifica a Germán para que lo agregue.
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Andrés González, responsable de Auth y frontend base.
+
+CONTEXTO: La app usa Firebase Auth + Firestore. El usuario ya está autenticado con useAuth().
+Ya existe: frontend/src/firebase/config.js con app, auth y db exportados.
+
+TAREA 1 — Arreglar vulnerabilidad de seguridad:
+En el directorio frontend, ejecutar: npm audit fix
+Si react-router-dom sigue con HIGH después del fix automático: npm install react-router-dom@latest
+Verificar que npm audit --audit-level=high retorna 0 vulnerabilidades.
+
+TAREA 2 — Crear frontend/src/hooks/usePushNotifications.js
+Hook que:
+- Importa getMessaging y getToken de 'firebase/messaging'
+- Exporta usePushNotifications(currentUser) con método requestPermission()
+- requestPermission() solicita Notification.requestPermission()
+- Si se otorga, obtiene el FCM token con vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+- Guarda el token en Firestore: updateDoc(doc(db, 'users', currentUser.uid), { fcmToken: token, notificationsEnabled: true })
+- Maneja errores: si el usuario niega permiso, no lanzar error, solo retornar null
+
+TAREA 3 — Agregar inicialización de Firebase Messaging a frontend/src/firebase/config.js
+Importar getMessaging de 'firebase/messaging' y exportarlo:
+  export const messaging = typeof window !== 'undefined' ? getMessaging(app) : null
+El typeof window guard evita errores en SSR o tests.
+
+⚠️ NO modificar: App.jsx, main.jsx (son tuyos pero están bajo reglas de CLAUDE.md).
+Solo crear el hook y modificar config.js.
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] **BLOQUEANTE**: `cd backend && npm install helmet express-rate-limit` ejecutado
+- [ ] **BLOQUEANTE**: `app.js` actualizado con `helmet()`, CORS restrictivo, rate-limit
+- [ ] `npm audit` frontend: 0 HIGH/CRITICAL
+- [ ] GitHub Secrets: 7 secrets configurados y verificados con Germán
+- [ ] `frontend/src/hooks/usePushNotifications.js` — requestPermission + guardar fcmToken
+- [ ] `frontend/src/firebase/config.js` — messaging exportado
+- [ ] Variable `VITE_FIREBASE_VAPID_KEY` en `.env.local` y en GitHub Secrets

@@ -28,7 +28,9 @@ class ContentItem:
         return f"{self.source}_{self.externalId}"
 
     def to_firestore_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        d["titleLower"] = self.title.lower()
+        return d
 
     @classmethod
     def from_tmdb(cls, details: dict, watch_providers: list[str]) -> "ContentItem":

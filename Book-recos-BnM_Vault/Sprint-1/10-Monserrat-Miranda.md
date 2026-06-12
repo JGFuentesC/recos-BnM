@@ -162,3 +162,91 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] Integrado en `Feed.jsx` con el Tab Selector de Juan Carlos
 - [ ] `<DetailSheet />` de Marina integrado en `SwipeDeck.jsx` con estado `selectedContentId`
 - [ ] Probado en móvil (gestos táctiles reales)
+
+---
+
+## 🧪 QA Physical Testing — Tu asignación (Jun 13–15, 2026)
+
+> **Eres parte del equipo de QA/Testing.** Tu especialidad son los flujos que tú construiste: Onboarding y SwipeDeck. También cubres Feed. Usa el archivo `Book-recos-BnM_Vault/PHYSICAL_TEST_VALIDATION.md` para documentar resultados.
+>
+> **Ejecutar en:** dispositivo móvil real (preferible) o Chrome DevTools responsive 375px.
+> **URL a probar:** confirmar con Germán (Firebase Hosting).
+
+### 📋 Tus secciones asignadas: 27 casos
+
+---
+
+#### Sección 2 — HU1.2 Onboarding (9 casos: O-01 a O-09)
+
+**Prerequisito:** tener cuenta recién creada SIN onboarding completado.
+
+```
+☐ O-01: Llegar a /onboarding tras registro → primera tarjeta con imagen (Ciencia Ficción)
+☐ O-02: Observar barra de progreso en la parte superior → visible, indica avance entre 8 géneros
+☐ O-03: Swipe derecha en la tarjeta → avanza, género "Ciencia Ficción" seleccionado
+☐ O-04: Swipe izquierda en una tarjeta → avanza sin seleccionar el género
+☐ O-05: Recorrer las 8 tarjetas → todas cargan con imagen y descripción correctas
+☐ O-06: En selección manual de géneros → seleccionar ≥3 géneros → se resaltan visualmente
+☐ O-07: Completar onboarding hasta el final → redirige a /feed
+☐ O-08: Firebase Console → users/{userId} → prefs.genres tiene géneros seleccionados + cold_start_done: true
+☐ O-09: Cerrar sesión y volver a iniciar → redirige a /feed, NO a /onboarding otra vez
+```
+
+> ⚠️ **Prioridad:** O-08 es crítico — si el onboarding no guarda en Firestore, el feed no funcionará.
+
+---
+
+#### Sección 4 — HU3.1 Feed con datos reales (5 casos: F-01 a F-05)
+
+**Prerequisito:** estar autenticado con cuenta que completó onboarding. Catálogo en Firestore prod (Manuel).
+
+```
+☐ F-01: Llegar a /feed con tab "Películas" → SwipeDeck con portadas reales de TMDB
+☐ F-02: Observar tarjetas de películas → cada tarjeta tiene: portada, título, badge "🎬 Película", géneros, ⭐ rating, sinopsis
+☐ F-03: Cambiar a tab "Libros" → tarjetas con portadas de Google Books, badge "📚 Libro"
+☐ F-04: Verificar orden de tarjetas → mayor score (popularidad + rating) aparece primero
+☐ F-05: (Postman/Bruno) GET /api/feed?userId={uid}&type=movie con token → HTTP 200, array con contentId, title, cover, genres, rating, synopsis
+```
+
+---
+
+#### Sección 5 — HU3.2 SwipeDeck gestos (13 casos: S-01 a S-13)
+
+**Prerequisito:** estar en /feed con tarjetas cargadas.
+
+```
+☐ S-01: Ver feed → 3 tarjetas apiladas visibles: frente en primer plano, otras 2 escaladas
+☐ S-02: Arrastrar tarjeta lentamente a la DERECHA → aparece indicador "❤️ LIKE" (verde) en esquina superior izquierda
+☐ S-03: Arrastrar tarjeta lentamente a la IZQUIERDA → aparece indicador "✕ SKIP" (rojo) en esquina superior derecha
+☐ S-04: Soltar la tarjeta habiendo arrastrado <80px → la tarjeta REGRESA a su posición con animación
+☐ S-05: Arrastrar >80px a la DERECHA y soltar → tarjeta VUELA a la derecha, aparece la siguiente
+☐ S-06: Arrastrar >80px a la IZQUIERDA y soltar → tarjeta VUELA a la izquierda, aparece la siguiente
+☐ S-07: Swipe rápido (velocidad alta, <80px de distancia) → tarjeta se va si velocidad >~300px/s
+☐ S-08: Verificar en Firestore tras swipe → colección "swipes" con userId, contentId, contentType, action
+☐ S-09: Hacer swipes hasta quedar 5 tarjetas → app carga más contenido en background sin interrumpir
+☐ S-10: Hacer swipe de tarjeta ya swipeada antes → esa tarjeta NO reaparece en el feed
+☐ S-11: Hacer swipe de TODAS las tarjetas → aparece "¡Has visto todo!" con botón "Ver más"
+☐ S-12: Presionar "Ver más" → deck se reinicia y carga nuevas tarjetas
+☐ S-13: Simular modo avión y cargar feed → aparece mensaje de error con botón "Reintentar"
+```
+
+---
+
+### 📝 Cómo registrar bugs
+
+Cuando un caso falla:
+
+1. Marca con ❌ en el archivo `PHYSICAL_TEST_VALIDATION.md`
+2. Registra en §14 con el formato:
+```
+| BUG-XXX | NEW | Sección 5 SwipeDeck | S-05 | [descripción exacta] | Alta | — | Monserrat |
+```
+3. Abre Claude Code con el prompt del §14 del PHYSICAL_TEST_VALIDATION.md
+
+### ✅ Checklist QA Monserrat
+
+- [ ] Sección 2 Onboarding: 9/9 casos ejecutados y documentados
+- [ ] Sección 4 Feed datos reales: 5/5 casos ejecutados
+- [ ] Sección 5 SwipeDeck gestos: 13/13 casos ejecutados
+- [ ] Bugs encontrados registrados en PHYSICAL_TEST_VALIDATION.md §14
+- [ ] Resumen de resultados completado en §15A (columnas Onboarding + Feed + SwipeDeck)

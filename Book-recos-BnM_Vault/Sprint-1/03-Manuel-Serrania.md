@@ -191,3 +191,151 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `backend/src/services/scoring.js` — función `scoreCandidates` exportada
 - [ ] Total ≥500 docs en colección `content`
 - [ ] PR abierto con screenshot del emulador mostrando el conteo
+
+---
+
+## 🚀 Fase 2 — Engagement (Jun 13–15, 2026)
+
+> **Eres la pieza central de Fase 2.** El scoring de afinidad histórica es la feature P1 de engagement. Con los datos de swipes reales ya en Firestore, puedes calcular qué géneros le gustan más a cada usuario y ajustar el feed.
+
+### 🎯 Tu misión Fase 2
+
+**Prioridad 0 — Ingest a producción (Jueves 12 jun):**
+
+```bash
+# Re-ejecutar ingest contra Firestore producción (NO el emulador)
+# Asegurarse de que .env tiene las credenciales de producción (no FIRESTORE_EMULATOR_HOST)
+python ingest/tmdb_ingest.py   # ≥300 películas en prod
+python ingest/books_ingest.py  # ≥200 libros en prod
+
+# Verificar en Firebase Console → Firestore → colección content:
+# al menos 500 documentos con todos los campos del schema
+```
+
+**Tarea 1 — Agregar `buildGenreAffinity` a `scoring.js` (Feature P1 Fase 2):**
+
+> ⚠️ CONTEXTO REAL DEL CÓDIGO: `backend/src/services/scoring.js` ya existe con la función `computeScore(items, genreAffinity = {})` que acepta el mapa de afinidad. **No debes reescribir `computeScore`** — solo agregar `buildGenreAffinity` como nueva función.
+> La función ya exporta: `module.exports = { normalize, computeScore, scoreCandidates: computeScore }`
+> Tu tarea: agregar `buildGenreAffinity` y exportarla también.
+
+Agregar a `backend/src/services/scoring.js` (antes de `module.exports`):
+
+```javascript
+/**
+ * Calcula multiplicadores de afinidad por género a partir del historial de swipes.
+ * Retorna: { "Sci-Fi": 1.44, "Drama": 0.96 } — solo géneros con ≥5 swipes.
+ * Luis pasa este resultado como segundo parámetro a computeScore(candidates, genreAffinity).
+ *
+ * @param {Array} swipeDocs - Array de { genres: string[], action: "like"|"dislike" }
+ * @returns {Object} mapa genero → multiplicador (rango 0.8 – 1.6)
+ */
+function buildGenreAffinity(swipeDocs) {
+  const byGenre = {}
+  swipeDocs.forEach(({ genres = [], action }) => {
+    genres.forEach(g => {
+      if (!byGenre[g]) byGenre[g] = { likes: 0, total: 0 }
+      byGenre[g].total++
+      if (action === 'like') byGenre[g].likes++
+    })
+  })
+  return Object.fromEntries(
+    Object.entries(byGenre)
+      .filter(([, v]) => v.total >= 5)
+      .map(([g, v]) => [g, 0.8 + (v.likes / v.total) * 0.8])
+  )
+}
+```
+
+Actualizar la última línea del archivo:
+```javascript
+// ANTES:
+module.exports = { normalize, computeScore, scoreCandidates: computeScore }
+
+// DESPUÉS:
+module.exports = { normalize, computeScore, scoreCandidates: computeScore, buildGenreAffinity }
+```
+
+**Tarea 2 — Agregar `titleLower` al ingest para habilitar la búsqueda:**
+
+Luis necesita hacer range queries por título en Firestore. El campo `titleLower` no existe en los docs actuales. Agregar a `ingest/src/tmdb_ingest.py` en el `movie_payload`:
+
+```python
+movie_payload = {
+    "title":      details.get("title"),
+    "titleLower": (details.get("title") or "").lower(),   # ← AGREGAR esta línea
+    "synopsis":   details.get("overview"),
+    # ... resto de campos igual
+}
+```
+
+Hacer lo mismo en `books_ingest.py` en el payload del libro:
+```python
+book_payload = {
+    "title":      vol_info.get("title"),
+    "titleLower": (vol_info.get("title") or "").lower(),  # ← AGREGAR esta línea
+    # ... resto igual
+}
+```
+
+> Después de agregar `titleLower`, re-ejecutar el ingest contra producción para que los docs existentes también tengan el campo.
+
+**Tarea 3 — Coordinar con Luis Téllez:**
+
+Luis va a llamar a `buildGenreAffinity(swipeDocs)` desde `/api/feed` y pasar el resultado a `computeScore(candidates, genreAffinity)`. Tú solo entregas las funciones. Confirmar que el módulo exporta:
+```javascript
+module.exports = { normalize, computeScore, scoreCandidates: computeScore, buildGenreAffinity }
+```
+
+**Tarea 3 — Ingest incremental (Fase 2 catálogo fresco):**
+
+Agregar a los scripts de ingest lógica para no reimportar títulos que ya existen en Firestore si `syncedAt` es de menos de 7 días. Esto reduce costos de API y tiempo de ejecución.
+
+```python
+# Al inicio del script, obtener IDs ya existentes con syncedAt reciente
+recent_cutoff = datetime.now() - timedelta(days=7)
+existing = {doc.id for doc in db.collection('content')
+            .where('syncedAt', '>=', recent_cutoff).stream()}
+# Solo procesar los que no estén en existing
+```
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Manuel Serranía, responsable del ingest y scoring.
+
+CONTEXTO IMPORTANTE — Estado real del código:
+- backend/src/services/scoring.js YA EXISTE con computeScore(items, genreAffinity={})
+  La función ya acepta genreAffinity como segundo parámetro y aplica un multiplicador por género.
+  Exporta: { normalize, computeScore, scoreCandidates: computeScore }
+  NO reescribir computeScore — solo agregar buildGenreAffinity al mismo archivo.
+
+TAREA 1 — Agregar buildGenreAffinity a backend/src/services/scoring.js
+La función recibe: Array de { genres: string[], action: "like"|"dislike" }
+Retorna: { "Sci-Fi": 1.44, "Drama": 0.96 } — solo géneros con ≥5 swipes.
+Fórmula multiplicador: 0.8 + (likes/total) * 0.8  → rango 0.8–1.6
+Actualizar module.exports para incluir buildGenreAffinity:
+  module.exports = { normalize, computeScore, scoreCandidates: computeScore, buildGenreAffinity }
+
+TAREA 2 — Agregar campo titleLower a los payloads de ingest
+En ingest/src/tmdb_ingest.py: agregar "titleLower": (details.get("title") or "").lower()
+En el script de libros: mismo patrón con el campo de título correspondiente.
+Esto habilita las range queries de Firestore para el buscador de contenido (Luis lo necesita).
+
+TAREA 3 — Agregar skip de reimport a ingest/tmdb_ingest.py
+Al inicio del script: consultar Firestore por IDs ya presentes con syncedAt > hace 7 días.
+Skip silencioso (sin error) si el externalId ya existe y es reciente.
+
+TAREA 4 — Tests de buildGenreAffinity en backend/tests/
+- Input: 10 swipes de "Sci-Fi" (8 likes, 2 dislikes) → affinity["Sci-Fi"] ≈ 1.44
+- Input: < 5 swipes de "Drama" → "Drama" NO aparece en el resultado
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] Ingest ejecutado en **producción** (no emulador) — ≥500 docs en `content` prod
+- [x] `backend/src/services/scoring.js` — agrega `buildGenreAffinity` (NO reescribir `computeScore`)
+- [x] `module.exports` incluye `buildGenreAffinity` en el mismo archivo
+- [x] `ingest/src/tmdb_ingest.py` — campo `titleLower` en payload de película
+- [x] Libros ingest — campo `titleLower` en payload de libro (`ingest/src/models.py` → `to_firestore_dict`)
+- [x] Tests de `buildGenreAffinity` passing (6/6)
+- [x] Skip de reimport (7 días) — `ingest/src/tmdb_ingest.py`
