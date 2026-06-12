@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, googleProvider } from '../firebase/config'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 
 const AuthContext = createContext(null)
 
@@ -22,6 +23,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { requestPermission } = usePushNotifications(currentUser)
 
   const loadUserProfile = useCallback(async (uid) => {
     const profileRef = doc(db, 'users', uid)
@@ -87,14 +89,16 @@ export function AuthProvider({ children }) {
   const loginWithEmail = useCallback(async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password)
     await ensureUserDocument(result.user, 'email')
+    await requestPermission(result.user)
     return result.user
-  }, [ensureUserDocument])
+  }, [ensureUserDocument, requestPermission])
 
   const loginWithGoogle = useCallback(async () => {
     const result = await signInWithPopup(auth, googleProvider)
     await ensureUserDocument(result.user, 'google')
+    await requestPermission(result.user)
     return result.user
-  }, [ensureUserDocument])
+  }, [ensureUserDocument, requestPermission])
 
   const register = useCallback(async (email, password, displayName) => {
     const result = await createUserWithEmailAndPassword(auth, email, password)
@@ -104,8 +108,9 @@ export function AuthProvider({ children }) {
     }
 
     await ensureUserDocument(result.user, 'email')
+    await requestPermission(result.user)
     return result.user
-  }, [ensureUserDocument])
+  }, [ensureUserDocument, requestPermission])
 
   const logout = useCallback(async () => {
     await signOut(auth)

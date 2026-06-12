@@ -1,16 +1,43 @@
+const path = require('path')
 const dotenv = require('dotenv')
+
+dotenv.config({ path: path.resolve(__dirname, '..', '.env.local') })
 dotenv.config()
 const express = require('express')
 const cors = require('cors')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 const auth = require('./middleware/auth')
 const app = express()
 
-app.use(cors())
-app.use(express.json())
+app.use(helmet())
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+
+    return callback(new Error('CORS'))
+  },
+  credentials: true,
+}))
+
+app.use(express.json({ limit: '10kb' }))
+
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }))
+app.use('/api/swipe', rateLimit({ windowMs: 60 * 1000, max: 30 }))
 
 app.get('/health', (req, res) => {
   res.json({ ok: true })
 })
+
+app.get('/api/health', auth, (req, res) => {
+  res.json({ ok: true, uid: req.user.uid, email: req.user.email })
+})
+
+app.use('/api', auth)
 
 app.get('/api/private/ping', auth, (req, res) => {
   res.json({ ok: true, uid: req.user.uid })
