@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 
 const TABS = [
   { path: '/feed', label: 'Descubrir', icon: '🔍' },
+  { path: '/search', label: 'Buscar', icon: '🔎' },
   { path: '/library', label: 'Biblioteca', icon: '📚' },
   { path: '/profile', label: 'Perfil', icon: '👤' },
 ]
