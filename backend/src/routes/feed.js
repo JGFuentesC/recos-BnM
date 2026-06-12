@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const authMiddleware = require('../middleware/auth')
-const { computeScore } = require('../services/scoring')
+const { computeScore, buildGenreAffinity } = require('../services/scoring')
 const admin = require('../firebase/admin')
 const db = admin.firestore()
 
@@ -81,7 +81,18 @@ router.get('/', authMiddleware, async (req, res) => {
     const unseen = candidates.filter(item => !swipedIds.has(item.contentId))
 
     // 5. Aplicar scoring con afinidad de géneros del usuario
-    const genreAffinity = userGenres.reduce((acc, g) => ({ ...acc, [g]: 1.2 }), {})
+    let genreAffinity = {}
+    if (swipesSnap.size >= 10) {
+      const swipeData = swipesSnap.docs.map(swipeDoc => {
+        const { contentId, action } = swipeDoc.data()
+        const candidate = candidates.find(c => c.contentId === contentId)
+        return { genres: candidate?.genres || [], action }
+      }).filter(d => d.genres.length > 0)
+      genreAffinity = buildGenreAffinity(swipeData)
+    } else {
+      genreAffinity = userGenres.reduce((acc, g) => ({ ...acc, [g]: 1.2 }), {})
+    }
+
     const scored = computeScore(unseen, genreAffinity)
 
     // 6. Paginación por cursor (índice numérico)

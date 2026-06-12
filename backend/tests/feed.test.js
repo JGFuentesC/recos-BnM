@@ -34,7 +34,15 @@ const mockCollection = jest.fn().mockImplementation((col) => {
   if (col === 'swipes') {
     return {
       where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
       get:   jest.fn().mockResolvedValue({ docs: mockSwipeDocs }),
+    }
+  }
+  if (col === 'collections') {
+    return {
+      where: jest.fn().mockReturnThis(),
+      get:   jest.fn().mockResolvedValue({ docs: [] }),
     }
   }
 })
