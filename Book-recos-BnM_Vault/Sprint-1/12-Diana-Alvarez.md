@@ -158,3 +158,249 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `frontend/src/components/BottomNav.jsx` — acceso en 1 tap
 - [ ] Estado vacío cuando no hay ítems
 - [ ] Reemplazar mocks con `GET /api/collections` real cuando esté disponible
+
+---
+
+## 🚀 Fase 2 — Listas Compartibles UI + Búsqueda en BottomNav (Jun 13–15, 2026)
+
+> **Feature P2 de Fase 2:** Agregar el botón "Compartir lista" en Library.jsx que usa el endpoint de Christian. También agregar el ícono de búsqueda en BottomNav para Juan Carlos.
+
+### 🎯 Tu misión Fase 2
+
+**Tarea 1 — Botón "Compartir lista" en Library.jsx:**
+
+En `frontend/src/pages/Library.jsx`, agregar botón de compartir junto a cada lista en el filtro de listName.
+
+```javascript
+// En Library.jsx — dentro del componente de filtro de listas o junto al nombre de cada lista
+const handleShareList = async (listName) => {
+  // Obtener el collectionId de cualquier ítem de la lista
+  const listItem = collections.find(c => c.listName === listName)
+  if (!listItem) return
+  
+  try {
+    const token = await currentUser.getIdToken()
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/collections/${listItem.collectionId}/share`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    )
+    if (!res.ok) throw new Error('Error al compartir')
+    
+    const { shareUrl } = await res.json()
+    
+    // Intentar Web Share API primero, luego copiar al portapapeles
+    if (navigator.share) {
+      await navigator.share({ title: listName, url: shareUrl })
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      // Mostrar toast "¡Link copiado!"
+      setToast('¡Link copiado!')
+    }
+  } catch (err) {
+    setToast('No se pudo compartir la lista')
+  }
+}
+```
+
+Agregar en el JSX de cada lista un ícono de compartir `↗`:
+```jsx
+{/* Junto a cada chip de listName en el filtro */}
+<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+  <span>{listName}</span>
+  <button
+    onClick={(e) => { e.stopPropagation(); handleShareList(listName) }}
+    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}
+    title="Compartir lista"
+  >
+    ↗
+  </button>
+</div>
+```
+
+**Tarea 2 — Agregar ícono de búsqueda en BottomNav.jsx:**
+
+Juan Carlos Macías creó `Search.jsx` y necesita que el buscador sea accesible desde la barra inferior. Actualizar `BottomNav.jsx`:
+
+```javascript
+// frontend/src/components/BottomNav.jsx — agregar tab de búsqueda
+const tabs = [
+  { path: '/feed',    icon: '🃏', label: 'Descubrir' },
+  { path: '/search',  icon: '🔍', label: 'Buscar' },     // NUEVO Fase 2
+  { path: '/library', icon: '📚', label: 'Biblioteca' },
+  { path: '/profile', icon: '👤', label: 'Perfil' }
+]
+```
+
+**Tarea 3 — Pantalla `/shared/:shareToken` (ver lista compartida):**
+
+Crear `frontend/src/pages/SharedList.jsx` para que cualquier persona (sin login) pueda ver una lista compartida:
+
+```javascript
+// frontend/src/pages/SharedList.jsx
+import { useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+
+export default function SharedList() {
+  const { shareToken }           = useParams()
+  const [item,    setItem]       = useState(null)
+  const [loading, setLoading]    = useState(true)
+  const [error,   setError]      = useState(null)
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/collections/share/${shareToken}`)
+      .then(r => r.ok ? r.json() : Promise.reject('No encontrado'))
+      .then(setItem)
+      .catch(() => setError('Esta lista no existe o ya no está disponible.'))
+      .finally(() => setLoading(false))
+  }, [shareToken])
+
+  if (loading) return <p style={{ textAlign:'center', padding:'40px' }}>Cargando lista...</p>
+  if (error)   return <p style={{ textAlign:'center', padding:'40px', color:'#e53e3e' }}>{error}</p>
+
+  return (
+    <div style={{ padding: '24px', maxWidth: '480px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '22px', marginBottom: '16px' }}>
+        Lista compartida: {item.listName}
+      </h1>
+      <div style={{ padding: '16px', background: '#f9f9f9', borderRadius: '12px' }}>
+        <p><strong>Tipo:</strong> {item.contentType === 'movie' ? '🎬 Película' : '📚 Libro'}</p>
+        {item.personalNote && <p style={{ color: '#666', fontStyle: 'italic' }}>"{item.personalNote}"</p>}
+        <p style={{ fontSize: '12px', color: '#999' }}>
+          Guardado el {new Date(item.savedAt).toLocaleDateString('es-MX')}
+        </p>
+      </div>
+      <p style={{ textAlign: 'center', marginTop: '24px', color: '#888', fontSize: '13px' }}>
+        Descubre más en <a href="/" style={{ color: '#ff571a' }}>Recos BnM</a>
+      </p>
+    </div>
+  )
+}
+```
+
+> La ruta `/shared/:shareToken` va en `App.jsx` (Edgar la agrega — es su archivo).
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Diana Álvarez, responsable de Library.jsx, CollectionItem.jsx y BottomNav.jsx.
+
+CONTEXTO: Christian Ruiz ya tiene el endpoint POST /api/collections/:id/share que devuelve { shareToken, shareUrl }.
+Ya existe useAuth() con currentUser. La variable de entorno VITE_API_URL tiene la URL del backend.
+
+TAREA 1 — Agregar función handleShareList en Library.jsx
+- Función async que recibe un listName
+- Busca en el array de collections un ítem con ese listName para obtener su collectionId
+- Llama a POST ${VITE_API_URL}/api/collections/${collectionId}/share con Bearer token
+- Recibe { shareUrl } del response
+- Si navigator.share disponible → navigator.share({ title: listName, url: shareUrl })
+- Si no → navigator.clipboard.writeText(shareUrl) + mostrar toast "¡Link copiado!"
+- Mostrar toast de error si falla
+
+TAREA 2 — Agregar botón ↗ junto a cada chip de listName en el filtro de listas
+En Library.jsx, donde se muestran los chips de listName (filtro), envolver cada chip en un div flex
+con el nombre de la lista y un botón ↗ que llame a handleShareList(listName).
+El botón ↗ tiene style: background none, border none, cursor pointer, fontSize 14px.
+Usar e.stopPropagation() para que el click en ↗ no active el filtro de la lista.
+
+TAREA 3 — Actualizar BottomNav.jsx
+Agregar un cuarto tab "🔍 Buscar" con path="/search" entre "Descubrir" y "Biblioteca".
+El tab activo se detecta con useLocation() de react-router-dom.
+
+TAREA 4 — Crear frontend/src/pages/SharedList.jsx
+Página pública (sin ProtectedRoute) que:
+- Lee el :shareToken de useParams()
+- Hace fetch a GET ${VITE_API_URL}/api/collections/share/${shareToken} (sin token de auth)
+- Muestra: listName, contentType (con emoji), personalNote (si existe), savedAt formateado
+- Estado de carga y estado de error amigables
+- Link a / al final para invitar al usuario a descargar la app
+```
+
+---
+
+## 🧪 QA Physical Testing — Tu asignación (Jun 13–15, 2026)
+
+> **Eres parte del equipo de QA/Testing.** Cubres la Biblioteca, Tab Selector, CI/CD y GCP. Para las secciones de GCP necesitarás acceso a Firebase Console y Google Cloud Console.
+
+### 📋 Tus secciones asignadas: 26 casos
+
+---
+
+#### Sección 3 — HU2.1 Tab Selector (5 casos: T-01 a T-05)
+
+```
+☐ T-01: Llegar a /feed → Tab Selector visible con "🎬 Películas" y "📚 Libros"
+☐ T-02: Estado inicial → tab "Películas" activo: fondo naranja #ff571a, texto blanco
+☐ T-03: Presionar "Libros" → tab Libros se activa (naranja), SwipeDeck se reinicia con tipo book
+☐ T-04: Hacer 3 swipes en Libros → cambiar a Películas → SwipeDeck se reinicia completamente
+☐ T-05: Cambiar entre tabs varias veces rápido → sin crash, cada cambio reinicia el deck
+```
+
+---
+
+#### Sección 7 — HU5.1 Biblioteca / Colecciones (6 casos: B-01 a B-06)
+
+**Prerequisito:** Guardar al menos 1 ítem desde el DetailSheet (caso D-09).
+
+```
+☐ B-01: Navegar a /library autenticado → pantalla de biblioteca con ítems guardados
+☐ B-02: GET /api/collections?userId={uid} con token → HTTP 200, array de colecciones del usuario
+☐ B-03: POST /api/collections con body válido → HTTP 201, doc creado en Firestore
+☐ B-04: POST /api/collections con mismo contentId dos veces → HTTP 409 (anti-duplicados)
+☐ B-05: PATCH /api/collections/{id} con {"personalNote":"Mi nota"} → HTTP 200, campo actualizado
+☐ B-06: DELETE /api/collections/{id} → HTTP 204, doc eliminado de Firestore
+```
+
+---
+
+#### Sección 11 — CI/CD Pipeline (5 casos: CI-01 a CI-05)
+
+**Prerequisito:** Acceso al repositorio en GitHub y al pipeline de Actions.
+
+```
+☐ CI-01: Abrir cualquier PR activo en GitHub → pipeline "CI/CD Pipeline Recos-BnM" aparece ejecutándose
+☐ CI-02: Verificar job backend-ingest-tests → logs muestran pytest ingest/tests/ en verde
+☐ CI-03: Verificar job frontend-build-deploy → build de Vite exitoso sin errores
+☐ CI-04: Verificar que deploy a Firebase Hosting solo ocurre en push a main (no en PRs)
+☐ CI-05: Verificar URL de Firebase Hosting tras push a main → refleja cambios en <3 minutos
+```
+
+---
+
+#### Sección 13 — GCP Infrastructure (10 casos: GCP-01 a GCP-10)
+
+**Acceso requerido:** [Firebase Console](https://console.firebase.google.com) + [GCP Console](https://console.cloud.google.com)
+
+```
+☐ GCP-01: Firebase Console → Authentication → Sign-in method → Email/Password y Google habilitados
+☐ GCP-02: Firebase Console → Firestore Database → existen 4 colecciones: users, content, swipes, collections
+☐ GCP-03: Firestore → Indexes → Composite → índice "type + genres" en estado Enabled
+☐ GCP-04: Firestore → Rules → reglas publicadas (NO en modo allow read,write: if true)
+☐ GCP-05: Firestore → colección content → al menos 20 docs con campos: contentId, title, cover, genres, rating, synopsis, type, score
+☐ GCP-06: GCP Console → Cloud Run → servicio recos-bnm-api → estado OK, GET /health → {"ok":true}
+☐ GCP-07: Cloud Run → servicio → Variables → FIREBASE_PROJECT_ID configurada
+☐ GCP-08: Firebase Console → Hosting → URL activa tipo recos-bnm.web.app, estado Released
+☐ GCP-09: GCP Console → Cloud Scheduler → job ingest con cron "0 4 * * *", estado Enabled
+☐ GCP-10: GCP Console → Cloud Run Jobs → job de ingest desplegado, último run sin errores críticos
+```
+
+---
+
+### 📝 Cómo registrar bugs
+
+```
+| BUG-XXX | NEW | Sección 13 GCP | GCP-06 | [descripción] | Alta | — | Diana |
+```
+
+### ✅ Checklist QA Diana + Fase 2
+
+- [ ] Sección 3 Tab Selector: 5/5 casos ejecutados
+- [ ] Sección 7 Biblioteca: 6/6 casos ejecutados
+- [ ] Sección 11 CI/CD: 5/5 casos ejecutados
+- [ ] Sección 13 GCP: 10/10 casos ejecutados
+- [ ] **Fase 2:** `handleShareList` en `Library.jsx` con botón ↗
+- [ ] **Fase 2:** `BottomNav.jsx` con tab "🔍 Buscar" para Juan Carlos
+- [ ] **Fase 2:** `SharedList.jsx` creado para ver listas compartidas
+- [ ] Bugs registrados en §14, resumen en §15A

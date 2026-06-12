@@ -223,3 +223,106 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `docs/api-collection.json` — colección Postman con los 7 endpoints
 - [ ] `docs/ROADMAP.md` — 3 fases del PRD §13
 - [ ] Bugs encontrados reportados como Issues en GitHub con label `bug` + `sprint-1`
+
+---
+
+## 🚀 Fase 2 — Coordinador QA + Colección Postman actualizada (Jun 13–15, 2026)
+
+> **Eres el coordinador QA del equipo.** Tu misión en Fase 2 es recolectar los resultados de Héctor, Marina, Monserrat y Diana, consolidar los bugs, y actualizar la colección Postman con los nuevos endpoints de Fase 2.
+
+### 🎯 Tu misión Fase 2
+
+**Tarea 0 — Preparar hoja de bugs ANTES del POC 1 (Jueves 12 jun):**
+
+En `PHYSICAL_TEST_VALIDATION.md` §14, preparar la tabla de bugs con las columnas estándar. Comunicar al equipo QA que registren bugs con este formato y que te avisen en el canal cuando agreguen uno nuevo.
+
+**Tarea 1 — Actualizar colección Postman con endpoints de Fase 2:**
+
+Agregar a `docs/Recos-BnM-API-Collection.json` los nuevos endpoints de Fase 2:
+
+```
+8. POST /api/collections/:id/share
+   - Body: {} (vacío — solo necesita el token del dueño)
+   - Header: Authorization: Bearer {{token}}
+   - Descripción: "Genera un link público para compartir la colección"
+   - Respuesta esperada: { shareToken: "abc123...", shareUrl: "https://recos-bnm.web.app/shared/abc123..." }
+
+9. GET /api/collections/share/:shareToken
+   - Param: shareToken = {{shareToken}} (sin auth — acceso público)
+   - Descripción: "Obtiene una lista compartida públicamente (sin login)"
+   - Respuesta esperada: { collectionId, listName, contentId, contentType, savedAt, personalNote }
+
+10. DELETE /api/collections/:id/share
+    - Param: id = {{collectionId}}
+    - Header: Authorization: Bearer {{token}}
+    - Descripción: "Revoca el acceso público a una lista compartida"
+    - Respuesta esperada: 204 No Content
+
+11. GET /api/search
+    - Query params: q={{searchQuery}}, type={{type}} (opcional: movie|book)
+    - Header: Authorization: Bearer {{token}}
+    - Descripción: "Busca contenido por título, autor o director"
+    - Respuesta esperada: array de { contentId, title, cover, type, genres, rating, synopsis }
+```
+
+**Tarea 2 — Consolidar resultados del POC 1 (Viernes 13 jun):**
+
+Después de que el equipo QA ejecute las pruebas, completar la tabla §15A en `PHYSICAL_TEST_VALIDATION.md`:
+- Recopilar los resultados de Héctor (secciones 0, 1, 8)
+- Recopilar los resultados de Monserrat (secciones 2, 4, 5)
+- Recopilar los resultados de Marina (secciones 6, 9, 10, 12)
+- Recopilar los resultados de Diana (secciones 3, 7, 11, 13)
+
+**Tarea 3 — Happy path de Fase 2 (Sábado 14 jun):**
+
+Ejecutar estos casos adicionales de Fase 2:
+
+```
+Caso F2-01: Hacer ≥10 swipes de películas → ir al feed y verificar que las tarjetas priorizan géneros likeados
+Caso F2-02: En /library, presionar ↗ junto a un listName → menú nativo de compartir (móvil) o "Link copiado" (desktop)
+Caso F2-03: Abrir el URL compartido en browser SIN estar logueado → página /shared/:token muestra la lista
+Caso F2-04: GET /api/collections/share/:token sin auth → HTTP 200 con datos de la lista
+Caso F2-05: En /library, ir al tab de búsqueda (si BottomNav tiene ícono) → buscar "interstellar" → aparece resultado
+Caso F2-06: GET /api/search?q=inter&type=movie con token → HTTP 200 con resultados
+```
+
+**Tarea 4 — Reporte final para el Lunes:**
+
+Compilar `PHYSICAL_TEST_VALIDATION.md` §15B y §15C con:
+- Total de bugs encontrados (Fase 1 + Fase 2)
+- Bugs FIXED vs pendientes
+- ¿App lista para entrega? (con observaciones)
+- Firma de validación §16
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Ulises Chaparro, responsable de QA y documentación.
+
+TAREA 1 — Actualizar docs/Recos-BnM-API-Collection.json
+Agregar 4 nuevos endpoints a la colección Postman existente (mantener los 7 originales):
+
+8. POST /api/collections/:id/share — genera shareToken (con auth)
+9. GET /api/collections/share/:shareToken — acceso público (sin auth)
+10. DELETE /api/collections/:id/share — revoca acceso público (con auth)
+11. GET /api/search?q=&type= — búsqueda de contenido (con auth)
+
+Usar las variables existentes: {{baseUrl}}, {{token}}, {{userId}}, {{collectionId}}
+Agregar nueva variable: {{shareToken}} con valor "" (a llenar después del POST share)
+
+TAREA 2 — Agregar casos de Fase 2 al docs/ROADMAP.md
+En la sección "## Fase 2 — Mejoras de engagement (Q3 2026)", actualizar con los features ya implementados:
+- ✅ Señal de afinidad histórica: scoring ajustado con like-ratio por género
+- ✅ Listas compartibles: endpoint share + página /shared/:token
+- ✅ Buscador de contenido: endpoint /api/search + página /search
+- 🚧 Notificaciones push: FCM configurado (en progreso)
+```
+
+### ✅ Checklist Fase 2 — Ulises
+
+- [ ] `docs/Recos-BnM-API-Collection.json` — 4 endpoints de Fase 2 agregados (total: 11)
+- [ ] Tabla §14 de bugs preparada y comunicada al equipo QA
+- [ ] Resultados consolidados de los 4 QA en §15A (después del POC 1)
+- [ ] Casos F2-01 a F2-06 ejecutados el sábado
+- [ ] `docs/ROADMAP.md` actualizado con status de Fase 2
+- [ ] §15B y §15C completados con firma en §16
