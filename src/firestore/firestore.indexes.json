@@ -4,8 +4,8 @@
       "collectionGroup": "content",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "type",       "order": "ASCENDING" },
-        { "fieldPath": "genres",     "arrayConfig": "CONTAINS" },
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "genres", "arrayConfig": "CONTAINS" },
         { "fieldPath": "popularity", "order": "DESCENDING" }
       ]
     },
@@ -13,8 +13,18 @@
       "collectionGroup": "content",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "type",   "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
         { "fieldPath": "rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "swipes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "contentType", "order": "ASCENDING" },
+        { "fieldPath": "action", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     }
   ],
