@@ -22,7 +22,9 @@ const VALID_CONTENT_TYPES = ['movie', 'book']
  * Response 500: error interno
  */
 router.post('/', authMiddleware, async (req, res) => {
-  const { userId, contentId, contentType, action } = req.body
+  // 1. Tolerancia: Aceptamos tanto 'contentType' como 'type' del frontend
+  const contentType = req.body.contentType || req.body.type
+  const { userId, contentId, action } = req.body
 
   // Validar campos requeridos primero
   if (!userId || !contentId || !contentType || !action) {
@@ -60,7 +62,8 @@ router.post('/', authMiddleware, async (req, res) => {
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
     })
 
-    return res.status(204).send()
+    // 2. Cambiado de 204 a 200 con JSON para evitar que el frontend se quede colgado esperando datos
+    return res.status(200).json({ success: true })
 
   } catch (err) {
     console.error('[swipe] Error:', err)
