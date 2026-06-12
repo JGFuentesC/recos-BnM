@@ -1,11 +1,10 @@
+const dotenv = require('dotenv')
+dotenv.config()
 const express = require('express')
 const cors = require('cors')
-const dotenv = require('dotenv')
 const auth = require('./middleware/auth')
-
-dotenv.config()
-
 const app = express()
+
 app.use(cors())
 app.use(express.json())
 
@@ -20,6 +19,7 @@ app.get('/api/private/ping', auth, (req, res) => {
 // Wave 2 — Luis Téllez
 app.use('/api/feed',  require('./routes/feed'))
 app.use('/api/swipe', require('./routes/swipe'))
+app.use('/api/search', require('./routes/search'))
 
 // Wave 2 — Héctor Morales
 app.use('/api/content', require('./routes/content'))

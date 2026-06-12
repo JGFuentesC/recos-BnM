@@ -90,24 +90,25 @@ describe('POST /api/swipe', () => {
     expect(res.body.error).toBe('invalid_action')
   })
 
-  test('204 — swipe válido (like)', async () => {
+  test('200 — swipe válido (like)', async () => {
     const res = await request(app)
       .post('/api/swipe')
       .set('Authorization', 'Bearer fake-token')
       .send(validBody)
 
-    expect(res.status).toBe(204)
-    expect(res.body).toEqual({})
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ success: true })
     expect(mockAdd).toHaveBeenCalledTimes(1)
   })
 
-  test('204 — swipe válido (dislike)', async () => {
+  test('200 — swipe válido (dislike)', async () => {
     const res = await request(app)
       .post('/api/swipe')
       .set('Authorization', 'Bearer fake-token')
       .send({ ...validBody, action: 'dislike' })
 
-    expect(res.status).toBe(204)
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ success: true })
     expect(mockAdd).toHaveBeenCalledTimes(1)
   })
 

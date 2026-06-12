@@ -1,6 +1,7 @@
 # Secrets — nunca commitear ningún .env real
 *.env
 *.env.*
+*.env.local*
 !*.env.example
 .DS_Store
 firebase-debug.log
