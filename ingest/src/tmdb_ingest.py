@@ -1,9 +1,12 @@
+import sys
 import time
 from datetime import datetime, timedelta, timezone
 import requests
 import firebase_admin
 from firebase_admin import credentials, firestore
 from config import get_tmdb_api_key
+
+sys.stdout.reconfigure(encoding='utf-8')
 
 TMDB_BASE = "https://api.themoviedb.org/3"
 TMDB_ATTRIBUTION = "This product uses the TMDB API but is not endorsed or certified by TMDB."
@@ -82,15 +85,18 @@ class TMDBClient:
         print(f"[TMDB] {len(candidates)} unique candidates ({len(popular)} popular + {len(top_rated)} top_rated)")
 
         # Skip reimport: saltar películas ya sincronizadas en los últimos 7 días
-        seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
-        recent_docs = db.collection("content").where("type", "==", "movie").where("updated_at", ">=", seven_days_ago).stream()
-        recent_tmdb_ids = {doc.to_dict().get("tmdb_id") for doc in recent_docs if doc.to_dict().get("tmdb_id")}
-        if recent_tmdb_ids:
-            skipped = len(candidates)
-            candidates = [m for m in candidates if m["id"] not in recent_tmdb_ids]
-            skipped -= len(candidates)
-            if skipped:
-                print(f"[TMDB] Skipped {skipped} recently synced movies")
+        try:
+            seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+            recent_docs = db.collection("content").where("type", "==", "movie").where("updated_at", ">=", seven_days_ago).stream()
+            recent_tmdb_ids = {doc.to_dict().get("tmdb_id") for doc in recent_docs if doc.to_dict().get("tmdb_id")}
+            if recent_tmdb_ids:
+                skipped = len(candidates)
+                candidates = [m for m in candidates if m["id"] not in recent_tmdb_ids]
+                skipped -= len(candidates)
+                if skipped:
+                    print(f"[TMDB] Skipped {skipped} recently synced movies")
+        except Exception as e:
+            print(f"[TMDB] Skip reimport no disponible (primera vez?): {e}")
 
         items = []
         content_ref = db.collection("content") # Referencia a la colección unificada de Firestore
