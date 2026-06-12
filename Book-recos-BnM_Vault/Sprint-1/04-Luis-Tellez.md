@@ -276,12 +276,12 @@ Solo decirme la línea exacta para agregar en app.js (no modificarlo tú, André
 
 ### ✅ Checklist Fase 2
 
-- [ ] `backend/src/routes/feed.js` — affinity plana (1.2) **reemplazada** por `buildGenreAffinity(swipeData)` cuando ≥10 swipes
-- [ ] `backend/src/routes/search.js` — `GET /api/search?q=&type=` funcional con sanitización
-- [ ] Coordinado con Manuel: campo `titleLower` en ingest + `buildGenreAffinity` exportado en `scoring.js`
-- [ ] Coordinado con Andrés: línea `/api/search` agregada a `app.js`
-- [ ] Tests de swipe: cambiados de **204** a **200** `{success:true}` (ya fue cambiado en el código)
-- [ ] Tests feed con affinity (mockear `buildGenreAffinity`)
+- [x] `backend/src/routes/feed.js` — affinity plana (1.2) **reemplazada** por `buildGenreAffinity(swipeData)` cuando ≥10 swipes
+- [x] `backend/src/routes/search.js` — `GET /api/search?q=&type=` funcional con sanitización
+- [x] Coordinado con Manuel: campo `titleLower` en ingest + `buildGenreAffinity` exportado en `scoring.js`
+- [x] Coordinado con Andrés: línea `/api/search` agregada a `app.js`
+- [x] Tests de swipe: cambiados de **204** a **200** `{success:true}` (ya fue cambiado en el código)
+- [x] Tests feed con affinity (mockear `buildGenreAffinity`)
 
 ---
 
@@ -437,10 +437,10 @@ No tocar app.js (es de Andrés). No tocar scoring.js (es de Manuel).
 
 ### ✅ Checklist Seguridad Luis
 
-- [ ] SEC-L-01: IDOR bloqueado en /api/feed — probado con userId de otro usuario → 403
-- [ ] SEC-L-01: IDOR bloqueado en /api/swipe — probado con userId de otro usuario → 403
-- [ ] SEC-L-02: Sanitización en /api/search — probado con `<script>` y caracteres especiales → no falla
-- [ ] SEC-L-03: Todos los endpoints responden 401 sin token
-- [ ] SEC-L-04: Ningún 500 expone stack trace o paths internos
-- [ ] SEC-L-05: /api/swipe devuelve 429 después de 30 requests/min
-- [ ] DevLog actualizado con hallazgos de seguridad
+- [x] SEC-L-01: IDOR bloqueado en /api/feed — probado con userId de otro usuario → 403
+- [x] SEC-L-01: IDOR bloqueado en /api/swipe — probado con userId de otro usuario → 403
+- [x] SEC-L-02: Sanitización en /api/search — probado con `<script>` y caracteres especiales → no falla
+- [x] SEC-L-03: Todos los endpoints responden 401 sin token
+- [x] SEC-L-04: Ningún 500 expone stack trace o paths internos
+- [x] SEC-L-05: /api/swipe devuelve 429 después de 30 requests/min
+- [x] DevLog actualizado con hallazgos de seguridad

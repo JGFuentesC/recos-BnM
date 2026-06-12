@@ -136,12 +136,12 @@ describe('POST /api/collections', () => {
     expect(res.body.collectionId.length).toBeGreaterThan(0)
   })
 
-  test('duplicado (mismo contentId + userId) -> 409', async () => {
+  test('duplicado (mismo contentId + userId) -> 201 alreadySaved', async () => {
     const payload = { userId: USER, contentId: 'm1', contentType: 'movie' }
     await request(app).post('/api/collections').set(...bearer(USER)).send(payload)
     const res = await request(app).post('/api/collections').set(...bearer(USER)).send(payload)
-    expect(res.status).toBe(409)
-    expect(res.body.error).toBe('already_exists')
+    expect(res.status).toBe(201)
+    expect(res.body.alreadySaved).toBe(true)
   })
 
   test('falta contentId -> 400', async () => {
