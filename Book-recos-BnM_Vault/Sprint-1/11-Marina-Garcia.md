@@ -194,3 +194,105 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] "↗ Compartir" → Web Share API con fallback
 - [ ] Integrado: tocar ContentCard abre el sheet
 - [ ] Probado en móvil (gestos táctiles)
+
+---
+
+## 🧪 QA Physical Testing — Tu asignación (Jun 13–15, 2026)
+
+> **Eres parte del equipo de QA/Testing.** Cubres las secciones más complejas: DetailSheet, seguridad de Firestore, PWA y casos borde. Usa `Book-recos-BnM_Vault/PHYSICAL_TEST_VALIDATION.md` para documentar resultados.
+>
+> **Ejecutar en:** Chrome DevTools con responsive 375px (iPhone SE) + modo avión para las pruebas de PWA.
+
+### 📋 Tus secciones asignadas: 34 casos
+
+---
+
+#### Sección 6 — HU4.1 DetailSheet (16 casos: D-01 a D-16)
+
+**Prerequisito:** estar en /feed con tarjetas cargadas.
+
+```
+☐ D-01: Tocar (tap) tarjeta sin arrastrar → bottom sheet sube desde abajo con animación suave (300ms ease-out)
+☐ D-02: Al abrir el sheet → spinner de carga visible mientras obtiene detalle
+☐ D-03: Esperar que cargue → aparece: portada (16:9 movie / 3:4 book), badge tipo, título, ⭐ rating, año, chips géneros, sinopsis completa
+☐ D-04: Revisar sección "Director:" o "Autor:" → nombre correcto según el tipo
+☐ D-05: Abrir detalle de película → sección "Disponible en:" con plataformas OR texto "No hay información de streaming disponible"
+☐ D-06: Abrir detalle de libro → NO aparece sección "Disponible en:"
+☐ D-07: Ver los 3 botones en la parte inferior → "✕ No me interesa" (gris), "💾 Guardar" (verde), "↗ Compartir" (azul) — todos visibles sin scroll
+☐ D-08: Presionar "✕ No me interesa" → sheet se cierra con animación (200ms), tarjeta desaparece del deck
+☐ D-09: Presionar "💾 Guardar" → toast verde "¡Guardado!" y sheet se cierra
+☐ D-10: Verificar en Firestore tras Guardar → doc en "collections" con userId, contentId, listName: "Guardados"
+☐ D-11: Presionar Guardar en ítem ya guardado (409) → NO muestra error, toast "¡Guardado!" igual
+☐ D-12: Presionar "↗ Compartir" en móvil → menú nativo de compartir del dispositivo
+☐ D-13: Presionar "↗ Compartir" en desktop (sin Web Share API) → toast "Link copiado"
+☐ D-14: Tocar el overlay oscuro fuera del sheet → sheet se cierra con animación slide-down
+☐ D-15: Hacer scroll dentro del sheet en contenido largo → sheet hace scroll internamente sin cerrarse
+☐ D-16: Abrir el sheet y luego hacer swipe en el deck → stack de swipe intacto al cerrar el sheet
+```
+
+---
+
+#### Sección 9 — Firestore Seguridad (3 casos: FS-01 a FS-03)
+
+**Prerequisito:** tener 2 cuentas de prueba distintas. Token del usuario A.
+
+```
+☐ FS-01: GET /api/collections?userId={otro_uid} con token del usuario A → HTTP 403 o array vacío
+☐ FS-02: DELETE /api/collections/{id_de_otro} con token del usuario A → HTTP 403 o 404
+☐ FS-03: Firebase Console → intentar escribir en "content" directamente (sin credenciales de ingest) → rechazado por reglas
+```
+
+> ⚠️ FS-01 y FS-02 verifican aislamiento de datos entre usuarios. Un fallo aquí es bug de ALTA severidad.
+
+---
+
+#### Sección 10 — PWA / Service Worker (5 casos: W-01 a W-05)
+
+**Ejecutar en Chrome desktop o Chrome Android.**
+
+```
+☐ W-01: Chrome mobile/desktop → revisar si aparece banner "Instalar app" o opción "Añadir a pantalla de inicio"
+☐ W-02: Instalar la PWA → abre desde ícono del home screen sin barra del browser (modo standalone)
+☐ W-03: Navegar por la app → activar modo avión → shell de la app (login/feed) carga desde caché
+☐ W-04: Chrome DevTools → Application → Service Workers → SW de sw.js está activo y registrado
+☐ W-05: Chrome DevTools → Application → Manifest → manifest.json válido, nombre "recos-BnM", íconos presentes
+```
+
+---
+
+#### Sección 12 — Casos borde y estrés (10 casos: CE-01 a CE-10)
+
+```
+☐ CE-01: App en pantalla 375px (iPhone SE) → todo el contenido legible y usable sin scroll horizontal
+☐ CE-02: Tarjeta con sinopsis >200 chars en ContentCard → truncada a 3 líneas con "..." (CSS line-clamp)
+☐ CE-03: Tarjeta con >3 géneros (5 géneros) → solo se muestran 3 + chip "+2"
+☐ CE-04: Tarjeta sin imagen de portada (cover: null) → placeholder con gradiente y título centrado
+☐ CE-05: Película sin watchProviders → DetailSheet muestra "No hay información de streaming disponible" (cursiva)
+☐ CE-06: Swipe muy rápido de varias tarjetas seguidas → sin duplicados, sin crash, índice avanza correctamente
+☐ CE-07: Cerrar y reabrir DetailSheet rápidamente (doble tap) → NO se abren dos sheets simultáneos
+☐ CE-08: Desconectar red durante swipe (POST /api/swipe falla) → swipe ocurre visualmente igual, app no se traba
+☐ CE-09: Sesión de Google expirada (token vencido) → app redirige a /login automáticamente
+☐ CE-10: Ingresar a /mock-feed sin autenticación → la página carga (es pública, no tiene ProtectedRoute)
+```
+
+---
+
+### 📝 Cómo registrar bugs
+
+Cuando un caso falla:
+
+1. Marca con ❌ en `PHYSICAL_TEST_VALIDATION.md`
+2. Registra en §14:
+```
+| BUG-XXX | NEW | Sección 6 DetailSheet | D-07 | [descripción] | Alta/Media/Baja | — | Marina |
+```
+3. Abre Claude Code con el prompt del §14
+
+### ✅ Checklist QA Marina
+
+- [ ] Sección 6 DetailSheet: 16/16 casos ejecutados y documentados
+- [ ] Sección 9 Firestore Security: 3/3 casos ejecutados
+- [ ] Sección 10 PWA/SW: 5/5 casos ejecutados
+- [ ] Sección 12 Casos borde: 10/10 casos ejecutados
+- [ ] Bugs encontrados registrados en §14
+- [ ] Resumen completado en §15A (columnas DetailSheet + Firestore + PWA + Casos borde)
