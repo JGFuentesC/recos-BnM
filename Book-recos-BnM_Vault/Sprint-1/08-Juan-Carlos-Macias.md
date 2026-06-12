@@ -160,3 +160,321 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `frontend/src/contexts/FeedContext.jsx` — `active_feed` global
 - [ ] Redirect a /feed al terminar onboarding
 - [ ] Se ve bien en 375px de ancho
+
+---
+
+## 🚀 Fase 2 — Buscador de Contenido (Jun 13–15, 2026)
+
+> **Feature P1 de Fase 2:** Buscador de contenido. Los usuarios podrán buscar directamente por título, autor o director en lugar de solo hacer swipe.
+
+### 🎯 Tu misión Fase 2
+
+**Tarea 1 — Pantalla `Search.jsx` (frontend del buscador):**
+
+Crear `frontend/src/pages/Search.jsx`:
+
+```javascript
+// frontend/src/pages/Search.jsx
+import { useState, useCallback } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import ContentCard from '../components/ContentCard'
+
+export default function Search() {
+  const { currentUser } = useAuth()
+  const [query,   setQuery]   = useState('')
+  const [type,    setType]    = useState('all')  // 'all' | 'movie' | 'book'
+  const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState(null)
+
+  const handleSearch = useCallback(async (q, t) => {
+    if (!q || q.trim().length < 2) return
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const token = await currentUser.getIdToken()
+      const params = new URLSearchParams({ q: q.trim() })
+      if (t && t !== 'all') params.set('type', t)
+      
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/search?${params}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (!res.ok) throw new Error('Error en búsqueda')
+      setResults(await res.json())
+    } catch (err) {
+      setError('No se pudo realizar la búsqueda. Intenta de nuevo.')
+    } finally {
+      setLoading(false)
+    }
+  }, [currentUser])
+
+  return (
+    <div style={{ padding: '16px', maxWidth: '480px', margin: '0 auto' }}>
+      {/* Barra de búsqueda */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+        <input
+          type="search"
+          placeholder="Buscar película, libro, autor..."
+          value={query}
+          onChange={e => {
+            setQuery(e.target.value)
+            if (e.target.value.length >= 2) handleSearch(e.target.value, type)
+          }}
+          style={{ flex: 1, padding: '10px 14px', borderRadius: '24px',
+                   border: '1px solid #ddd', fontSize: '16px' }}
+        />
+      </div>
+      
+      {/* Filtros de tipo */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        {['all', 'movie', 'book'].map(t => (
+          <button
+            key={t}
+            onClick={() => { setType(t); handleSearch(query, t) }}
+            style={{ padding: '6px 16px', borderRadius: '16px',
+                     background: type === t ? '#ff571a' : '#f0f0f0',
+                     color: type === t ? 'white' : '#333',
+                     border: 'none', cursor: 'pointer', fontSize: '14px' }}
+          >
+            {t === 'all' ? 'Todos' : t === 'movie' ? '🎬 Películas' : '📚 Libros'}
+          </button>
+        ))}
+      </div>
+      
+      {/* Resultados */}
+      {loading && <p style={{ textAlign: 'center', color: '#888' }}>Buscando...</p>}
+      {error   && <p style={{ textAlign: 'center', color: '#e53e3e' }}>{error}</p>}
+      {!loading && results.length === 0 && query.length >= 2 && (
+        <p style={{ textAlign: 'center', color: '#888' }}>Sin resultados para "{query}"</p>
+      )}
+      
+      <div style={{ display: 'grid', gap: '12px' }}>
+        {results.map(item => (
+          <ContentCard
+            key={item.contentId}
+            {...item}
+            onClick={() => {/* integrar DetailSheet si está disponible */}}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+**Tarea 2 — Agregar ruta `/search` y tab de búsqueda:**
+
+La ruta `/search` va en `App.jsx` (es tuyo según CLAUDE.md). También agregar un ícono de búsqueda 🔍 en `TabSelector.jsx` o como tab adicional en `BottomNav.jsx` de Diana.
+
+Opciones:
+- A) Agregar como tercer tab en `TabSelector.jsx` (más visible)
+- B) Pedir a Diana que agregue ícono de búsqueda en `BottomNav.jsx` (más consistente con el patrón actual)
+
+**Recomendación**: opción B — coordinar con Diana.
+
+**Tarea 3 — Agregar `VITE_API_URL` al `.env.local`:**
+
+```bash
+# frontend/.env.local
+VITE_API_URL=http://localhost:3001  # desarrollo
+# En producción: URL de Cloud Run (Germán la confirma)
+```
+
+Verificar que `VITE_API_URL` está en GitHub Secrets como secret del workflow de CI.
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Juan Carlos Macías, responsable de Onboarding y TabSelector.
+
+CONTEXTO: Luis Téllez va a crear backend/src/routes/search.js con el endpoint GET /api/search?q=&type=
+La URL base del backend está en import.meta.env.VITE_API_URL.
+Ya existe <ContentCard /> en frontend/src/components/ContentCard.jsx con props: contentId, title, cover, genres, rating, synopsis, type, onClick.
+Ya existe useAuth() en frontend/src/contexts/AuthContext.jsx.
+
+TAREA 1 — Crear frontend/src/pages/Search.jsx
+Pantalla de búsqueda mobile-first con:
+- Input de búsqueda (dispara búsqueda automáticamente cuando hay ≥2 caracteres, con debounce de 300ms)
+- 3 chips de filtro tipo: "Todos" / "🎬 Películas" / "📚 Libros"
+- Lista de resultados usando <ContentCard /> en formato compacto (altura ~120px, no 75vh)
+- Estado vacío: "Busca una película, libro, autor o director"
+- Estado sin resultados: "Sin resultados para '{query}'"
+- Estado de carga: spinner o texto "Buscando..."
+- Manejo de error: "No se pudo realizar la búsqueda"
+
+El fetch va a GET ${import.meta.env.VITE_API_URL}/api/search con:
+  - Header Authorization: Bearer {await currentUser.getIdToken()}
+  - Query params: q={query} y type={type} (si no es 'all')
+
+TAREA 2 — Agregar debounce al input de búsqueda
+Usar un hook personalizado useDebounce(value, delay=300):
+  - Solo dispara el fetch cuando el usuario deja de escribir por 300ms
+  - Cancela la búsqueda anterior si el usuario sigue escribiendo
+
+TAREA 3 — Registrar ruta /search en App.jsx
+Agregar: <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+(Solo modificar App.jsx para agregar esta ruta)
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] `frontend/src/pages/Search.jsx` — búsqueda funcional con debounce
+- [ ] Filtros de tipo: Todos / Películas / Libros
+- [ ] Resultados usando `<ContentCard />` compacto
+- [ ] Ruta `/search` registrada en `App.jsx`
+- [ ] `VITE_API_URL` en `.env.local` y coordinado con Germán para GitHub Secrets
+- [ ] Coordinado con Diana: ícono de búsqueda en `BottomNav.jsx`
+
+---
+
+## 🔐 Seguridad — Auditoría y Corrección (Jun 14, 2026)
+
+> **Tu área de ownership es:** `frontend/src/pages/Search.jsx`, `frontend/src/pages/Onboarding.jsx`, `frontend/src/components/TabSelector.jsx`, `frontend/src/contexts/FeedContext.jsx`
+> Ejecuta esta auditoría el sábado ANTES de abrir el PR de Fase 2. Si encuentras algo, corrígelo en el mismo PR.
+
+### Vulnerabilidades a revisar y testear
+
+#### SEC-JC-01 — XSS en `Search.jsx` (Prioridad ALTA)
+
+**Qué es:** Si los resultados de la API se renderizan usando `dangerouslySetInnerHTML` o concatenación de strings en el DOM, un atacante podría inyectar HTML/JS malicioso.
+
+**Verificación:**
+1. Busca en `Search.jsx` cualquier uso de `dangerouslySetInnerHTML`
+2. Busca en `ContentCard.jsx` (Edgar) lo mismo
+3. Verifica que los resultados se pasan como props al componente (no se insertan como HTML crudo)
+
+```javascript
+// ❌ PELIGROSO — nunca hacer esto:
+<div dangerouslySetInnerHTML={{ __html: item.title }} />
+<div dangerouslySetInnerHTML={{ __html: item.synopsis }} />
+
+// ✅ CORRECTO — React escapa el contenido automáticamente:
+<div>{item.title}</div>
+<p>{item.synopsis}</p>
+```
+
+**Fix si encuentras `dangerouslySetInnerHTML`:**
+Reemplazar por la versión con JSX directo. React escapa todo por defecto.
+
+---
+
+#### SEC-JC-02 — Rutas protegidas sin auth (Prioridad ALTA)
+
+**Qué es:** `/search`, `/onboarding` y cualquier ruta que crees deben redirigir a `/login` si el usuario no está autenticado.
+
+**Verificación** (hacerlo en el browser):
+```
+1. Cerrar sesión en la app (logout)
+2. Navegar manualmente a:
+   - /search       → debe redirigir a /login
+   - /onboarding   → debe redirigir a /login
+   - /feed         → debe redirigir a /login
+3. Si CUALQUIERA carga sin estar logueado → brecha de seguridad
+```
+
+**Fix en App.jsx si alguna ruta no está protegida:**
+```jsx
+// Verificar que TODAS las rutas privadas usan <ProtectedRoute>
+<Route path="/search"     element={<ProtectedRoute><Search /></ProtectedRoute>} />
+<Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+// ⚠️ Coordinar con Andrés si necesitas que él haga el cambio en App.jsx
+```
+
+---
+
+#### SEC-JC-03 — Datos sensibles en URL o LocalStorage (Prioridad MEDIA)
+
+**Qué es:** El token de Firebase no debe aparecer en la URL ni guardarse en `localStorage` (es vulnerable a XSS). Firebase lo guarda automáticamente en `IndexedDB`.
+
+**Verificación:**
+```javascript
+// Abrir DevTools → Application → Storage
+
+// 1. Local Storage → buscar cualquier key que contenga "token", "uid", "user", "auth"
+//    → Si hay algo → ES UN PROBLEMA
+
+// 2. URL bar → asegurarse de que el query de búsqueda no incluye el token:
+//    Correcto: /search (token va en el header Authorization, no en la URL)
+//    Incorrecto: /search?token=eyJ...
+
+// 3. Session Storage → mismo check que Local Storage
+```
+
+**Fix si encuentras tokens en localStorage:**
+```javascript
+// ❌ Nunca hacer esto:
+localStorage.setItem('token', await currentUser.getIdToken())
+
+// ✅ Correcto — obtener el token fresco en cada request:
+const token = await currentUser.getIdToken()
+fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+```
+
+---
+
+#### SEC-JC-04 — Input de búsqueda no expone datos de otros usuarios (Prioridad MEDIA)
+
+**Qué es:** La pantalla de búsqueda no debe mostrar el historial de búsqueda de otros ni exponer IDs de usuarios en la URL.
+
+**Verificación:**
+```
+1. Abre la app con el usuario A → busca "Harry Potter"
+2. Copia la URL de la página de búsqueda
+3. Cierra sesión → inicia sesión con usuario B
+4. Pega la URL copiada
+5. Esperado: la app muestra la pantalla vacía del buscador (no los resultados del usuario A)
+6. Los resultados vienen de la API con el token del usuario activo, no de la URL
+```
+
+---
+
+#### SEC-JC-05 — Dependencias del frontend con vulnerabilidades conocidas (Prioridad MEDIA)
+
+**Verificación:**
+```bash
+cd frontend && npm audit --audit-level=high
+# Si hay HIGH o CRITICAL → documentarlos y avisar a Andrés para que ejecute npm audit fix
+```
+
+**Nota:** La corrección la hace Andrés (dueño del setup de deps). Tu rol es detectar y reportar.
+
+---
+
+### 🤖 Prompt para Claude Code — Auditoría de seguridad frontend
+
+```
+Proyecto: Recos-BnM. Soy Juan Carlos Macías, dueño de:
+- frontend/src/pages/Search.jsx (Fase 2, nuevo)
+- frontend/src/pages/Onboarding.jsx
+- frontend/src/components/TabSelector.jsx
+- frontend/src/contexts/FeedContext.jsx
+
+Necesito auditar vulnerabilidades de seguridad en mis componentes. Haz lo siguiente:
+
+1. Lee Search.jsx y busca cualquier uso de dangerouslySetInnerHTML o concatenación de strings en el DOM (SEC-JC-01)
+   - Si encuentras: reemplazar por JSX directo ({variable})
+
+2. Lee Onboarding.jsx y FeedContext.jsx: verificar que no hay datos de usuario (uid, email, token) guardados en localStorage o sessionStorage (SEC-JC-03)
+
+3. En Search.jsx: confirmar que el parámetro q de búsqueda NO aparece en la URL como query param (no debe ser /search?q=algo, la búsqueda es solo estado local de React) (SEC-JC-04)
+
+4. Ejecuta: cd frontend && npm audit --audit-level=high
+   - Documentar el output sin corregir (la corrección es de Andrés González)
+
+5. Verificar en App.jsx que /search usa <ProtectedRoute> (solo verificar, no modificar si ya está correcto) (SEC-JC-02)
+
+Por cada hallazgo: mostrar el código ANTES y DESPUÉS del fix (si aplica).
+Generar mini reporte al final: hallazgos encontrados y estado (corregido / reportado a responsable).
+No tocar App.jsx ni ContentCard.jsx (no son tuyos).
+```
+
+### ✅ Checklist Seguridad Juan Carlos
+
+- [ ] SEC-JC-01: `Search.jsx` sin `dangerouslySetInnerHTML` — revisado visualmente ✓
+- [ ] SEC-JC-02: `/search` y `/onboarding` redirigen a `/login` sin auth — probado en browser ✓
+- [ ] SEC-JC-03: No hay tokens/uid en `localStorage` — revisado en DevTools → Application ✓
+- [ ] SEC-JC-04: URL de búsqueda no expone query ni datos de sesión ✓
+- [ ] SEC-JC-05: `npm audit` ejecutado — findings reportados a Andrés ✓
+- [ ] DevLog actualizado con hallazgos de seguridad

@@ -67,4 +67,22 @@ function computeScore(items, genreAffinity = {}) {
     .sort((a, b) => b.score - a.score);
 }
 
-module.exports = { normalize, computeScore, scoreCandidates: computeScore };
+function buildGenreAffinity(swipes) {
+  const byGenre = {};
+  swipes.forEach(({ genres = [], action }) => {
+    genres.forEach((g) => {
+      if (!byGenre[g]) byGenre[g] = { likes: 0, total: 0 };
+      byGenre[g].total++;
+      if (action === "like") byGenre[g].likes++;
+    });
+  });
+  const affinity = {};
+  for (const [genre, { likes, total }] of Object.entries(byGenre)) {
+    if (total >= 5) {
+      affinity[genre] = +(0.8 + (likes / total) * 0.8).toFixed(2);
+    }
+  }
+  return affinity;
+}
+
+module.exports = { normalize, computeScore, scoreCandidates: computeScore, buildGenreAffinity };
