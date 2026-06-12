@@ -165,3 +165,138 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 - [ ] `docs/SCHEMA.md` — 4 colecciones documentadas
 - [ ] `firebase emulators:start` arranca sin errores
 - [ ] PR abierto y el equipo notificado
+
+---
+
+## 🚀 Fase 2 — Engagement (Jun 13–15, 2026)
+
+> **Objetivo:** Dejar la infraestructura lista para que el scoring de afinidad y las listas compartibles funcionen en producción.
+
+### 🎯 Tu misión Fase 2
+
+**Prioridad 0 — Deploy Fase 1 a producción (Jueves 12 jun, URGENTE):**
+
+```bash
+# Publicar reglas e índices a Firestore producción
+# ⚠️ Las rutas ya están mapeadas en firebase.json:
+#    "rules": "src/firestore/firestore.rules"
+#    "indexes": "src/firestore/firestore.indexes.json"
+# El comando usa firebase.json automáticamente — no hay que especificar rutas manualmente.
+firebase deploy --only firestore:rules,firestore:indexes
+
+# Verificar que las reglas estén activas (no en allow read/write: if true)
+# Firebase Console → Firestore → Rules → confirmar fecha de publicación
+```
+
+**Tarea 1 — Dos nuevos índices en `src/firestore/firestore.indexes.json` (Fase 2):**
+
+> ⚠️ Editar **`src/firestore/firestore.indexes.json`** (NO el `firestore.indexes.json` de la raíz — ese es una copia antigua). El `firebase.json` apunta al de `src/firestore/`.
+
+**Índice A — Swipes para `buildGenreAffinity` (Manuel lo necesita):**
+```json
+{
+  "collectionGroup": "swipes",
+  "queryScope": "COLLECTION",
+  "fields": [
+    { "fieldPath": "userId",      "order": "ASCENDING" },
+    { "fieldPath": "contentType", "order": "ASCENDING" },
+    { "fieldPath": "action",      "order": "ASCENDING" }
+  ]
+}
+```
+
+**Índice B — Content por `titleLower` para búsqueda (Luis + Juan Carlos lo necesitan):**
+```json
+{
+  "collectionGroup": "content",
+  "queryScope": "COLLECTION",
+  "fields": [
+    { "fieldPath": "titleLower", "order": "ASCENDING" }
+  ]
+}
+```
+
+Después de agregar ambos índices, el archivo `src/firestore/firestore.indexes.json` quedará con **4 índices** (los 2 existentes + estos 2 nuevos).
+
+**Tarea 2 — Campo `shareToken` en schema de collections (Fase 2 listas compartibles):**
+
+Christian Ruiz va a agregar `shareToken` y `isPublic` a la colección `collections`. Actualizar `docs/SCHEMA.md` con los nuevos campos opcionales:
+
+```
+collections/{collectionId}
+  ...campos existentes...
+  shareToken: string (opcional, generado al compartir)
+  isPublic: boolean (default: false)
+```
+
+Actualizar también las reglas para permitir lectura pública de colecciones con `isPublic == true`:
+
+```javascript
+match /collections/{collectionId} {
+  // Lectura pública si la colección tiene shareToken
+  allow read: if resource.data.isPublic == true
+           || (request.auth != null && resource.data.userId == request.auth.uid);
+  allow write: if request.auth != null
+            && (resource == null || resource.data.userId == request.auth.uid);
+}
+```
+
+**Tarea 3 — Campo `fcmToken` en schema de users (Fase 2 notificaciones):**
+
+Germán va a guardar el FCM token de cada usuario para notificaciones push. Agregar campo al schema:
+
+```
+users/{userId}
+  ...campos existentes...
+  fcmToken: string (opcional, guardado cuando el usuario acepta notificaciones)
+  notificationsEnabled: boolean (default: false)
+```
+
+**Tarea 4 — Deploy producción verificación final:**
+
+```bash
+# Después de deploy, verificar en GCP Console:
+# GCP-01: Firebase Auth → Email/Password y Google habilitados
+# GCP-02: Firestore → colecciones users, content, swipes, collections existen
+# GCP-03: Firestore → Indexes → índices "Enabled"
+# GCP-04: Firestore → Rules → fecha de publicación reciente
+```
+
+### 🤖 Prompt Fase 2 para Claude Code
+
+```
+Proyecto: Recos-BnM. Soy Israel Pérez, responsable de Firestore.
+Rutas reales en el repo:
+  - Reglas:  src/firestore/firestore.rules
+  - Índices: src/firestore/firestore.indexes.json
+  (firebase.json ya apunta a estas rutas — no tocar la raíz firestore.indexes.json)
+
+TAREA 1 — Agregar 2 nuevos índices a src/firestore/firestore.indexes.json:
+
+Índice A — Swipes (para buildGenreAffinity de Manuel):
+  Colección "swipes", campos: userId (ASC) + contentType (ASC) + action (ASC)
+
+Índice B — Content por titleLower (para GET /api/search de Luis):
+  Colección "content", campos: titleLower (ASC)
+  (Simple field index — permite range queries: startAt(q).endAt(q+''))
+
+TAREA 2 — Actualizar src/firestore/firestore.rules para permitir lectura pública de collections con isPublic==true:
+La regla debe quedar: allow read si isPublic==true OR (autenticado Y es el dueño).
+La regla write permanece igual: solo el dueño puede escribir.
+
+TAREA 3 — Actualizar docs/SCHEMA.md agregando los nuevos campos opcionales:
+- collections: shareToken (string, opcional), isPublic (boolean, default false)
+- users: fcmToken (string, opcional), notificationsEnabled (boolean, default false)
+
+Después de cada cambio, ejecutar: firebase deploy --only firestore:rules,firestore:indexes
+y verificar que no hay errores en el output.
+```
+
+### ✅ Checklist Fase 2
+
+- [ ] `src/firestore/firestore.rules` — regla de lectura pública para `isPublic == true`
+- [ ] `src/firestore/firestore.indexes.json` — índice swipes: `userId + contentType + action` (A)
+- [ ] `src/firestore/firestore.indexes.json` — índice content: `titleLower ASC` (B)
+- [ ] `docs/SCHEMA.md` — campos `shareToken`, `isPublic`, `fcmToken`, `notificationsEnabled`
+- [ ] `firebase deploy --only firestore:rules,firestore:indexes` exitoso en producción
+- [ ] GCP-01 a GCP-05 verificados en consola
