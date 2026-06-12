@@ -333,8 +333,9 @@ TAREA 4 — Tests de buildGenreAffinity en backend/tests/
 ### ✅ Checklist Fase 2
 
 - [ ] Ingest ejecutado en **producción** (no emulador) — ≥500 docs en `content` prod
-- [ ] `backend/src/services/scoring.js` — agrega `buildGenreAffinity` (NO reescribir `computeScore`)
-- [ ] `module.exports` incluye `buildGenreAffinity` en el mismo archivo
-- [ ] `ingest/src/tmdb_ingest.py` — campo `titleLower` en payload de película
-- [ ] Libros ingest — campo `titleLower` en payload de libro
-- [ ] Tests de `buildGenreAffinity` passing
+- [x] `backend/src/services/scoring.js` — agrega `buildGenreAffinity` (NO reescribir `computeScore`)
+- [x] `module.exports` incluye `buildGenreAffinity` en el mismo archivo
+- [x] `ingest/src/tmdb_ingest.py` — campo `titleLower` en payload de película
+- [x] Libros ingest — campo `titleLower` en payload de libro (`ingest/src/models.py` → `to_firestore_dict`)
+- [x] Tests de `buildGenreAffinity` passing (6/6)
+- [x] Skip de reimport (7 días) — `ingest/src/tmdb_ingest.py`
