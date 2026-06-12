@@ -39,6 +39,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-09-monserrat-detail-integration | 2026-06-09 (sesión 14)]] | Wave 3 frontend: integración de `DetailSheet` en `SwipeDeck.jsx` — import agregado + bloque JSX descomentado. Checklist de entrega completo: SwipeDeck, Feed.jsx, TabSelector, DetailSheet integrados. | Claude Code (claude-sonnet-4-6) + Monserrat Miranda Olivas |
 | [[DevLog/2026-06-10-juan-carlos-security | 2026-06-10 (sesión 15)]] | Security hardening: confirmación de rotación de API keys (TMDB, Google Books, Firebase), eliminación de `jc.env` y `.DS_Store` del tracking git, endurecimiento de `.gitignore`, PR `fix/remove-jc-env` → `main`. Hallazgo: key hardcodeada en HTML de Andrés. | Claude Code (big-pickle) + Juan Carlos Macías |
 | [[DevLog/2026-06-11-manuel-ingest-phase2 | 2026-06-11 (sesión 16)]] | Phase 2 completo: `buildGenreAffinity`, `titleLower`, skip reimport, 6 tests + **Ingest a producción** (552 docs: 300 movies + 250 books), `books_ingest.py` con escritura directa a Firestore, fixes de encoding Windows | Claude Code (big-pickle) + Manuel Serranía |
+| [[DevLog/2026-06-11-edgar-phase2 | 2026-06-11 (sesión 17)]] | Phase 2 PM: auditorías de seguridad movidas al Vault `09_Risk_Governance/` (MEDIUM-05 cerrado), `.gitignore` actualizado con glob patterns, `About.jsx` + `About.module.css` creados (logo TMDB, atribución, 13 integrantes), DevLog completo. Pendiente: Andrés agrega ruta `/about` en `App.jsx`. | Claude Code (claude-sonnet-4-6) + Edgar Coronel Navarrete |
 
 ---
 
