@@ -270,12 +270,15 @@ La ruta `/search` ya está registrada en `App.jsx` por Andrés. Verificar que es
 
 **Tarea 3 — Menú global: `AppLayout.jsx` con `BottomNav` en todas las pantallas (PRD requerimiento):**
 
-> **Problema actual:** `BottomNav` solo aparece en `Library.jsx`. `Feed.jsx` y `Search.jsx` no lo tienen. El PRD (Screen Specs §BottomNav) especifica que debe estar visible en **todas** las pantallas principales.
+> **Problema actual:** `BottomNav` solo aparece en `Library.jsx` (línea 346). `Feed.jsx` y tu `Search.jsx` no lo incluyen. El PRD (Screen Specs §BottomNav) exige que esté visible en **todas** las pantallas principales.
 
-**Paso 1 — Crear `frontend/src/components/AppLayout.jsx`:**
+---
+
+#### Cambio 1 — CREAR archivo nuevo: `frontend/src/components/AppLayout.jsx`
+
+Este archivo no existe. Créalo con exactamente este contenido:
 
 ```jsx
-// frontend/src/components/AppLayout.jsx
 import BottomNav from './BottomNav'
 
 export default function AppLayout({ children }) {
@@ -288,51 +291,81 @@ export default function AppLayout({ children }) {
 }
 ```
 
-> `paddingBottom: 72` evita que el contenido quede oculto detrás del BottomNav (que tiene 64px de alto + margen de seguridad).
+> `BottomNav.jsx` ya existe en la misma carpeta (`frontend/src/components/`) — solo lo importas.
 
-**Paso 2 — Aplicar `AppLayout` en tu propio `Search.jsx`:**
+---
+
+#### Cambio 2 — MODIFICAR `frontend/src/pages/Search.jsx` (tu archivo)
+
+Hay que hacer **2 cambios** en el archivo:
+
+**2a — Agregar el import en la línea 1** (después de los imports existentes):
 
 ```jsx
-// frontend/src/pages/Search.jsx  (al inicio)
+// Agregar esta línea después de la línea 2 (después del import de useAuth):
 import AppLayout from '../components/AppLayout'
-
-export default function Search() {
-  // ... tu código existente ...
-
-  return (
-    <AppLayout>
-      <div style={{ padding: '16px', maxWidth: '480px', margin: '0 auto' }}>
-        {/* ... contenido de Search igual que antes ... */}
-      </div>
-    </AppLayout>
-  )
-}
 ```
 
-**Paso 3 — Coordinar con Andrés González para aplicarlo globalmente en `App.jsx`:**
+**2b — Envolver el return con `<AppLayout>`**
 
-Enviarle este snippet y pedirle que envuelva las rutas protegidas principales:
+El `return` actual (línea 227) es:
+```jsx
+return (
+  <div style={s.page}>
+    ...
+  </div>
+)
+```
+
+Cámbialo a:
+```jsx
+return (
+  <AppLayout>
+    <div style={s.page}>
+      ...
+    </div>
+  </AppLayout>
+)
+```
+
+> El `paddingBottom: '80px'` que ya tiene `s.page` (línea 24) puede quedarse — no causa problema.
+
+---
+
+#### Cambio 3 — COORDINAR con Andrés González (él modifica `App.jsx`)
+
+Mándale este mensaje con el snippet exacto:
+
+> "Andrés, creé `AppLayout.jsx` en `frontend/src/components/`. Necesito que en `App.jsx` importes el componente y envuelvas las rutas de `/feed`, `/search` y `/library` así:"
 
 ```jsx
-// App.jsx — pedir a Andrés que importe y aplique AppLayout
+// Agregar este import junto a los demás imports de componentes:
 import AppLayout from './components/AppLayout'
 
-// Cada ruta protegida de pantalla principal:
+// Cambiar estas 3 rutas:
 <Route path="/feed"    element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>} />
 <Route path="/search"  element={<ProtectedRoute><AppLayout><Search /></AppLayout></ProtectedRoute>} />
 <Route path="/library" element={<ProtectedRoute><AppLayout><Library /></AppLayout></ProtectedRoute>} />
 ```
 
-> ⚠️ Coordinar también con **Diana Álvarez**: una vez que `AppLayout` sea global, ella debe **eliminar** el `<BottomNav />` que tiene hardcodeado en `Library.jsx` para evitar que aparezca duplicado.
+---
 
-**Paso 4 — Verificar en móvil (375px):**
+#### Cambio 4 — COORDINAR con Diana Álvarez (ella modifica `Library.jsx`)
 
-Checklist visual antes de hacer el PR:
-- [ ] BottomNav visible en `/feed` al scrollear hacia abajo
-- [ ] BottomNav visible en `/search`
-- [ ] BottomNav visible en `/library` (sin duplicarse)
-- [ ] El tab activo se resalta correctamente según la ruta actual (`pathname.startsWith`)
-- [ ] El contenido no queda tapado por el BottomNav (padding correcto)
+Mándale este mensaje:
+
+> "Diana, una vez que Andrés aplique `AppLayout` globalmente en `App.jsx`, el `BottomNav` va a aparecer duplicado en `/library` porque `Library.jsx` ya lo tiene en la línea 346. ¿Puedes eliminar esa línea `<BottomNav />` y el import de la línea 4 (`import BottomNav from '../components/BottomNav'`) cuando Andrés confirme que su cambio está en main?"
+
+---
+
+#### Verificación final antes del PR
+
+Corre `npm run dev` y revisa en el navegador con pantalla de 375px:
+
+- [ ] Navegar a `/search` → el BottomNav aparece fijo abajo
+- [ ] El tab "Buscar" se resalta en naranja en `/search`
+- [ ] El tab "Descubrir" se resalta en naranja en `/feed`
+- [ ] El contenido no queda tapado por el BottomNav al scrollear
 
 **Tarea 4 — Agregar `VITE_API_URL` al `.env.local`:**
 
