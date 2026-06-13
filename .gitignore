@@ -31,3 +31,6 @@ ingest/serviceAccountKey.json
 backend/serviceAccountKey.json
 ingest/serviceAccountKey.json
 serviceAccountKey.json
+
+# Local AI baseline file (never commit)
+ai-project-baseline.md
