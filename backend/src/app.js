@@ -10,7 +10,11 @@ const rateLimit = require('express-rate-limit')
 const auth = require('./middleware/auth')
 const app = express()
 
-app.use(helmet())
+app.use(helmet({
+  crossOriginOpenerPolicy: {
+    policy: 'same-origin-allow-popups',
+  },
+}))
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')
 app.use(cors({
