@@ -8,6 +8,7 @@ import MockFeed from './pages/MockFeed'
 import Onboarding from './pages/Onboarding'
 import Register from './pages/Register'
 import About from './pages/About'
+import Search from './pages/Search'
 import './App.css'
 
 function App() {
@@ -38,6 +39,14 @@ function App() {
           element={
             <ProtectedRoute>
               <LibraryPlaceholder />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
             </ProtectedRoute>
           }
         />
