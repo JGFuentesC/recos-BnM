@@ -155,7 +155,6 @@ export default function Library() {
   useEffect(() => {
     if (!USE_API || !currentUser) return
     const original = window.fetch.bind(window)
-    let showTimer = null
     let hideTimer = null
 
     window.fetch = async (input, init) => {
@@ -168,12 +167,22 @@ export default function Library() {
           headers: { ...(init?.headers ?? {}), Authorization: `Bearer ${token}` },
         })
         if (response.ok && method === 'PATCH') {
-          clearTimeout(showTimer)
-          showTimer = setTimeout(() => {
-            setToast({ msg: '✓ Nota guardada' })
-            clearTimeout(hideTimer)
-            hideTimer = setTimeout(() => setToast(null), 3000)
-          }, 2000)
+          // Sync personalNote back into items so CollectionItem's blur guard
+          // (note === item.personalNote) prevents a duplicate PATCH on next blur.
+          try {
+            const body = JSON.parse(init?.body ?? '{}')
+            const collectionId = url.replace(`${API_BASE}/api/collections/`, '').split('/')[0]
+            if (body.personalNote !== undefined) {
+              setItems((prev) =>
+                prev.map((i) =>
+                  i.collectionId === collectionId ? { ...i, personalNote: body.personalNote } : i
+                )
+              )
+            }
+          } catch {}
+          setToast({ msg: '✓ Nota guardada' })
+          clearTimeout(hideTimer)
+          hideTimer = setTimeout(() => setToast(null), 3000)
         }
         return response
       }
@@ -182,7 +191,6 @@ export default function Library() {
 
     return () => {
       window.fetch = original
-      clearTimeout(showTimer)
       clearTimeout(hideTimer)
     }
   }, [currentUser])
