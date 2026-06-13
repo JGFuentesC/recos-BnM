@@ -45,14 +45,31 @@ router.get('/', authMiddleware, async (req, res) => {
     const prefs = userDoc.exists ? (userDoc.data().prefs || {}) : {}
     const userGenres = prefs.genres || []
 
-    // 2. Consultar colección content filtrada por type (+ géneros si existen)
-    let contentQuery = db.collection('content').where('type', '==', type)
+    // 2. Consultar colección content filtrada por type (+ géneros si existen).
+    // Si no hay resultados por géneros, hacemos fallback a solo type.
+    // Esto evita que el feed de libros quede vacío cuando las preferencias vienen de películas
+    // y los géneros de Google Books no coinciden con los géneros de TMDB.
+    let contentSnap
 
     if (userGenres.length > 0) {
-      contentQuery = contentQuery.where('genres', 'array-contains-any', userGenres)
+      const genreQuery = db
+        .collection('content')
+        .where('type', '==', type)
+        .where('genres', 'array-contains-any', userGenres)
+        .limit(50)
+
+      contentSnap = await genreQuery.get()
     }
 
-    const contentSnap = await contentQuery.limit(50).get()
+    if (!contentSnap || contentSnap.empty) {
+      const fallbackQuery = db
+        .collection('content')
+        .where('type', '==', type)
+        .limit(50)
+
+      contentSnap = await fallbackQuery.get()
+    }
+
     const candidates = contentSnap.docs.map(doc => ({
       contentId: doc.id,
       ...doc.data(),
