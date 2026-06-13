@@ -266,15 +266,75 @@ export default function Search() {
 
 **Tarea 2 — Agregar ruta `/search` y tab de búsqueda:**
 
-La ruta `/search` va en `App.jsx` (es tuyo según CLAUDE.md). También agregar un ícono de búsqueda 🔍 en `TabSelector.jsx` o como tab adicional en `BottomNav.jsx` de Diana.
+La ruta `/search` ya está registrada en `App.jsx` por Andrés. Verificar que está activa y que `BottomNav` la resalta correctamente al navegar a `/search`.
 
-Opciones:
-- A) Agregar como tercer tab en `TabSelector.jsx` (más visible)
-- B) Pedir a Diana que agregue ícono de búsqueda en `BottomNav.jsx` (más consistente con el patrón actual)
+**Tarea 3 — Menú global: `AppLayout.jsx` con `BottomNav` en todas las pantallas (PRD requerimiento):**
 
-**Recomendación**: opción B — coordinar con Diana.
+> **Problema actual:** `BottomNav` solo aparece en `Library.jsx`. `Feed.jsx` y `Search.jsx` no lo tienen. El PRD (Screen Specs §BottomNav) especifica que debe estar visible en **todas** las pantallas principales.
 
-**Tarea 3 — Agregar `VITE_API_URL` al `.env.local`:**
+**Paso 1 — Crear `frontend/src/components/AppLayout.jsx`:**
+
+```jsx
+// frontend/src/components/AppLayout.jsx
+import BottomNav from './BottomNav'
+
+export default function AppLayout({ children }) {
+  return (
+    <div style={{ minHeight: '100vh', paddingBottom: 72 }}>
+      {children}
+      <BottomNav />
+    </div>
+  )
+}
+```
+
+> `paddingBottom: 72` evita que el contenido quede oculto detrás del BottomNav (que tiene 64px de alto + margen de seguridad).
+
+**Paso 2 — Aplicar `AppLayout` en tu propio `Search.jsx`:**
+
+```jsx
+// frontend/src/pages/Search.jsx  (al inicio)
+import AppLayout from '../components/AppLayout'
+
+export default function Search() {
+  // ... tu código existente ...
+
+  return (
+    <AppLayout>
+      <div style={{ padding: '16px', maxWidth: '480px', margin: '0 auto' }}>
+        {/* ... contenido de Search igual que antes ... */}
+      </div>
+    </AppLayout>
+  )
+}
+```
+
+**Paso 3 — Coordinar con Andrés González para aplicarlo globalmente en `App.jsx`:**
+
+Enviarle este snippet y pedirle que envuelva las rutas protegidas principales:
+
+```jsx
+// App.jsx — pedir a Andrés que importe y aplique AppLayout
+import AppLayout from './components/AppLayout'
+
+// Cada ruta protegida de pantalla principal:
+<Route path="/feed"    element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>} />
+<Route path="/search"  element={<ProtectedRoute><AppLayout><Search /></AppLayout></ProtectedRoute>} />
+<Route path="/library" element={<ProtectedRoute><AppLayout><Library /></AppLayout></ProtectedRoute>} />
+```
+
+> ⚠️ Coordinar también con **Diana Álvarez**: una vez que `AppLayout` sea global, ella debe **eliminar** el `<BottomNav />` que tiene hardcodeado en `Library.jsx` para evitar que aparezca duplicado.
+
+**Paso 4 — Verificar en móvil (375px):**
+
+Checklist visual antes de hacer el PR:
+- [ ] BottomNav visible en `/feed` al scrollear hacia abajo
+- [ ] BottomNav visible en `/search`
+- [ ] BottomNav visible en `/library` (sin duplicarse)
+- [ ] El tab activo se resalta correctamente según la ruta actual (`pathname.startsWith`)
+- [ ] El contenido no queda tapado por el BottomNav (padding correcto)
+
+**Tarea 4 — Agregar `VITE_API_URL` al `.env.local`:**
 
 ```bash
 # frontend/.env.local
@@ -323,9 +383,13 @@ Agregar: <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRou
 - [ ] `frontend/src/pages/Search.jsx` — búsqueda funcional con debounce
 - [ ] Filtros de tipo: Todos / Películas / Libros
 - [ ] Resultados usando `<ContentCard />` compacto
-- [ ] Ruta `/search` registrada en `App.jsx`
+- [ ] Ruta `/search` activa y verificada en `App.jsx`
 - [ ] `VITE_API_URL` en `.env.local` y coordinado con Germán para GitHub Secrets
-- [ ] Coordinado con Diana: ícono de búsqueda en `BottomNav.jsx`
+- [ ] **NUEVO** `frontend/src/components/AppLayout.jsx` — wrapper con `<BottomNav />` y `paddingBottom: 72`
+- [ ] **NUEVO** `Search.jsx` envuelto con `<AppLayout>` — BottomNav visible en pantalla de búsqueda
+- [ ] **NUEVO** Coordinado con Andrés: `AppLayout` aplicado globalmente en `App.jsx` para `/feed`, `/search`, `/library`
+- [ ] **NUEVO** Coordinado con Diana: `<BottomNav />` eliminado de `Library.jsx` (evitar duplicado)
+- [ ] **NUEVO** Verificado en móvil 375px — tab activo resaltado según ruta, contenido no tapado
 
 ---
 
@@ -478,3 +542,90 @@ No tocar App.jsx ni ContentCard.jsx (no son tuyos).
 - [ ] SEC-JC-04: URL de búsqueda no expone query ni datos de sesión ✓
 - [ ] SEC-JC-05: `npm audit` ejecutado — findings reportados a Andrés ✓
 - [ ] DevLog actualizado con hallazgos de seguridad
+
+---
+
+## 🚀 Cómo abrir tu PR de Fase 2
+
+> Ejecuta estos comandos desde la raíz del repo una vez que termines todos los cambios.
+
+### Paso 1 — Asegúrate de estar en tu branch de Fase 2
+
+```bash
+# Si no tienes branch de Fase 2 todavía, créalo:
+git checkout -b feat/jc-fase2
+
+# Si ya tienes el branch, solo cámbiate a él:
+git checkout feat/jc-fase2
+```
+
+### Paso 2 — Agrega tus archivos al commit
+
+```bash
+# Solo los archivos que son tuyos:
+git add frontend/src/pages/Search.jsx
+git add frontend/src/components/AppLayout.jsx
+git add frontend/src/pages/Onboarding.jsx        # si lo modificaste
+git add frontend/src/components/TabSelector.jsx   # si lo modificaste
+git add frontend/src/contexts/FeedContext.jsx      # si lo modificaste
+
+# Verifica qué estás por commitear:
+git status
+git diff --staged
+```
+
+### Paso 3 — Haz el commit
+
+```bash
+git commit -m "feat(jc): Search.jsx con debounce + AppLayout con BottomNav global"
+```
+
+### Paso 4 — Sube el branch y abre el PR
+
+```bash
+git push -u origin feat/jc-fase2
+```
+
+Luego en GitHub → [JGFuentesC/recos-BnM](https://github.com/JGFuentesC/recos-BnM/compare) → **Compare & pull request**
+
+**Título del PR:**
+```
+feat(jc/fase2): Search.jsx + AppLayout con BottomNav global
+```
+
+**Descripción del PR (copiar y pegar):**
+```
+## Qué hace este PR
+
+- `Search.jsx`: pantalla de búsqueda con debounce 300ms, filtros Todos/Películas/Libros, resultados con ContentCard
+- `AppLayout.jsx`: wrapper que incluye BottomNav globalmente (paddingBottom: 72px para no tapar contenido)
+- `Search.jsx` envuelto con AppLayout — BottomNav ya visible en /search
+
+## Coordinación requerida (antes de merge)
+
+- [ ] **Andrés González**: aplicar `<AppLayout>` en `App.jsx` para rutas `/feed`, `/search`, `/library`
+- [ ] **Diana Álvarez**: eliminar `<BottomNav />` hardcodeado en `Library.jsx` una vez AppLayout sea global
+
+## Cómo probar
+
+1. `cd frontend && npm run dev`
+2. Ir a `/search` → debe aparecer BottomNav abajo
+3. Tab "Buscar" debe estar resaltado en naranja
+4. Escribir ≥2 caracteres → búsqueda se dispara sola (esperar 300ms)
+5. Filtros Todos / 🎬 Películas / 📚 Libros funcionan
+
+## Archivos modificados
+
+- `frontend/src/pages/Search.jsx`
+- `frontend/src/components/AppLayout.jsx` (nuevo)
+```
+
+### Paso 5 — Asignar revisores
+
+En el PR de GitHub, asignar como reviewer a:
+- **edgarcoroneln** (PM — Edgar Coronel)
+- **JGFuentesC** (repo owner)
+
+---
+
+> 💡 **Nota para el PM (Edgar):** Una vez que Juan Carlos abra el PR, coordinar con Andrés para el snippet de `App.jsx` y con Diana para el cleanup de `Library.jsx`. Esos dos cambios son los que completan el BottomNav global.

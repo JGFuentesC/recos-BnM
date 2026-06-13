@@ -17,7 +17,9 @@ last_updated: "2026-06-05"
 
 ```
 frontend/src/pages/Onboarding.jsx
+frontend/src/pages/Search.jsx
 frontend/src/components/TabSelector.jsx
+frontend/src/components/AppLayout.jsx   ← NUEVO Fase 2: wrapper global con BottomNav
 frontend/src/contexts/FeedContext.jsx
 ```
 
