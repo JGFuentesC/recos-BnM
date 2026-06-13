@@ -11,6 +11,7 @@ const auth = require('./middleware/auth')
 const app = express()
 
 app.use(helmet({
+  contentSecurityPolicy: false,
   crossOriginOpenerPolicy: {
     policy: 'same-origin-allow-popups',
   },
@@ -58,7 +59,15 @@ app.use('/api/content', require('./routes/content'))
 // Wave 2 — Christian Ruiz
 app.use('/api/collections', require('./routes/collections'))
 
+// Serve frontend build — SPA fallback
+const frontendDist = path.resolve(__dirname, '../../frontend/dist')
+app.use(express.static(frontendDist))
+app.use((req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'))
+})
+
+const host = process.env.HOST || '0.0.0.0'
 const port = Number(process.env.PORT || 3001)
-app.listen(port, () => {
-  console.log(`[backend] listening on http://localhost:${port}`)
+app.listen(port, host, () => {
+  console.log(`[backend] listening on http://${host}:${port}`)
 })
