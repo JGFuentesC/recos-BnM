@@ -306,7 +306,7 @@ Usar la colección `docs/Recos-BnM-API-Collection.json`. Obtener token con: Fire
 
 | ID | Estado | Sección | Caso | Descripción del problema | Severidad | Arreglado en | Responsable |
 |----|--------|---------|------|--------------------------|-----------|--------------|-------------|
-| BUG-001 | — | — | — | *(sin bugs aún — completar durante la ejecución)* | — | — | — |
+| BUG-001 | NEW | CI/CD Pipeline | CI-05 | Falla en CI-05: git exit code 128 (bloqueante) | Alta | — | Diana |
 
 ### Prompt para Claude Code al encontrar un bug
 

@@ -170,6 +170,82 @@
           ]
         }
       }
+    },
+    {
+      "name": "Search",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/search?q=query",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "query"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Share Collection",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections/:id/share",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections",
+            ":id",
+            "share"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Shared Collection",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections/share/:token",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections",
+            "share",
+            ":token"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Revoke Collection Share",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/collections/:id/share",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "collections",
+            ":id",
+            "share"
+          ]
+        }
+      }
     }
   ],
   "variable": [

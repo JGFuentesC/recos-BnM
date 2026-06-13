@@ -43,6 +43,7 @@ tags: [devlog, index, moc]
 | [[DevLog/2026-06-12-luis-fase2 | 2026-06-12 (sesión 18)]] | Phase 2: Implementación de búsqueda `/api/search` con degradación graciosa y sanitización (SEC-L-02), lógica de afinidad dinámica en el feed, alineación de tests Jest a verde (54/54 casos), nuevo test suite `search.test.js`. | Claude Code (Gemini 3.5 Flash) + Luis Téllez Domínguez |
 | [[DevLog/2026-06-12-christian-collections-share | 2026-06-12 (sesión 19)]] | Phase 2 backend: 3 endpoints de compartir en `/api/collections` — `POST /:id/share` (shareToken + isPublic), `GET /share/:token` (público, antes de `/:id`), `DELETE /:id/share` (revoca con `FieldValue.delete`). +5 tests (fake Firestore con `limit()` y `FieldValue.delete()`). Verificado con Node: 25/25 en collections, 59/59 en todo el backend. | Claude Code (claude-opus-4-8) + Christian Ruiz Hurtado |
 | [[DevLog/2026-06-12-juan-carlos-search-fase2 | 2026-06-12 (sesión 20)]] | Phase 2 frontend: `Search.jsx` (buscador con debounce 300ms, chips Todos/Películas/Libros, CompactCard, AbortController), ruta `/search` registrada en `App.jsx` con `ProtectedRoute`. Auditoría SEC-JC-01..04 PASS. SEC-JC-05 (`npm audit`) pendiente de ejecución manual. | Claude Code (claude-sonnet-4-6) + Juan Carlos Macías Mayen |
+| [[DevLog/2026-06-13-ulises-qa | 2026-06-13 (sesión 21)]] | Phase 2 QA y Consolidación de Bugs: Actualizada colección de Postman con 4 endpoints nuevos y consolidado bug CI-05 (exit code 128) en PHYSICAL_TEST_VALIDATION.md | Antigravity (Gemini 3.1 Pro (Low)) + Ulises |
 
 ---
 
