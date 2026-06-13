@@ -55,7 +55,7 @@ router.get('/', authMiddleware, async (req, res) => {
       contentQuery = contentQuery.where('genres', 'array-contains-any', userGenres)
     }
 
-    const contentSnap = await contentQuery.limit(50).get()
+    let contentSnap = await contentQuery.limit(50).get()
 
     if (!contentSnap || contentSnap.empty) {
       const fallbackQuery = db
