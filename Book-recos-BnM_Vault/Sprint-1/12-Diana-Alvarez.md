@@ -150,14 +150,14 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 
 ## ✅ Checklist de entrega
 
-- [ ] `frontend/src/pages/Library.jsx` — lista con filtros tipo y listName
-- [ ] `frontend/src/components/CollectionItem.jsx` — nota editable inline
-- [ ] `PATCH /api/collections/:id` al editar nota (con toast confirmación)
-- [ ] `DELETE /api/collections/:id` con confirmación previa
-- [ ] Modal "Nueva lista" funcional
-- [ ] `frontend/src/components/BottomNav.jsx` — acceso en 1 tap
-- [ ] Estado vacío cuando no hay ítems
-- [ ] Reemplazar mocks con `GET /api/collections` real cuando esté disponible
+- [x] `frontend/src/pages/Library.jsx` — lista con filtros tipo y listName
+- [x] `frontend/src/components/CollectionItem.jsx` — nota editable inline
+- [x] `PATCH /api/collections/:id` al editar nota (con toast confirmación)
+- [x] `DELETE /api/collections/:id` con confirmación previa
+- [x] Modal "Nueva lista" funcional
+- [x] `frontend/src/components/BottomNav.jsx` — acceso en 1 tap
+- [x] Estado vacío cuando no hay ítems
+- [x] Reemplazar mocks con `GET /api/collections` real cuando esté disponible
 
 ---
 
@@ -331,11 +331,11 @@ Página pública (sin ProtectedRoute) que:
 #### Sección 3 — HU2.1 Tab Selector (5 casos: T-01 a T-05)
 
 ```
-☐ T-01: Llegar a /feed → Tab Selector visible con "🎬 Películas" y "📚 Libros"
-☐ T-02: Estado inicial → tab "Películas" activo: fondo naranja #ff571a, texto blanco
-☐ T-03: Presionar "Libros" → tab Libros se activa (naranja), SwipeDeck se reinicia con tipo book
-☐ T-04: Hacer 3 swipes en Libros → cambiar a Películas → SwipeDeck se reinicia completamente
-☐ T-05: Cambiar entre tabs varias veces rápido → sin crash, cada cambio reinicia el deck
+☑ T-01: Llegar a /feed → Tab Selector visible con "🎬 Películas" y "📚 Libros"
+☑ T-02: Estado inicial → tab "Películas" activo: fondo naranja #ff571a, texto blanco
+☑ T-03: Presionar "Libros" → tab Libros se activa (naranja), SwipeDeck se reinicia con tipo book
+☑ T-04: Hacer 3 swipes en Libros → cambiar a Películas → SwipeDeck se reinicia completamente
+☑ T-05: Cambiar entre tabs varias veces rápido → sin crash, cada cambio reinicia el deck
 ```
 
 ---
@@ -345,12 +345,12 @@ Página pública (sin ProtectedRoute) que:
 **Prerequisito:** Guardar al menos 1 ítem desde el DetailSheet (caso D-09).
 
 ```
-☐ B-01: Navegar a /library autenticado → pantalla de biblioteca con ítems guardados
-☐ B-02: GET /api/collections?userId={uid} con token → HTTP 200, array de colecciones del usuario
-☐ B-03: POST /api/collections con body válido → HTTP 201, doc creado en Firestore
-☐ B-04: POST /api/collections con mismo contentId dos veces → HTTP 409 (anti-duplicados)
-☐ B-05: PATCH /api/collections/{id} con {"personalNote":"Mi nota"} → HTTP 200, campo actualizado
-☐ B-06: DELETE /api/collections/{id} → HTTP 204, doc eliminado de Firestore
+☑ B-01: Navegar a /library autenticado → pantalla de biblioteca con ítems guardados
+☑ B-02: GET /api/collections?userId={uid} con token → HTTP 200, array de colecciones del usuario
+☑ B-03: POST /api/collections con body válido → HTTP 201, doc creado en Firestore
+☑ B-04: POST /api/collections con mismo contentId dos veces → HTTP 409 (anti-duplicados)
+☑ B-05: PATCH /api/collections/{id} con {"personalNote":"Mi nota"} → HTTP 200, campo actualizado
+☑ B-06: DELETE /api/collections/{id} → HTTP 204, doc eliminado de Firestore
 ```
 
 ---
@@ -360,11 +360,11 @@ Página pública (sin ProtectedRoute) que:
 **Prerequisito:** Acceso al repositorio en GitHub y al pipeline de Actions.
 
 ```
-☐ CI-01: Abrir cualquier PR activo en GitHub → pipeline "CI/CD Pipeline Recos-BnM" aparece ejecutándose
-☐ CI-02: Verificar job backend-ingest-tests → logs muestran pytest ingest/tests/ en verde
-☐ CI-03: Verificar job frontend-build-deploy → build de Vite exitoso sin errores
-☐ CI-04: Verificar que deploy a Firebase Hosting solo ocurre en push a main (no en PRs)
-☐ CI-05: Verificar URL de Firebase Hosting tras push a main → refleja cambios en <3 minutos
+☑ CI-01: Abrir cualquier PR activo en GitHub → pipeline "CI/CD Pipeline Recos-BnM" aparece ejecutándose
+☑ CI-02: Verificar job backend-ingest-tests → logs muestran pytest ingest/tests/ en verde
+☑ CI-03: Verificar job frontend-build-deploy → build de Vite exitoso sin errores
+☑ CI-04: Verificar que deploy a Firebase Hosting solo ocurre en push a main (no en PRs)
+☐ CI-05: Verificar URL de Firebase Hosting tras push a main → refleja cambios en <3 minutos — ❌ FALLA: BUG-001 git exit code 128
 ```
 
 ---
@@ -396,11 +396,11 @@ Página pública (sin ProtectedRoute) que:
 
 ### ✅ Checklist QA Diana + Fase 2
 
-- [ ] Sección 3 Tab Selector: 5/5 casos ejecutados
-- [ ] Sección 7 Biblioteca: 6/6 casos ejecutados
-- [ ] Sección 11 CI/CD: 5/5 casos ejecutados
+- [x] Sección 3 Tab Selector: 5/5 casos ejecutados
+- [x] Sección 7 Biblioteca: 6/6 casos ejecutados
+- [ ] Sección 11 CI/CD: 5/5 casos ejecutados — 4/5 completos, CI-05 bloqueado por BUG-001
 - [ ] Sección 13 GCP: 10/10 casos ejecutados
-- [ ] **Fase 2:** `handleShareList` en `Library.jsx` con botón ↗
-- [ ] **Fase 2:** `BottomNav.jsx` con tab "🔍 Buscar" para Juan Carlos
-- [ ] **Fase 2:** `SharedList.jsx` creado para ver listas compartidas
+- [x] **Fase 2:** `handleShareList` en `Library.jsx` con botón ↗
+- [x] **Fase 2:** `BottomNav.jsx` con tab "🔍 Buscar" para Juan Carlos
+- [x] **Fase 2:** `SharedList.jsx` creado para ver listas compartidas
 - [ ] Bugs registrados en §14, resumen en §15A
