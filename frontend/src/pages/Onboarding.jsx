@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
@@ -26,7 +27,7 @@ const CARDS = [
     genres: ['Fantasia'],
     chips: ['Aventura', 'Magia'],
     description: 'Mundos perdidos, magia antigua y batallas que cambian reinos.',
-    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://picsum.photos/seed/fantasy/1200/800',
   },
   {
     id: 'genre_thriller',
@@ -77,6 +78,72 @@ const CARDS = [
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80',
   },
 ]
+
+// ── Estilos indicadores — idénticos a SwipeDeck.jsx ─────────────────────────
+const indicatorBase = {
+  position: 'absolute',
+  top: 20,
+  zIndex: 10,
+  color: 'white',
+  fontWeight: 700,
+  fontSize: 18,
+  padding: '8px 16px',
+  borderRadius: 8,
+  pointerEvents: 'none',
+}
+
+// ── SwipeCard — tarjeta arrastrable con gestos (framer-motion) ───────────────
+function SwipeCard({ card, onAction }) {
+  const x           = useMotionValue(0)
+  const rotate      = useTransform(x, [-200, 200], [-12, 12])
+  const likeOpacity = useTransform(x, [30, 100], [0, 1])
+  const skipOpacity = useTransform(x, [-100, -30], [1, 0])
+
+  function handleDragEnd(_, info) {
+    const swipeRight = info.offset.x > 80  || info.velocity.x >  300
+    const swipeLeft  = info.offset.x < -80 || info.velocity.x < -300
+
+    if (swipeRight) {
+      animate(x, 600,  { duration: 0.3 })
+      onAction('like')
+    } else if (swipeLeft) {
+      animate(x, -600, { duration: 0.3 })
+      onAction('dislike')
+    }
+  }
+
+  return (
+    <motion.div
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.9}
+      style={{ x, rotate, position: 'relative', touchAction: 'none', cursor: 'grab' }}
+      onDragEnd={handleDragEnd}
+    >
+      {/* Indicadores ❤️ / ✕ — mismos colores y posición que SwipeDeck */}
+      <motion.div style={{ ...indicatorBase, left: 20, background: '#22c55e', opacity: likeOpacity }}>
+        ❤️ LIKE
+      </motion.div>
+      <motion.div style={{ ...indicatorBase, right: 20, background: '#ef4444', opacity: skipOpacity }}>
+        ✕ SKIP
+      </motion.div>
+
+      <article className="ob-card">
+        <img className="ob-card-image" src={card.image} alt={card.title} />
+        <div className="ob-overlay" />
+        <div className="ob-card-body">
+          <div className="ob-chips">
+            {card.chips.map((chip) => (
+              <span key={chip} className="ob-chip">{chip}</span>
+            ))}
+          </div>
+          <h2 className="ob-card-title">{card.title}</h2>
+          <p className="ob-card-description">{card.description}</p>
+        </div>
+      </article>
+    </motion.div>
+  )
+}
 
 export default function Onboarding() {
   const { currentUser, logout, setUserProfile } = useAuth()
@@ -213,23 +280,10 @@ export default function Onboarding() {
 
             <p className="ob-card-counter">{index + 1} de {CARDS.length} tarjetas</p>
 
-            {current ? (
-              <article className="ob-card">
-                <img className="ob-card-image" src={current.image} alt={current.title} />
-                <div className="ob-overlay" />
-                <div className="ob-card-body">
-                  <div className="ob-chips">
-                    {current.chips.map((chip) => (
-                      <span key={chip} className="ob-chip">{chip}</span>
-                    ))}
-                  </div>
-                  <h2 className="ob-card-title">{current.title}</h2>
-                  <p className="ob-card-description">{current.description}</p>
-                </div>
-              </article>
-            ) : (
-              <p className="ob-empty">Sin tarjetas disponibles.</p>
-            )}
+            {current
+              ? <SwipeCard key={index} card={current} onAction={handleAction} />
+              : <p className="ob-empty">Sin tarjetas disponibles.</p>
+            }
 
             <section className="ob-actions">
               <button className="ob-btn ob-btn-muted" onClick={() => handleAction('dislike')}>
@@ -237,9 +291,6 @@ export default function Onboarding() {
               </button>
               <button className="ob-btn ob-btn-like" onClick={() => handleAction('like')}>
                 ♡
-              </button>
-              <button className="ob-btn ob-btn-muted" onClick={() => handleAction('like')}>
-                ⌑
               </button>
             </section>
 
