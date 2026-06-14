@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import AppLayout from '../components/AppLayout'
 
 // ── useDebounce ───────────────────────────────────────────────────────────────
 // Retrasa la actualización de `value` por `delay` ms.
@@ -225,58 +226,60 @@ export default function Search() {
   const showNoResults = hasQuery && !loading && !error && results.length === 0
 
   return (
-    <div style={s.page}>
+    <AppLayout>
+      <div style={s.page}>
 
-      {/* ── Input de búsqueda ─────────────────────────────────────────────── */}
-      <div style={s.inputWrapper}>
-        <input
-          type="search"
-          placeholder="Buscar película, libro, autor..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          style={s.input}
-          autoComplete="off"
-          aria-label="Buscar contenido"
-        />
-      </div>
+        {/* ── Input de búsqueda ───────────────────────────────────────────── */}
+        <div style={s.inputWrapper}>
+          <input
+            type="search"
+            placeholder="Buscar película, libro, autor..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            style={s.input}
+            autoComplete="off"
+            aria-label="Buscar contenido"
+          />
+        </div>
 
-      {/* ── Chips de filtro por tipo ──────────────────────────────────────── */}
-      <div style={s.filtersRow} role="group" aria-label="Filtrar por tipo">
-        {[
-          { key: 'all',   label: 'Todos'       },
-          { key: 'movie', label: '🎬 Películas' },
-          { key: 'book',  label: '📚 Libros'    },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setType(key)}
-            style={s.chip(type === key)}
-            aria-pressed={type === key}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Mensajes de estado ────────────────────────────────────────────── */}
-      {showEmpty     && <p style={s.message()}>Busca una película, libro, autor o director</p>}
-      {loading       && <p style={s.message()}>Buscando...</p>}
-      {error         && <p style={s.message('#e53e3e')}>{error}</p>}
-      {showNoResults && <p style={s.message()}>Sin resultados para &ldquo;{query}&rdquo;</p>}
-
-      {/* ── Lista de resultados ───────────────────────────────────────────── */}
-      {!loading && results.length > 0 && (
-        <div style={s.resultsList} role="list">
-          {results.map(item => (
-            <CompactCard
-              key={item.contentId}
-              item={item}
-              onClick={() => { /* integrar DetailSheet cuando esté disponible */ }}
-            />
+        {/* ── Chips de filtro por tipo ────────────────────────────────────── */}
+        <div style={s.filtersRow} role="group" aria-label="Filtrar por tipo">
+          {[
+            { key: 'all',   label: 'Todos'       },
+            { key: 'movie', label: '🎬 Películas' },
+            { key: 'book',  label: '📚 Libros'    },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setType(key)}
+              style={s.chip(type === key)}
+              aria-pressed={type === key}
+            >
+              {label}
+            </button>
           ))}
         </div>
-      )}
 
-    </div>
+        {/* ── Mensajes de estado ──────────────────────────────────────────── */}
+        {showEmpty     && <p style={s.message()}>Busca una película, libro, autor o director</p>}
+        {loading       && <p style={s.message()}>Buscando...</p>}
+        {error         && <p style={s.message('#e53e3e')}>{error}</p>}
+        {showNoResults && <p style={s.message()}>Sin resultados para &ldquo;{query}&rdquo;</p>}
+
+        {/* ── Lista de resultados ─────────────────────────────────────────── */}
+        {!loading && results.length > 0 && (
+          <div style={s.resultsList} role="list">
+            {results.map(item => (
+              <CompactCard
+                key={item.contentId}
+                item={item}
+                onClick={() => { /* integrar DetailSheet cuando esté disponible */ }}
+              />
+            ))}
+          </div>
+        )}
+
+      </div>
+    </AppLayout>
   )
 }
