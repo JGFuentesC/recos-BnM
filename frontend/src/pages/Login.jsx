@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { loginWithEmail, loginWithGoogle, refreshUserProfile, userProfile } = useAuth()
+  const { currentUser, loading, loginWithEmail, loginWithGoogle, refreshUserProfile, userProfile } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
@@ -13,6 +13,32 @@ export default function Login() {
   function resolvePostAuthRoute(profile) {
     return profile?.prefs?.cold_start_done ? '/feed' : '/onboarding'
   }
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function redirectIfAlreadyAuthenticated() {
+      if (loading || !currentUser) return
+
+      try {
+        const freshProfile = await refreshUserProfile(currentUser.uid)
+
+        if (!cancelled) {
+          navigate(resolvePostAuthRoute(freshProfile ?? userProfile), { replace: true })
+        }
+      } catch {
+        if (!cancelled) {
+          navigate('/feed', { replace: true })
+        }
+      }
+    }
+
+    redirectIfAlreadyAuthenticated()
+
+    return () => {
+      cancelled = true
+    }
+  }, [currentUser, loading, navigate, refreshUserProfile, userProfile])
 
   function mapErrorMessage(code) {
     if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
