@@ -4,7 +4,7 @@ date: "2026-06-11"
 author_human: "Manuel Serranía Reinada"
 agent: "Claude Code"
 model: "big-pickle"
-session_duration: "2h"
+session_duration: "4h"
 tags: [devlog, sprint-1, phase-2, ingest, scoring]
 ---
 
@@ -50,12 +50,38 @@ tags: [devlog, sprint-1, phase-2, ingest, scoring]
   - Skip de reimport usa `updated_at` (campo existente en docs del legacy path) en lugar de `syncedAt` (que no está en el payload de `tmdb_ingest.py`)
 - **Correcciones manuales:** ninguna
 
+---
+
+## ⚡ Segunda sesión — Ingest a producción + books fix (misma fecha)
+
+Se completó el ítem faltante del checklist de Fase 2: **ejecutar ingest contra Firestore producción**.
+
+### Qué se hizo
+- `ingest/src/books_ingest.py` — agregada inicialización Firebase + escritura directa a Firestore + bloque standalone (mismo patrón que `tmdb_ingest.py`)
+- `ingest/src/tmdb_ingest.py` — skip-reimport envuelto en try-except para evitar crash cuando no existe el índice compuesto en producción
+- Ambos scripts — agregado `sys.stdout.reconfigure(encoding='utf-8')` para evitar UnicodeEncodeError en Windows
+- Se copió `serviceAccountKey.json` de `backend/` a `ingest/`
+- Se creó `ingest/.env` con las API keys y `FIRESTORE_PROJECT_ID=proyectofinal-71637`
+- **Ejecución contra producción:** 300 películas + 250 libros = **552 docs en Firestore producción**
+
+### Archivos modificados
+- `ingest/src/books_ingest.py` — Firebase init, escritura Firestore, standalone, UTF-8 fix
+- `ingest/src/tmdb_ingest.py` — try-except skip-reimport, UTF-8 fix
+- `ingest/.env` — creado con API keys y project ID
+- `Book-recos-BnM_Vault/Sprint-1/03-Manuel-Serrania.md` — checklist actualizado (producción ✅)
+
+### Decisiones autónomas
+- Se usó el mismo schema de payload que `tmdb_ingest.py` para mantener consistencia en la colección `content`
+- No se agregó skip-reimport a `books_ingest.py` para mantenerlo simple en esta iteración
+
+### Correcciones manuales
+- La `GOOGLE_BOOKS_API_KEY` original era incorrecta (JWT de TMDB). Se reemplazó con la key real de Google Books.
+
 ## Bloqueantes encontrados
-- Los tests existentes (`feed`, `swipe`, `collections`) ya fallaban antes de estos cambios por mocks desactualizados. No hay regresiones.
+- El frontend solo muestra 1 libro al filtrar por tipo "book" — probablemente por filtro de géneros del usuario vs géneros de Google Books, no por problema del ingest
+- El frontend apunta al backend en localhost:3001, que sí conecta a producción Firestore correctamente
 
 ## Próximos pasos para el siguiente colaborador
 - **Luis Téllez:** puede importar `buildGenreAffinity` desde `scoring.js` e integrarlo en `GET /api/feed`
-- **Germán Pacheco:** generar service account key de producción para `ingest/serviceAccountKey.json`
-- **Israel Pérez:** desplegar índices de Firestore (swipes + titleLower)
-- **Juan Carlos:** rotar API keys y compartir nuevos valores
-- Para producción: comentar `FIRESTORE_EMULATOR_HOST` en `ingest/.env`, luego ejecutar `python src/main.py`
+- **Manuel:** Corregir filtro de géneros del feed si los géneros de Google Books no coinciden con los seleccionados en onboarding
+- **Manuel:** Abrir PR con screenshot del conteo en Firebase Console

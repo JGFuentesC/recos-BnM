@@ -1,0 +1,17 @@
+DEVLOG - LUIS TÉLLEZ DOMÍNGUEZ
+Proyecto: Recos-BnM
+Rol: Dev Bajo
+Épica: 3 - Recomendación y Mecánica de Swipe (Fase 1) & Engagement (Fase 2)
+
+Resumen de Entregas:
+
+Fase 1 (MVP):
+- Endpoint GET /api/feed: Devuelve una lista de 10 ítems listos para swipe, excluyendo los ya swipeados por el usuario y los guardados en colecciones. Incorpora el scoring base de Manuel (popularidad + rating). Soporta paginación por cursor.
+- Endpoint POST /api/swipe: Registra la acción de swipe (like/dislike) en Firestore. Modificado para retornar HTTP 200 con { success: true } para garantizar fluidez del frontend.
+- Tests automatizados Jest: feed.test.js y swipes.test.js para validación de contratos locales.
+
+Fase 2 (Engagement):
+- Endpoint GET /api/search: Creado en backend/src/routes/search.js. Realiza búsquedas alfanuméricas case-insensitive usando titleLower. Implementa sanitización de q (SEC-L-02) y degradación graciosa (graceful degradation) para filtrar por tipo en memoria en caso de faltar el índice compuesto en Firestore.
+- Lógica de afinidad dinámica en GET /api/feed: Cuando el usuario tiene 10 o más swipes, calcula afinidades mediante buildGenreAffinity() y aplica un orden dinámico adaptado a los likes/dislikes reales del usuario en su feed.
+- Alineación de tests Jest: Se corrigieron mocks de collections y chaining de swipes. Se actualizó el suite para pasar a verde 54/54 tests exitosos (incluyendo search.test.js).
+- Documentación: Bitácora de Sprint (04-Luis-Tellez.md) y DevLogIndex actualizados.

@@ -160,14 +160,14 @@ Luego agrega la entrada a DevLog/DevLog_Index.md en la tabla.
 
 ## ✅ Checklist de entrega
 
-- [ ] `frontend/src/components/ContentCard.jsx` — todas las props
-- [ ] `frontend/src/components/ContentCard.module.css` — estilos
-- [ ] Placeholder cuando no hay imagen
-- [ ] Rating con ⭐ y 1 decimal
-- [ ] Synopsis truncada a 3 líneas
-- [ ] Animación de entrada (200ms)
-- [ ] `frontend/src/pages/MockFeed.jsx` — 4 tarjetas de prueba
-- [ ] Se ve bien en 375px de ancho
+- [x] `frontend/src/components/ContentCard.jsx` — todas las props
+- [x] `frontend/src/components/ContentCard.module.css` — estilos
+- [x] Placeholder cuando no hay imagen
+- [x] Rating con ⭐ y 1 decimal
+- [x] Synopsis truncada a 3 líneas
+- [x] Animación de entrada (200ms)
+- [x] `frontend/src/pages/MockFeed.jsx` — 4 tarjetas de prueba
+- [x] Se ve bien en 375px de ancho
 
 ---
 
@@ -291,7 +291,69 @@ No modificar .gitignore sin mi confirmación.
 ### ✅ Checklist Fase 2
 
 - [ ] Deploy POC 1 coordinado — URL de Firebase Hosting confirmada con el equipo
-- [ ] `frontend/src/pages/About.jsx` — logo TMDB + atribución completa
-- [ ] Ruta `/about` registrada en `App.jsx`
-- [ ] `.gitignore` revisado — auditorías de seguridad no ignoradas
+- [x] `frontend/src/pages/About.jsx` — logo TMDB + atribución completa *(hecho 2026-06-11)*
+- [x] `frontend/src/pages/About.module.css` — estilos mobile-first *(hecho 2026-06-11)*
+- [ ] Ruta `/about` registrada en `App.jsx` — **pendiente: Andrés González** (ver snippet abajo)
+- [x] `.gitignore` actualizado — patrones glob para auditorías futuras *(hecho 2026-06-11)*
+- [x] Auditorías movidas al Vault `09_Risk_Governance/` — MEDIUM-05 cerrado *(hecho 2026-06-11)*
+- [ ] Tab "Acerca" en `BottomNav.jsx` — **pendiente: Diana Álvarez** (opcional, ver snippet abajo)
 - [ ] Deck de demo preparado con los 6 puntos de demostración
+
+---
+
+## 📋 Estado Phase 2 — 2026-06-11
+
+### Lo que Edgar completó esta sesión
+
+| Tarea                     | Archivo                                             | Estado  |
+| ------------------------- | --------------------------------------------------- | ------- |
+| Mover auditorías al Vault | `09_Risk_Governance/SECURITY-AUDIT-2026-06-10.md`   | ✅ Hecho |
+| Mover plan de remediación | `09_Risk_Governance/REMEDIATION-PLAN-2026-06-10.md` | ✅ Hecho |
+| Actualizar `.gitignore`   | `.gitignore` raíz — glob patterns                   | ✅ Hecho |
+| Crear pantalla About      | `frontend/src/pages/About.jsx`                      | ✅ Hecho |
+| Estilos About             | `frontend/src/pages/About.module.css`               | ✅ Hecho |
+| DevLog Phase 2            | `DevLog/2026-06-11-edgar-phase2.md`                 | ✅ Hecho |
+
+### Lo que está pendiente y quién lo necesita hacer
+
+#### 🔴 Bloqueante para completar Phase 2 de Edgar
+
+**→ Andrés González** debe agregar la ruta `/about` en `frontend/src/App.jsx`:
+
+```javascript
+// 1. Agregar import al inicio del archivo:
+import About from './pages/About'
+
+// 2. Agregar ruta ANTES del catch-all "*":
+<Route path="/about" element={<About />} />
+// IMPORTANTE: NO usar ProtectedRoute — es acceso público (requerido por licencia TMDB)
+```
+
+> ⚠️ Sin este cambio, la pantalla About.jsx existe pero no es accesible desde ninguna URL.
+
+---
+
+#### 🟡 Opcional para mejorar la experiencia
+
+**→ Diana Álvarez** puede agregar el acceso a About desde `frontend/src/components/BottomNav.jsx`:
+
+```javascript
+// En el array TABS, agregar al final:
+{ path: '/about', label: 'Acerca', icon: 'ℹ️' },
+```
+
+Alternativa sin modificar BottomNav: Edgar puede coordinar que el link a `/about` aparezca en el footer de `Login.jsx`.
+
+---
+
+#### 🔴 Blockers del POC 1 que Edgar debe confirmar (Deadline: Jue 12 Jun)
+
+| Persona | Tarea | Estado a confirmar |
+|---------|-------|-------------------|
+| **Andrés** | Instalar `helmet` + `express-rate-limit` en backend | ¿Commiteado? |
+| **Germán** | Agregar job `deploy-backend` a `.github/workflows/deploy.yml` | ¿En su rama? |
+| **Germán** | Configurar 7 GitHub Secrets en Settings → Actions | ¿Configurados? |
+| **Israel** | `firebase deploy --only firestore:rules,firestore:indexes` | ¿Ejecutado en prod? |
+| **Manuel** | Re-ejecutar ingest con campo `titleLower` en colección `content` | ¿≥500 docs? |
+
+> **Acción de Edgar:** Enviar mensaje al equipo el Jue 12 Jun AM solicitando confirmación de cada punto antes de hacer el push final a `main` que activa el deploy del POC 1.
