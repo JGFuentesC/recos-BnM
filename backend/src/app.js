@@ -31,8 +31,19 @@ app.use(cors({
 
 app.use(express.json({ limit: '10kb' }))
 
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }))
-app.use('/api/swipe', rateLimit({ windowMs: 60 * 1000, max: 30 }))
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+}))
+
+app.use('/api/swipe', rateLimit({
+  windowMs: 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+}))
 
 app.get('/health', (req, res) => {
   res.json({ ok: true })
