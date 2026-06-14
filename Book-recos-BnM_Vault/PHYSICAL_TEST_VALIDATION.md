@@ -55,13 +55,13 @@ Completar antes de ejecutar cualquier prueba.
 
 | # | Verificación | Resultado | Notas |
 |---|--------------|-----------|-------|
-| P-01 | La URL pública de Firebase Hosting está activa y carga la app | | |
-| P-02 | El backend en Cloud Run responde: `GET [API_URL]/health` devuelve `{"ok":true}` | | |
-| P-03 | Tienes 2 cuentas de prueba disponibles: una Google y una email/password | | |
-| P-04 | Tienes acceso a Postman o Bruno con la colección `Recos-BnM-API-Collection.json` | | |
-| P-05 | Tienes abierta la consola de Firebase (Firestore) para verificar documentos escritos | | |
-| P-06 | Estás en un dispositivo móvil O el navegador está en modo responsive (375px — iPhone SE) | | |
-| P-07 | El catálogo de contenido tiene al menos 20 ítems en la colección `content` de Firestore | | |
+| P-01 | La URL pública de Firebase Hosting está activa y carga la app | ⏳ | **Pendiente:** URL de prod no entregada (Germán). Local: Vite `:5173` carga OK |
+| P-02 | El backend en Cloud Run responde: `GET [API_URL]/health` devuelve `{"ok":true}` | ✅ local | Backend local `:3001` → `{"ok":true}` HTTP 200. Falta confirmar Cloud Run (prod) — Héctor 2026-06-13 |
+| P-03 | Tienes 2 cuentas de prueba disponibles: una Google y una email/password | ✅ | Email/password (`hector.morales@anahuac.mx`) + cuenta Google, ambas usadas en R-06/R-08 — Héctor |
+| P-04 | Tienes acceso a Postman o Bruno con la colección `Recos-BnM-API-Collection.json` | ✅ | Colección presente en `docs/`; casos A-01→A-16 ejecutados con la misma firma vía curl — Héctor |
+| P-05 | Tienes abierta la consola de Firebase (Firestore) para verificar documentos escritos | ⏳ | Acceso a la consola de Firestore es de **Israel**; bloquea verificación de docs (R-07) |
+| P-06 | Estás en un dispositivo móvil O el navegador está en modo responsive (375px — iPhone SE) | ☐ | Pendiente verificación visual responsive |
+| P-07 | El catálogo de contenido tiene al menos 20 ítems en la colección `content` de Firestore | ✅ | Verificado vía `GET /api/feed`: múltiples páginas de movies y books (≥20) — Héctor 2026-06-13 |
 
 ---
 
@@ -71,37 +71,37 @@ Completar antes de ejecutar cualquier prueba.
 
 | # | Acción | Resultado esperado | ✅❌ | Notas |
 |---|--------|-------------------|-----|-------|
-| R-01 | Navegar a `/register` | Se muestra pantalla "Crear cuenta" con campos: Nombre, Correo, Contraseña, Confirmar contraseña | | |
-| R-02 | Dejar todos los campos vacíos y presionar "Registrarse con email" | Error: "Escribe tu nombre." | | |
-| R-03 | Llenar nombre, escribir correo inválido (ej. `abc`), presionar registrar | Error: "Correo invalido." | | |
-| R-04 | Llenar nombre + correo válido, escribir contraseña de 5 caracteres | Error: "La contrasena debe tener al menos 6 caracteres." | | |
-| R-05 | Llenar todo correctamente pero contraseñas distintas | Error: "Las contrasenas no coinciden." | | |
-| R-06 | Llenar todos los campos correctamente y presionar registrar | Mensaje "Creando cuenta...", redirige a `/onboarding` | | |
-| R-07 | Verificar en Firebase Console → Firestore → colección `users` | Existe documento `users/{userId}` recién creado | | |
+| R-01 | Navegar a `/register` | Se muestra pantalla "Crear cuenta" con campos: Nombre, Correo, Contraseña, Confirmar contraseña | ✅ | Local 2026-06-13: h1 + Google + 4 campos OK |
+| R-02 | Dejar todos los campos vacíos y presionar "Registrarse con email" | Error: "Escribe tu nombre." | ✅ | Mostró "Escribe tu nombre." |
+| R-03 | Llenar nombre, escribir correo inválido (ej. `abc`), presionar registrar | Error: "Correo invalido." | ⚠️ | **BUG-004:** salió el tooltip nativo del navegador (`type="email"`), no el mensaje de la app |
+| R-04 | Llenar nombre + correo válido, escribir contraseña de 5 caracteres | Error: "La contrasena debe tener al menos 6 caracteres." | ✅ | Mostró el mensaje esperado |
+| R-05 | Llenar todo correctamente pero contraseñas distintas | Error: "Las contrasenas no coinciden." | ✅ | Mostró "Las contrasenas no coinciden." |
+| R-06 | Llenar todos los campos correctamente y presionar registrar | Mensaje "Creando cuenta...", redirige a `/onboarding` | ✅ | Cuenta creada, redirigió a `/onboarding` |
+| R-07 | Verificar en Firebase Console → Firestore → colección `users` | Existe documento `users/{userId}` recién creado | ⏳ | **Bloqueado:** acceso a Firestore Console es de Israel — pendiente su verificación |
 
 ### 1B. Registro con Google
 
 | # | Acción | Resultado esperado | ✅❌ | Notas |
 |---|--------|-------------------|-----|-------|
-| R-08 | En `/register` presionar "Registrarse con Google" | Abre popup de Google. Al seleccionar cuenta redirige a `/onboarding` | | |
-| R-09 | Cerrar el popup de Google a la mitad | Error: "Cerraste la ventana de Google antes de completar el acceso." | | |
+| R-08 | En `/register` presionar "Registrarse con Google" | Abre popup de Google. Al seleccionar cuenta redirige a `/onboarding` | ✅ | Local 2026-06-13: popup → `/onboarding` |
+| R-09 | Cerrar el popup de Google a la mitad | Error: "Cerraste la ventana de Google antes de completar el acceso." | ❌ | **BUG-001:** mostró "No se pudo registrar con Google. Revisa dominios autorizados.", no el mensaje esperado |
 
 ### 1C. Login con Email
 
 | # | Acción | Resultado esperado | ✅❌ | Notas |
 |---|--------|-------------------|-----|-------|
-| L-01 | Navegar a `/login` | Pantalla "Match&Read" con botón Google y formulario email/password | | |
-| L-02 | Intentar login con correo y contraseña incorrectos | Error: "Correo o contraseña incorrectos." | | |
-| L-03 | Login correcto con cuenta que ya completó onboarding | Redirige directo a `/feed` (no a /onboarding) | | |
-| L-04 | Login correcto con cuenta nueva (sin onboarding completado) | Redirige a `/onboarding` | | |
-| L-05 | Intentar acceder a `/feed` sin estar autenticado | Redirige automáticamente a `/login` | | |
-| L-06 | Intentar acceder a `/onboarding` sin estar autenticado | Redirige automáticamente a `/login` | | |
+| L-01 | Navegar a `/login` | Pantalla "Match&Read" con botón Google y formulario email/password | ✅ | Local 2026-06-13: "Match&Read" + Google + form |
+| L-02 | Intentar login con correo y contraseña incorrectos | Error: "Correo o contraseña incorrectos." | ✅ | Mostró "Correo o contraseña incorrectos." |
+| L-03 | Login correcto con cuenta que ya completó onboarding | Redirige directo a `/feed` (no a /onboarding) | ✅ | Redirigió a `/feed` |
+| L-04 | Login correcto con cuenta nueva (sin onboarding completado) | Redirige a `/onboarding` | ✅ | Redirigió a `/onboarding` |
+| L-05 | Intentar acceder a `/feed` sin estar autenticado | Redirige automáticamente a `/login` | ✅ | Redirigió a `/login` |
+| L-06 | Intentar acceder a `/onboarding` sin estar autenticado | Redirige automáticamente a `/login` | ✅ | Redirigió a `/login` |
 
 ### 1D. Login con Google
 
 | # | Acción | Resultado esperado | ✅❌ | Notas |
 |---|--------|-------------------|-----|-------|
-| L-07 | En `/login` presionar "Continuar con Google" | Abre popup. Al completar, redirige a `/feed` o `/onboarding` según `cold_start_done` | | |
+| L-07 | En `/login` presionar "Continuar con Google" | Abre popup. Al completar, redirige a `/feed` o `/onboarding` según `cold_start_done` | ✅ | Local 2026-06-13: cayó en `/onboarding` (cuenta sin onboarding completo) ✓ |
 
 ---
 
@@ -209,22 +209,22 @@ Usar la colección `docs/Recos-BnM-API-Collection.json`. Obtener token con: Fire
 
 | # | Endpoint | Body / Params | Respuesta esperada | ✅❌ | Notas |
 |---|----------|--------------|-------------------|-----|-------|
-| A-01 | `GET /health` | — | `{"ok": true}` HTTP 200 | | |
-| A-02 | `GET /api/private/ping` sin token | — | HTTP 401 Unauthorized | | |
-| A-03 | `GET /api/private/ping` con token válido | Header: `Authorization: Bearer {token}` | `{"ok": true, "uid": "..."}` HTTP 200 | | |
-| A-04 | `GET /api/feed?userId={uid}&type=movie` sin token | — | HTTP 401 | | |
-| A-05 | `GET /api/feed?userId={uid}&type=movie` con token | — | HTTP 200, array de contenido ordenado por score | | |
-| A-06 | `GET /api/feed?userId={uid}&type=book` con token | — | HTTP 200, array de libros | | |
-| A-07 | `GET /api/feed` con cursor (paginación) | `?cursor={lastIndex}` | HTTP 200, siguiente página de resultados | | |
-| A-08 | `POST /api/swipe` con token | `{"userId":"...","contentId":"...","contentType":"movie","action":"like"}` | HTTP 204 sin body | | |
-| A-09 | `POST /api/swipe` con token | mismo body con `"action":"dislike"` | HTTP 204 sin body | | |
-| A-10 | `GET /api/content/{id}` con token | contentId válido en path | HTTP 200, objeto completo con todos los campos + `watchProviders` (array, puede ser vacío) | | |
-| A-11 | `GET /api/content/INVALID_ID` con token | id inexistente | HTTP 404 | | |
-| A-12 | `GET /api/collections?userId={uid}` con token | — | HTTP 200, array de colecciones del usuario | | |
-| A-13 | `POST /api/collections` con token | `{"userId":"...","contentId":"...","contentType":"movie","listName":"Guardados"}` | HTTP 201 | | |
-| A-14 | `PATCH /api/collections/{id}` con token | `{"personalNote": "Excelente"}` | HTTP 200 | | |
-| A-15 | `DELETE /api/collections/{id}` con token | — | HTTP 204 | | |
-| A-16 | Cualquier endpoint con token expirado | token vencido | HTTP 401 | | |
+| A-01 | `GET /health` | — | `{"ok": true}` HTTP 200 | ✅ | Local 2026-06-13: 200 `{"ok":true}` |
+| A-02 | `GET /api/private/ping` sin token | — | HTTP 401 Unauthorized | ✅ | 401 `{"error":"missing_token"}` |
+| A-03 | `GET /api/private/ping` con token válido | Header: `Authorization: Bearer {token}` | `{"ok": true, "uid": "..."}` HTTP 200 | ✅ | 200 `{"ok":true,"uid":"ku54...FH92"}` |
+| A-04 | `GET /api/feed?userId={uid}&type=movie` sin token | — | HTTP 401 | ✅ | 401 `missing_token` |
+| A-05 | `GET /api/feed?userId={uid}&type=movie` con token | — | HTTP 200, array de contenido ordenado por score | ✅ | 200, array de movies (Superman, etc.) |
+| A-06 | `GET /api/feed?userId={uid}&type=book` con token | — | HTTP 200, array de libros | ✅ | 200, array de books (1984, etc.) |
+| A-07 | `GET /api/feed` con cursor (paginación) | `?cursor={lastIndex}` | HTTP 200, siguiente página de resultados | ✅ | 200 con `cursor=2`, página de resultados |
+| A-08 | `POST /api/swipe` con token | `{"userId":"...","contentId":"...","contentType":"movie","action":"like"}` | HTTP 204 sin body | ❌ | **BUG-002:** devuelve 200 `{"success":true}`, no 204 sin body |
+| A-09 | `POST /api/swipe` con token | mismo body con `"action":"dislike"` | HTTP 204 sin body | ❌ | **BUG-002:** 200 `{"success":true}` (mismo handler) |
+| A-10 | `GET /api/content/{id}` con token | contentId válido en path | HTTP 200, objeto completo con todos los campos + `watchProviders` (array, puede ser vacío) | ✅ | 200, `watchProviders:[]`. Obs. **BUG-003**: data sin `source`/`year` |
+| A-11 | `GET /api/content/INVALID_ID` con token | id inexistente | HTTP 404 | ✅ | 404 `{"error":"Content not found"}` |
+| A-12 | `GET /api/collections?userId={uid}` con token | — | HTTP 200, array de colecciones del usuario | ✅ | 200, array de colecciones |
+| A-13 | `POST /api/collections` con token | `{"userId":"...","contentId":"...","contentType":"movie","listName":"Guardados"}` | HTTP 201 | ✅ | 201 `{"collectionId":"7y3EplRkkNx2cUMECxfr"}` |
+| A-14 | `PATCH /api/collections/{id}` con token | `{"personalNote": "Excelente"}` | HTTP 200 | ✅ | 200, `{updated:{personalNote:"Excelente"}}` |
+| A-15 | `DELETE /api/collections/{id}` con token | — | HTTP 204 | ✅ | 204 sin body |
+| A-16 | Cualquier endpoint con token expirado | token vencido | HTTP 401 | ✅ | 401 `{"error":"invalid_token"}` (token inválido) |
 
 ---
 
@@ -306,7 +306,10 @@ Usar la colección `docs/Recos-BnM-API-Collection.json`. Obtener token con: Fire
 
 | ID | Estado | Sección | Caso | Descripción del problema | Severidad | Arreglado en | Responsable |
 |----|--------|---------|------|--------------------------|-----------|--------------|-------------|
-| BUG-001 | — | — | — | *(sin bugs aún — completar durante la ejecución)* | — | — | — |
+| BUG-001 | NEW | 1 Auth | R-09 | Al cerrar el popup de Google en **registro**, se muestra "No se pudo registrar con Google. Revisa dominios autorizados." en vez de "Cerraste la ventana de Google antes de completar el acceso." `Register.jsx` no mapea `auth/popup-closed-by-user` (ese mapeo solo existe en `Login.jsx`). | Baja | `frontend/src/pages/Register.jsx:21-24` | Andrés González |
+| BUG-002 | NEW | 8 API | A-08, A-09 | `POST /api/swipe` responde **HTTP 200 `{"success":true}`** en vez de **204 sin body**. Funciona (frontend fire-and-forget) pero incumple el contrato 204. Verificado en vivo con token real. | Media | `backend/src/routes/swipe.js:66` | Luis Téllez |
+| BUG-003 | NEW | 8 API / Data | A-10 | Compliance TMDB: los docs de `content` no traen el campo `source` (ni `year`), por lo que `GET /api/content/:id` nunca añade el `attribution` de TMDB. Verificado en 4 docs (movies + book). El endpoint es correcto; falta el dato en el ingest. | Media | `ingest/` (datos en Firestore `content`) | Manuel Serranía |
+| BUG-004 | NEW | 1 Auth | R-03 | Con correo inválido (`abc`), el input `type="email"` dispara la validación nativa del navegador (tooltip) y bloquea el submit antes de mostrar "Correo invalido." de la app. El caso no es reproducible tal como está escrito. | Baja | `frontend/src/pages/Register.jsx:78-83` | Andrés González |
 
 ### Prompt para Claude Code al encontrar un bug
 
@@ -331,15 +334,15 @@ Por favor revisa el código relevante y aplica el fix.
 
 | Sección | Total | ✅ Pasan | ❌ Fallan | ⚠️ Parcial | % Éxito |
 |---------|-------|---------|---------|----------|---------|
-| 0. Pre-requisitos | 7 | | | | |
-| 1. Auth (Login/Register) | 16 | | | | |
+| 0. Pre-requisitos | 7 | 4 | 0 | 0 | 57% (4/7 ejec., 3 pend: P-01/05/06) |
+| 1. Auth (Login/Register) | 16 | 13 | 1 (R-09) | 1 (R-03) | 81% (R-07 bloqueado — Israel) |
 | 2. Onboarding | 9 | | | | |
 | 3. Tab Selector | 5 | | | | |
 | 4. Feed datos reales | 5 | | | | |
 | 5. SwipeDeck gestos | 13 | | | | |
 | 6. DetailSheet | 16 | | | | |
 | 7. Biblioteca/Colecciones | 6 | | | | |
-| 8. API Postman/Bruno | 16 | | | | |
+| 8. API Postman/Bruno | 16 | 14 | 2 (A-08/A-09) | 0 | 88% |
 | 9. Firestore Seguridad | 3 | | | | |
 | 10. PWA/Service Worker | 5 | | | | |
 | 11. CI/CD Pipeline | 5 | | | | |
@@ -351,7 +354,7 @@ Por favor revisa el código relevante y aplica el fix.
 
 | Total bugs encontrados | Bugs FIXED | Bugs WONT FIX | Bugs pendientes (NEW / IN PROGRESS) |
 |------------------------|-----------|--------------|--------------------------------------|
-| | | | |
+| 4 (BUG-001 a 004, secc. Auth/API — Héctor) | 0 | 0 | 4 (BUG-001 Andrés, BUG-002 Luis, BUG-003 Manuel, BUG-004 Andrés) |
 
 ### 15C. Conclusión de la sesión
 
