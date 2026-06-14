@@ -60,5 +60,5 @@ jobs:
           source: backend/
           env_vars: |
             FIREBASE_PROJECT_ID=proyectofinal-71637
-            ALLOWED_ORIGINS=https://recos-bnm.web.app
+            ALLOWED_ORIGINS=https://recos-bnm.web.app,https://proyectofinal-71637.web.app
             NODE_ENV=production
